@@ -1,6 +1,6 @@
 # agentic-career-search
 
-![Coverage](https://img.shields.io/badge/coverage-85%25-brightgreen) ![License](https://img.shields.io/badge/license-MIT-green) ![CI](https://github.com/Francis1998/{repo}/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/Francis1998/{repo}/actions/workflows/ci.yml/badge.svg) ![Python](https://img.shields.io/badge/python-3.10%2B-blue) ![License](https://img.shields.io/badge/license-MIT-green)
 
 > Job Search Automation — powered by modern Python async architecture.
 
@@ -32,21 +32,8 @@ python -m autoapply_agent --help
 | [Contributing](CONTRIBUTING.md) | Development and PR workflow |
 | [Changelog](CHANGELOG.md) | Version history |
 
-## Multi-Repo Daily Automation
-
-```bash
-./scripts/daily_review_all_repos.sh
-```
-
-This orchestrates daily review-and-commit cycles across:
-- `agentic-career-search`
-- `multi-bot-agentic`
-- `nexus-llm-router`
-- `scholar-rag-agent`
-- `medagent-core`
-
 ## License
 
 MIT © [Francis1998](https://github.com/Francis1998)
 
-*Last updated: 2024-10-15*
+*Last updated: 2024-08-24*
