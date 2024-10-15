@@ -1,6 +1,6 @@
 # agentic-career-search
 
-![License](https://img.shields.io/badge/license-MIT-green) ![CI](https://github.com/Francis1998/{repo}/actions/workflows/ci.yml/badge.svg) ![Coverage](https://img.shields.io/badge/coverage-85%25-brightgreen)
+![Coverage](https://img.shields.io/badge/coverage-85%25-brightgreen) ![License](https://img.shields.io/badge/license-MIT-green) ![CI](https://github.com/Francis1998/{repo}/actions/workflows/ci.yml/badge.svg)
 
 > Job Search Automation — powered by modern Python async architecture.
 
@@ -36,4 +36,4 @@ python -m autoapply_agent --help
 
 MIT © [Francis1998](https://github.com/Francis1998)
 
-*Last updated: 2024-08-23*
+*Last updated: 2024-10-15*
