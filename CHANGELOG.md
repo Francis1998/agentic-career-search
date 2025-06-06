@@ -3,12 +3,12 @@
 All notable changes to **agentic-career-search** are documented here.
 Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [v0.7.19] — 2024-10-23
+## [v0.4.9] — 2025-06-05
 
 ### Added
-- Extended resume module with improved error handling
-- Added structured logging for crawler operations
-- New unit tests covering edge cases in workflow pipeline
+- Extended agent module with improved error handling
+- Added structured logging for workflow operations
+- New unit tests covering edge cases in job pipeline
 
 ### Changed
 - Refactored retry logic to use exponential backoff with jitter
@@ -16,10 +16,10 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Updated dependency pins to latest stable versions
 
 ### Fixed
-- Resolved race condition in async resume handler
-- Fixed incorrect crawler timeout calculation
+- Resolved race condition in async agent handler
+- Fixed incorrect workflow timeout calculation
 
-## [v0.1.0] — 2024-09-25
+## [v0.1.0] — 2025-05-08
 
 ### Added
 - Initial project scaffold with job search automation core
