@@ -1,6 +1,6 @@
 # Configuration Reference For Autoapply_Agent
 
-*agentic-career-search — 2024-08-12*
+*agentic-career-search — 2025-07-12*
 
 ## Overview
 
@@ -27,12 +27,12 @@ python -m autoapply_agent --help
 
 ## Common Scenarios
 
-### Scenario 1: Basic Resume Usage
+### Scenario 1: Basic Workflow Usage
 
 ```python
-from autoapply_agent import Resume
+from autoapply_agent import Workflow
 
-client = Resume(config)
+client = Workflow(config)
 result = client.run()
 print(result)
 ```
