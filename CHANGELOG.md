@@ -1,26 +1,27 @@
 # Changelog
 
 All notable changes to **agentic-career-search** are documented here.
-Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
+Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [v0.1.63] - 2026-02-16
+## [v0.4.12] — 2025-09-12
 
 ### Added
-- Improved documentation coverage for core modules
-- Added type annotations to utility functions
-- Extended test coverage for edge cases
+- Extended crawler module with improved error handling
+- Added structured logging for application operations
+- New unit tests covering edge cases in workflow pipeline
 
 ### Changed
-- Refactored internal logging to use structured format
-- Updated dependency pins for security patches
+- Refactored retry logic to use exponential backoff with jitter
+- Improved type annotations across core modules
+- Updated dependency pins to latest stable versions
 
 ### Fixed
-- Resolved intermittent timeout issue in async operations
-- Fixed edge case in input validation logic
+- Resolved race condition in async crawler handler
+- Fixed incorrect application timeout calculation
 
-## [v0.1.0] - 2026-01-19
+## [v0.1.0] — 2025-08-22
 
 ### Added
-- Initial project scaffold
-- Core agent runtime
-- Basic documentation
+- Initial project scaffold with job search automation core
+- Basic autoapply_agent implementation
+- README and setup documentation
