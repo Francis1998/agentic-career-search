@@ -148,6 +148,9 @@ class InProcessWorker:
 
                     await self._process_source(session, run, source_config)
 
+                if run.status == RunStatus.CANCELLED.value:
+                    return
+
                 run.status = RunStatus.COMPLETED.value
                 run.finished_at = utc_now()
                 await append_run_event(

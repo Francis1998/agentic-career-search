@@ -59,7 +59,7 @@ class LLMEnrichmentService:
             if self._settings.llm_provider == "gpt":
                 return await self._call_gpt(prompt)
             return None
-        except (httpx.HTTPError, ValueError, KeyError, TypeError):
+        except (httpx.HTTPError, ValueError, KeyError, TypeError, IndexError):
             return None
 
     @staticmethod
