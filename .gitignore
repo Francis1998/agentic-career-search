@@ -44,6 +44,8 @@ logs/
 *.pid
 *.seed
 *.pid.lock
+*.db
+.automation/
 
 # Distribution / packaging
 *.tar.gz

@@ -32,6 +32,19 @@ python -m autoapply_agent --help
 | [Contributing](CONTRIBUTING.md) | Development and PR workflow |
 | [Changelog](CHANGELOG.md) | Version history |
 
+## Multi-Repo Daily Automation
+
+```bash
+./scripts/daily_review_all_repos.sh
+```
+
+This orchestrates daily review-and-commit cycles across:
+- `agentic-career-search`
+- `multi-bot-agentic`
+- `nexus-llm-router`
+- `scholar-rag-agent`
+- `medagent-core`
+
 ## License
 
 MIT © [Francis1998](https://github.com/Francis1998)
