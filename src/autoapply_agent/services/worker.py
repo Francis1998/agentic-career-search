@@ -140,13 +140,14 @@ class InProcessWorker:
                     await session.commit()
                     return
 
+                seen_urls: set[str] = set()
                 for source_config in sources:
                     cancellation_requested = await self._is_cancel_requested(session, run.id)
                     if cancellation_requested:
                         await self._mark_cancelled(session, run)
                         return
 
-                    await self._process_source(session, run, source_config)
+                    await self._process_source(session, run, source_config, seen_urls)
 
                 if run.status == RunStatus.CANCELLED.value:
                     return
@@ -168,7 +169,11 @@ class InProcessWorker:
                 await session.commit()
 
     async def _process_source(
-        self, session: AsyncSession, run: Run, source_config: SourceConfig
+        self,
+        session: AsyncSession,
+        run: Run,
+        source_config: SourceConfig,
+        seen_urls: set[str],
     ) -> None:
         """Process one configured source for a run.
 
@@ -176,6 +181,7 @@ class InProcessWorker:
             session: Active async DB session.
             run: Active run model.
             source_config: Source configuration model.
+            seen_urls: URLs already persisted for this run (cross-source dedup).
         """
 
         adapter = self._adapters.get(SourceType(source_config.source_type))
@@ -226,6 +232,9 @@ class InProcessWorker:
                 await self._mark_cancelled(session, run)
                 return
 
+            if job_candidate.url in seen_urls:
+                continue
+
             decision = self._decision_engine.evaluate(job_candidate, run.query)
             llm_enrichment = None
             if self._llm_enrichment_service is not None:
@@ -274,6 +283,7 @@ class InProcessWorker:
                     raw=self._build_job_raw_payload(job_candidate.raw, decision, llm_enrichment),
                 )
             )
+            seen_urls.add(job_candidate.url)
             inserted_count += 1
 
         await append_run_event(
