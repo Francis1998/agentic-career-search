@@ -124,3 +124,4 @@ Then inspect:
 - `ARCHITECTURE.md` component design and lifecycle
 - `SAFETY.md` guardrails and responsible use
 - `PROMPTS.md` copy-paste AI prompts for repo recreation and upgrade tasks
+- `DAILY_IMPROVEMENTS.md` rolling cron-driven improvement history
