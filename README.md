@@ -1,4 +1,4 @@
-# autoapply-agentic-job-search-plus
+# agentic-career-search
 
 A Python-first FastAPI service for queueing deterministic job-search runs, scraping public careers pages (Greenhouse and Lever), scoring listings, and storing run lifecycle events.
 
