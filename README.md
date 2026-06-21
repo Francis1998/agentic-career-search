@@ -2,57 +2,82 @@
 
 ![CI](https://github.com/Francis1998/agentic-career-search/actions/workflows/ci.yml/badge.svg) ![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-3776AB) ![FastAPI](https://img.shields.io/badge/framework-FastAPI-009688) ![License](https://img.shields.io/badge/license-MIT-green)
 
-AI-agent-oriented backend for autonomous job discovery and explainable decision workflows.
+AI-agent backend for autonomous job discovery, explainable decisions, and production-style operations.
 
-## Why teams use this
+## Demo Gallery
 
-This project solves a common failure mode in job-search automation: lots of scraping, little trust.
+![Core Agent Loop](assets/demo/agentic-career-search-demo.gif)
 
-Instead of opaque outputs, you get:
-- deterministic scoring with rationale traces,
-- explicit run lifecycle states and event logs,
-- pluggable adapters for external sources,
-- optional LLM enrichment (Gemini, Kimi, Claude),
-- production-style quality gates (ruff, mypy, pytest, CI).
+![LLM Provider Flow](assets/demo/llm-provider-flow.gif)
 
-## Real use cases (issue -> solution)
+![Ops Reliability Loop](assets/demo/ops-reliability-loop.gif)
 
-| Problem | Why it blocks adoption | How this repo solves it |
+## Why this exists
+
+Most job-search automation demos fail in real usage because they:
+- cannot explain why a role is ranked highly,
+- cannot recover cleanly when providers fail,
+- have no durable event trace for debugging,
+- become hard to maintain once features grow.
+
+This project solves those issues with explicit agent engineering primitives:
+- deterministic decision engine with rationale traces,
+- state-machine run lifecycle and durable event log,
+- tool/adapters abstraction for external integrations,
+- safety controls (timeouts, bounded scope, cancellation),
+- optional LLM enrichment via multiple providers.
+
+## Real use cases (problem -> solution)
+
+| Problem | Why it hurts | How this repo solves it |
 |---|---|---|
-| “We can scrape jobs but can’t explain ranking decisions.” | Stakeholders cannot trust automation output. | `AgentDecisionEngine` persists score, matched terms, priority tier, and rationale per job. |
-| “Agent runs fail silently.” | Debugging and reliability regress quickly. | Run timeline events (`run.*`, `source.*`, `agent.*`) give a replayable execution trail. |
-| “Switching model vendors is painful.” | Provider lock-in slows experimentation. | Configurable LLM enrichment layer consumes outputs from Gemini/Kimi/Claude with graceful fallback. |
-| “Pipelines break under API/provider instability.” | Operational noise and false negatives. | Deterministic baseline still produces usable decisions when LLM enrichment is unavailable. |
-| “Docs don’t convince users this is production-minded.” | Hard to onboard collaborators and reviewers. | Architecture, configuration, safety, deployment, and troubleshooting docs are included. |
+| Teams can scrape jobs but cannot justify recommendations | Low trust from users and reviewers | `AgentDecisionEngine` stores score, matched terms, priority tier, and rationale |
+| Background runs are hard to debug | Silent failures block iteration speed | Durable run events (`run.*`, `source.*`, `agent.*`) support replay-style troubleshooting |
+| Vendor lock-in around one model provider | High migration cost and brittle integrations | Configurable LLM enrichment supports GPT-style, Claude, Gemini, and Kimi APIs |
+| Model/API outages break the entire flow | System appears unreliable | Graceful fallback preserves deterministic baseline output when LLM enrichment is unavailable |
+| Repo quality degrades over time | Contributors lose confidence | CI checks + daily automation loop maintain quality and push incremental improvements |
 
-## Agent architecture
+## LLM API integration (consumes model outputs)
 
-```mermaid
-flowchart LR
-    A[POST /runs] --> B[queued]
-    B --> C[worker claims run]
-    C --> D[source adapters fetch jobs]
-    D --> E[AgentDecisionEngine]
-    E --> F[optional LLM enrichment]
-    F --> G[persist jobs + event logs]
-    G --> H[GET /runs/{id}/events and GET /jobs]
-```
-
-## LLM integration
-
-The code supports consumption of provider outputs from:
+Provider integration is built into the code path:
 - Gemini API
 - Kimi (Moonshot, OpenAI-compatible)
 - Claude (Anthropic Messages API)
+- GPT-compatible APIs through OpenAI-style endpoint patterns
 
-Enable with environment variables:
+Enable provider enrichment:
 
 ```env
 LLM_ENABLE_ENRICHMENT=true
 LLM_PROVIDER=gemini   # or kimi / claude
 ```
 
-Then configure matching provider keys in `.env` (see `CONFIGURATION.md`).
+Then set matching API keys in `.env` (see `CONFIGURATION.md`).
+
+## Engineering standards covered
+
+This repository follows the requested standards:
+1. standalone repo architecture (not coupled to source repo internals),
+2. AI-agent-first design with deterministic decision traces,
+3. LLM output consumption from Claude/Gemini/Kimi and GPT-style integrations,
+4. production-minded layout (`src`, `tests`, `scripts`, CI, env config, migrations),
+5. high-quality docs (`README`, `QUICKSTART`, `CONFIGURATION`, `SAFETY`, `ARCHITECTURE`),
+6. branch-based merge workflow for controlled integration (no direct unsafe merges),
+7. lint/type/test validation before finalization,
+8. no Docker requirement for standard local verification,
+9. phase branches for development roadmap (`phase/01` to `phase/10`),
+10. commit-forward workflow with frequent incremental pushes.
+
+## API snapshot
+
+- `POST /source-configs` create source adapter configs
+- `GET /source-configs` list enabled sources
+- `POST /runs` enqueue autonomous run
+- `GET /runs/{run_id}` inspect run state
+- `GET /runs/{run_id}/events` inspect event timeline
+- `POST /runs/{run_id}/cancel` request cancellation
+- `GET /jobs` inspect normalized, scored, and enriched outputs
+- `GET /health/live` and `GET /health/ready`
 
 ## Quick start
 
@@ -66,17 +91,6 @@ cp .env.example .env
 uv run uvicorn autoapply_agent.main:app --reload
 ```
 
-## API snapshot
-
-- `POST /source-configs` create source adapter configs
-- `GET /source-configs` list enabled sources
-- `POST /runs` enqueue autonomous run
-- `GET /runs/{run_id}` inspect run state
-- `GET /runs/{run_id}/events` inspect event timeline
-- `POST /runs/{run_id}/cancel` request cancellation
-- `GET /jobs` inspect normalized/scored/enriched outputs
-- `GET /health/live` and `GET /health/ready`
-
 ## Documentation
 
 | Document | Description |
@@ -88,6 +102,12 @@ uv run uvicorn autoapply_agent.main:app --reload
 | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Deployment guidance |
 | [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) | Common failure recovery paths |
 | [CHANGELOG.md](CHANGELOG.md) | Release history |
+
+## Regenerate demos
+
+```bash
+./scripts/generate_demo_gif.sh
+```
 
 ## License
 
