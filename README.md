@@ -39,6 +39,7 @@ LLM provider integration is supported for decision enrichment, including:
 - [Demo Preview](#demo-preview)
 - [Demo Gallery](#demo-gallery)
 - [Showcase Value](#showcase-value)
+- [Real-World Use Cases](#real-world-use-cases)
 - [System Flow](#system-flow)
 - [What The Agent Produces](#what-the-agent-produces)
 - [API Surface](#api-surface)
@@ -57,6 +58,24 @@ This repository is designed as a portfolio-grade AI agent systems project:
 - **Tool abstraction layer** for heterogeneous web sources (`Greenhouse`, `Lever`).
 - **Operational controls** including cancellation, timeouts, bounded ingestion, and health probes.
 - **Engineering rigor** with strict typing, linting, integration tests, and GitHub Actions.
+
+## Real-World Use Cases
+
+| Problem / Pain | Why it hurts | How this project solves it | What you can show |
+|---|---|---|---|
+| Job search is manual and fragmented across sites | Lost time and inconsistent tracking | One run ingests postings via pluggable adapters and persists normalized outputs | `POST /runs` + `GET /jobs` with structured results |
+| No clear rationale for why a role is relevant | Hard to trust black-box automation | Deterministic decision engine records score, matched terms, priority tier, and rationale | `raw.agent_decision` + `agent.decision` events |
+| Teams need auditable AI behavior | Difficult to debug or govern autonomous systems | Full event timeline per run with explicit state transitions and error events | `GET /runs/{run_id}/events` for replayable trace |
+| Need to compare model providers in production | Vendor lock-in and brittle integrations | Optional LLM enrichment layer supports Gemini, Kimi, and Claude via config | `LLM_PROVIDER` switch + `raw.llm_enrichment` output |
+| Provider/API outages break pipelines | Downtime and noisy failures | Graceful fallback to deterministic decisions when enrichment fails or keys are missing | Run still completes with deterministic plan output |
+| Agent systems drift without operational discipline | Quality regresses over time | Built-in CI + daily automation loop for ongoing improvements and commits | GitHub Actions + daily improvement commit trail |
+
+### Concrete scenarios
+
+- **Individual job seeker:** run daily query objectives, prioritize high-fit roles, and keep machine-readable rationale for review.
+- **Career coach / agency:** generate consistent triage outputs for multiple query profiles without manual copy-paste work.
+- **AI infra engineer portfolio:** demonstrate orchestration, provider abstraction, observability, and reliability patterns in one repo.
+- **Applied AI team starter kit:** use this architecture as a reference for event-driven agent backends with deterministic guardrails.
 
 ## System Flow
 
