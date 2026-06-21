@@ -12,6 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from autoapply_agent.adapters.base import CareerSourceAdapter, SourceAdapterError
 from autoapply_agent.core.time import utc_now
 from autoapply_agent.db.models import Job, Run, RunStatus, SourceConfig, SourceType
+from autoapply_agent.services.agent_decision import AgentDecision, AgentDecisionEngine
 from autoapply_agent.services.events import append_run_event
 from autoapply_agent.services.planning import DeterministicPlanningService
 from autoapply_agent.services.scoring import DeterministicScoringService
@@ -46,8 +47,10 @@ class InProcessWorker:
 
         self._session_factory = session_factory
         self._adapters = adapters
-        self._scoring_service = scoring_service
-        self._planning_service = planning_service
+        self._decision_engine = AgentDecisionEngine(
+            scoring_service=scoring_service,
+            planning_service=planning_service,
+        )
         self._poll_interval_seconds = poll_interval_seconds
         self._default_timeout_seconds = default_timeout_seconds
         self._max_jobs_per_source = max_jobs_per_source
@@ -216,8 +219,20 @@ class InProcessWorker:
                 await self._mark_cancelled(session, run)
                 return
 
-            score = self._scoring_service.score(job_candidate, run.query)
-            plan_steps = self._planning_service.plan(job_candidate, run.query)
+            decision = self._decision_engine.evaluate(job_candidate, run.query)
+            await append_run_event(
+                session,
+                run.id,
+                "agent.decision",
+                f"Decision created for {job_candidate.title}",
+                payload={
+                    "source_config_id": source_config.id,
+                    "url": job_candidate.url,
+                    "priority_tier": decision.priority_tier,
+                    "score": decision.score,
+                    "matched_terms": decision.matched_query_terms,
+                },
+            )
             session.add(
                 Job(
                     run_id=run.id,
@@ -227,9 +242,9 @@ class InProcessWorker:
                     location=job_candidate.location,
                     company=job_candidate.company,
                     url=job_candidate.url,
-                    score=score,
-                    plan_steps=plan_steps,
-                    raw=job_candidate.raw,
+                    score=decision.score,
+                    plan_steps=decision.plan_steps,
+                    raw=self._build_job_raw_payload(job_candidate.raw, decision),
                 )
             )
             inserted_count += 1
@@ -350,3 +365,26 @@ class InProcessWorker:
             return None
 
         return claimed_run_id
+
+    @staticmethod
+    def _build_job_raw_payload(
+        existing_raw: dict[str, object] | None,
+        decision: AgentDecision,
+    ) -> dict[str, object]:
+        """Merge source payload with deterministic agent decision trace.
+
+        Args:
+            existing_raw: Adapter-provided raw payload.
+            decision: Decision package from the agent engine.
+
+        Returns:
+            Merged raw payload with `agent_decision` details.
+        """
+
+        merged_payload: dict[str, object] = dict(existing_raw or {})
+        merged_payload["agent_decision"] = {
+            "priority_tier": decision.priority_tier,
+            "matched_query_terms": decision.matched_query_terms,
+            "rationale": decision.rationale,
+        }
+        return merged_payload

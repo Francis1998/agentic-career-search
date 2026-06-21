@@ -21,6 +21,28 @@ class DeterministicScoringService:
             Deterministic score in range [0.0, 1.0].
         """
 
+        matched_terms = self.match_terms(job_candidate, query)
+        keyword_bonus = min(len(matched_terms) * 0.1, 0.4)
+
+        digest_prefix = sha256(job_candidate.url.encode("utf-8")).hexdigest()[:8]
+        digest_component = int(digest_prefix, 16) / 0xFFFFFFFF
+        stability_bonus = 0.1 * digest_component
+
+        base_score = 0.45
+        final_score = min(0.99, base_score + keyword_bonus + stability_bonus)
+        return round(final_score, 4)
+
+    def match_terms(self, job_candidate: JobCandidate, query: str | None) -> list[str]:
+        """Return normalized query terms matched in candidate search text.
+
+        Args:
+            job_candidate: Candidate to inspect.
+            query: Optional query text.
+
+        Returns:
+            Sorted list of matched query terms.
+        """
+
         normalized_query_tokens = self._tokenize(query)
         searchable_text = " ".join(
             token
@@ -31,20 +53,7 @@ class DeterministicScoringService:
             ]
             if token
         ).lower()
-
-        keyword_bonus = 0.0
-        for token in normalized_query_tokens:
-            if token in searchable_text:
-                keyword_bonus += 0.1
-        keyword_bonus = min(keyword_bonus, 0.4)
-
-        digest_prefix = sha256(job_candidate.url.encode("utf-8")).hexdigest()[:8]
-        digest_component = int(digest_prefix, 16) / 0xFFFFFFFF
-        stability_bonus = 0.1 * digest_component
-
-        base_score = 0.45
-        final_score = min(0.99, base_score + keyword_bonus + stability_bonus)
-        return round(final_score, 4)
+        return [token for token in normalized_query_tokens if token in searchable_text]
 
     @staticmethod
     def _tokenize(query: str | None) -> list[str]:

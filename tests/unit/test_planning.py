@@ -30,6 +30,7 @@ def test_plan_contains_expected_steps() -> None:
 
     steps = planning_service.plan(candidate, "python platform")
 
-    assert len(steps) == 5
+    assert len(steps) == 6
     assert steps[0].startswith("Open posting:")
-    assert "Tailor resume" in steps[2]
+    assert steps[1].startswith("Triage priority:")
+    assert "Tailor resume" in steps[3]

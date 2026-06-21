@@ -3,9 +3,9 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "autoapply-agentic-job-search-plus"
+name = "agentic-career-search"
 version = "0.1.0"
-description = "Python-first agentic job-search browser automation service"
+description = "AI-agent orchestration backend for autonomous job discovery workflows"
 readme = "README.md"
 requires-python = ">=3.11"
 authors = [{ name = "SolidRusT Networks" }]

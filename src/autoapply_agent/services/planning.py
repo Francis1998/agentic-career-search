@@ -8,12 +8,18 @@ from autoapply_agent.adapters.base import JobCandidate
 class DeterministicPlanningService:
     """Create deterministic action plans from a job candidate."""
 
-    def plan(self, job_candidate: JobCandidate, query: str | None) -> list[str]:
+    def plan(
+        self,
+        job_candidate: JobCandidate,
+        query: str | None,
+        priority_tier: str = "medium",
+    ) -> list[str]:
         """Build deterministic application plan steps.
 
         Args:
             job_candidate: Candidate to plan for.
             query: Optional run query string.
+            priority_tier: Priority hint from decision engine.
 
         Returns:
             Ordered plan steps.
@@ -24,6 +30,7 @@ class DeterministicPlanningService:
 
         return [
             f"Open posting: {job_candidate.url}",
+            f"Triage priority: {priority_tier}",
             f"Validate fit against query: {query_hint}",
             f"Tailor resume to role title: {job_candidate.title}",
             f"Draft cover note referencing {company_text}",

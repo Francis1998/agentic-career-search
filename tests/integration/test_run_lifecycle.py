@@ -113,6 +113,7 @@ def test_run_lifecycle_complete_with_worker(
         assert events_response.status_code == 200
         event_types = [entry["event_type"] for entry in events_response.json()]
         assert "run.created" in event_types
+        assert "agent.decision" in event_types
         assert "run.completed" in event_types
 
         jobs_response = client.get(f"/jobs?run_id={run_id}")
@@ -120,6 +121,8 @@ def test_run_lifecycle_complete_with_worker(
         jobs = jobs_response.json()
         assert len(jobs) == 1
         assert jobs[0]["title"] == "Python Backend Engineer"
+        assert "agent_decision" in jobs[0]["raw"]
+        assert jobs[0]["raw"]["agent_decision"]["priority_tier"] in {"low", "medium", "high"}
 
 
 def test_cancel_queued_run(
