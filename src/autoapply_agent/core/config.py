@@ -23,7 +23,7 @@ class Settings(BaseSettings):
     enable_worker: bool = Field(default=True, alias="ENABLE_WORKER")
     environment: Literal["dev", "test", "prod"] = Field(default="dev", alias="ENVIRONMENT")
     llm_enable_enrichment: bool = Field(default=False, alias="LLM_ENABLE_ENRICHMENT")
-    llm_provider: Literal["gemini", "kimi", "claude"] = Field(
+    llm_provider: Literal["gemini", "kimi", "claude", "gpt"] = Field(
         default="gemini",
         alias="LLM_PROVIDER",
     )
@@ -38,6 +38,10 @@ class Settings(BaseSettings):
 
     claude_api_key: str | None = Field(default=None, alias="CLAUDE_API_KEY")
     claude_model: str = Field(default="claude-3-5-sonnet-latest", alias="CLAUDE_MODEL")
+
+    openai_api_key: str | None = Field(default=None, alias="OPENAI_API_KEY")
+    openai_model: str = Field(default="gpt-4o-mini", alias="OPENAI_MODEL")
+    openai_base_url: str = Field(default="https://api.openai.com/v1", alias="OPENAI_BASE_URL")
 
 
 settings = Settings()

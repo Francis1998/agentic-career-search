@@ -56,6 +56,8 @@ class LLMEnrichmentService:
                 return await self._call_kimi(prompt)
             if self._settings.llm_provider == "claude":
                 return await self._call_claude(prompt)
+            if self._settings.llm_provider == "gpt":
+                return await self._call_gpt(prompt)
             return None
         except (httpx.HTTPError, ValueError, KeyError, TypeError):
             return None
@@ -111,12 +113,39 @@ class LLMEnrichmentService:
     async def _call_kimi(self, prompt: str) -> LLMEnrichmentResult | None:
         """Call Kimi (Moonshot) OpenAI-compatible chat completions API."""
 
-        api_key = self._settings.kimi_api_key
+        return await self._call_openai_compatible(
+            provider="kimi",
+            api_key=self._settings.kimi_api_key,
+            model=self._settings.kimi_model,
+            base_url=self._settings.kimi_base_url,
+            prompt=prompt,
+        )
+
+    async def _call_gpt(self, prompt: str) -> LLMEnrichmentResult | None:
+        """Call GPT through an OpenAI-compatible chat completions API."""
+
+        return await self._call_openai_compatible(
+            provider="gpt",
+            api_key=self._settings.openai_api_key,
+            model=self._settings.openai_model,
+            base_url=self._settings.openai_base_url,
+            prompt=prompt,
+        )
+
+    async def _call_openai_compatible(
+        self,
+        *,
+        provider: str,
+        api_key: str | None,
+        model: str,
+        base_url: str,
+        prompt: str,
+    ) -> LLMEnrichmentResult | None:
+        """Call an OpenAI-compatible chat completions endpoint."""
+
         if not api_key:
             return None
-        model = self._settings.kimi_model
-        base_url = self._settings.kimi_base_url.rstrip("/")
-        endpoint = f"{base_url}/chat/completions"
+        endpoint = f"{base_url.rstrip('/')}/chat/completions"
         payload: dict[str, object] = {
             "model": model,
             "temperature": 0.2,
@@ -136,7 +165,7 @@ class LLMEnrichmentService:
         summary = self._normalize_text(choice)
         if not summary:
             return None
-        return LLMEnrichmentResult(provider="kimi", model=model, summary=summary)
+        return LLMEnrichmentResult(provider=provider, model=model, summary=summary)
 
     async def _call_claude(self, prompt: str) -> LLMEnrichmentResult | None:
         """Call Anthropic Claude Messages API and normalize summary text."""

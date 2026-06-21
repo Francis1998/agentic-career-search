@@ -1,64 +1,73 @@
-# Production Deployment Of Job Search Automation
+# Deployment Guide
 
-*agentic-career-search — 2024-09-24*
-
-## Overview
-
-This guide covers production deployment of job search automation for the `agentic-career-search` project.
+Production-minded deployment notes for `agentic-career-search`.
 
 ## Prerequisites
 
-- Python 3.10+
-- Redis (if using distributed mode)
-- Environment variables configured (see `.env.example`)
+- Python 3.11+
+- `uv` (recommended) or another PEP 517 installer
+- Outbound HTTPS access to configured career page sources
+- Optional: LLM provider API keys when enrichment is enabled
 
-## Quick Start
+## Local / single-node deployment
 
 ```bash
-# Install dependencies
-pip install -e ".[dev]"
-
-# Copy and configure environment
+git clone https://github.com/Francis1998/agentic-career-search.git
+cd agentic-career-search
+uv venv
+source .venv/bin/activate
+uv sync --extra dev --frozen
 cp .env.example .env
-
-# Run the autoapply_agent module
-python -m autoapply_agent --help
+uv run uvicorn autoapply_agent.main:app --host 0.0.0.0 --port 8000
 ```
 
-## Common Scenarios
+Health checks:
 
-### Scenario 1: Basic Job Usage
-
-```python
-from autoapply_agent import Job
-
-client = Job(config)
-result = client.run()
-print(result)
+```bash
+curl -s http://127.0.0.1:8000/health/live
+curl -s http://127.0.0.1:8000/health/ready
 ```
 
-### Scenario 2: Advanced Configuration
+## Environment configuration
 
-```python
-from autoapply_agent.config import Settings
+See [CONFIGURATION.md](../CONFIGURATION.md) for the full variable reference.
 
-settings = Settings(
-    max_retries=3,
-    timeout=30,
-    log_level="INFO",
-)
+Minimum production settings:
+
+```env
+ENVIRONMENT=prod
+DATABASE_URL=sqlite+aiosqlite:///./data/autoapply_agent.db
+ENABLE_WORKER=true
+HTTP_TIMEOUT_SECONDS=12.0
+MAX_JOBS_PER_SOURCE=50
 ```
 
-## Troubleshooting
+Optional LLM enrichment:
 
-| Issue | Cause | Fix |
-|-------|-------|-----|
-| `ConnectionError` | API endpoint unreachable | Check `BASE_URL` in `.env` |
-| `TimeoutError` | Request took too long | Increase `timeout` setting |
-| `AuthError` | Invalid or expired token | Rotate API key |
+```env
+LLM_ENABLE_ENRICHMENT=true
+LLM_PROVIDER=gpt   # gemini | kimi | claude | gpt
+OPENAI_API_KEY=your_key_here
+```
 
-## See Also
+## Database and migrations
 
-- [README](../README.md)
-- [ARCHITECTURE](../ARCHITECTURE.md)
+- Runtime bootstraps tables via SQLAlchemy `create_all` for local simplicity.
+- Alembic scaffold lives under `alembic/` for incremental schema control.
+- Apply migrations with:
+
+```bash
+uv run alembic upgrade head
+```
+
+## Operational notes
+
+- The in-process worker polls queued runs; for higher throughput, run a dedicated worker process pattern in future releases.
+- Cancellation is cooperative: active runs finish the current source step before stopping.
+- LLM provider failures degrade to deterministic-only output; runs still complete.
+
+## See also
+
+- [ARCHITECTURE.md](../ARCHITECTURE.md)
+- [SAFETY.md](../SAFETY.md)
 - [API Reference](./API.md)

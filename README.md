@@ -49,7 +49,7 @@ Enable provider enrichment:
 
 ```env
 LLM_ENABLE_ENRICHMENT=true
-LLM_PROVIDER=gemini   # or kimi / claude
+LLM_PROVIDER=gemini   # or kimi / claude / gpt
 ```
 
 Then set matching API keys in `.env` (see `CONFIGURATION.md`).

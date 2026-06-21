@@ -46,6 +46,35 @@ def test_enrichment_returns_none_when_provider_key_missing() -> None:
     assert enrichment is None
 
 
+def test_enrichment_returns_none_when_gpt_key_missing() -> None:
+    """Service returns no enrichment when GPT key is absent."""
+
+    settings = Settings(
+        APP_NAME="test",
+        DATABASE_URL="sqlite+aiosqlite:///./test.db",
+        LLM_ENABLE_ENRICHMENT=True,
+        LLM_PROVIDER="gpt",
+    )
+    service = LLMEnrichmentService(settings)
+    candidate = JobCandidate(
+        external_id="job-2",
+        title="Platform Engineer",
+        location="Remote",
+        company="example.ai",
+        url="https://example.ai/jobs/2",
+        raw=None,
+    )
+
+    enrichment = asyncio.run(
+        service.enrich_job_decision(
+            job_candidate=candidate,
+            query="platform engineering",
+            deterministic_rationale=["deterministic baseline"],
+        )
+    )
+    assert enrichment is None
+
+
 def test_normalize_text_handles_string_and_list() -> None:
     """Normalize text helper handles both direct and segmented content."""
 

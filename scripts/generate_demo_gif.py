@@ -185,6 +185,8 @@ def _decks() -> Sequence[Deck]:
                     bullet_points=(
                         "Gemini API",
                         "Kimi (Moonshot) API",
+                        "Claude API",
+                        "GPT-compatible API",
                     ),
                 ),
                 Slide(

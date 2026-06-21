@@ -12,7 +12,7 @@ Configuration is environment-variable driven via `pydantic-settings`.
 | `HTTP_USER_AGENT` | `agentic-career-search/0.2` | Outbound HTTP user agent |
 | `ENABLE_WORKER` | `true` | Start in-process worker on boot |
 | `LLM_ENABLE_ENRICHMENT` | `false` | Enable provider-based LLM decision enrichment |
-| `LLM_PROVIDER` | `gemini` | Active LLM provider: `gemini`, `kimi`, `claude` |
+| `LLM_PROVIDER` | `gemini` | Active LLM provider: `gemini`, `kimi`, `claude`, `gpt` |
 | `LLM_TIMEOUT_SECONDS` | `12.0` | LLM API timeout in seconds |
 | `GEMINI_API_KEY` | _empty_ | Gemini API key |
 | `GEMINI_MODEL` | `gemini-2.5-flash` | Gemini model |
@@ -21,6 +21,9 @@ Configuration is environment-variable driven via `pydantic-settings`.
 | `KIMI_BASE_URL` | `https://api.moonshot.cn/v1` | Kimi base URL |
 | `CLAUDE_API_KEY` | _empty_ | Anthropic Claude API key |
 | `CLAUDE_MODEL` | `claude-3-5-sonnet-latest` | Claude model |
+| `OPENAI_API_KEY` | _empty_ | GPT / OpenAI-compatible API key |
+| `OPENAI_MODEL` | `gpt-4o-mini` | GPT model name |
+| `OPENAI_BASE_URL` | `https://api.openai.com/v1` | OpenAI-compatible base URL |
 
 ## Recommended Profiles
 
@@ -69,6 +72,16 @@ LLM_ENABLE_ENRICHMENT=true
 LLM_PROVIDER=claude
 CLAUDE_API_KEY=your_key_here
 CLAUDE_MODEL=claude-3-5-sonnet-latest
+```
+
+### LLM enrichment enabled (GPT example)
+
+```env
+LLM_ENABLE_ENRICHMENT=true
+LLM_PROVIDER=gpt
+OPENAI_API_KEY=your_key_here
+OPENAI_MODEL=gpt-4o-mini
+OPENAI_BASE_URL=https://api.openai.com/v1
 ```
 
 ## Notes

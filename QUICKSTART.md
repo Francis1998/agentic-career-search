@@ -71,7 +71,7 @@ Add to `.env` before starting the API:
 
 ```env
 LLM_ENABLE_ENRICHMENT=true
-LLM_PROVIDER=gemini   # or kimi / claude
+LLM_PROVIDER=gemini   # or kimi / claude / gpt
 GEMINI_API_KEY=your_key_here
 ```
 

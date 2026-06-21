@@ -1,64 +1,37 @@
-# Configuration Reference For Autoapply_Agent
+# Configuration (Extended Notes)
 
-*agentic-career-search — 2025-07-12*
+Primary configuration reference: [CONFIGURATION.md](../CONFIGURATION.md).
 
-## Overview
+This page captures deployment-specific guidance that complements the root variable table.
 
-This guide covers configuration reference for autoapply_agent for the `agentic-career-search` project.
+## Provider selection matrix
 
-## Prerequisites
+| `LLM_PROVIDER` | Required keys | API style |
+|---|---|---|
+| `gemini` | `GEMINI_API_KEY`, optional `GEMINI_MODEL` | Google Generative Language REST |
+| `kimi` | `KIMI_API_KEY`, optional `KIMI_MODEL`, `KIMI_BASE_URL` | OpenAI-compatible chat completions |
+| `claude` | `CLAUDE_API_KEY`, optional `CLAUDE_MODEL` | Anthropic Messages API |
+| `gpt` | `OPENAI_API_KEY`, optional `OPENAI_MODEL`, `OPENAI_BASE_URL` | OpenAI-compatible chat completions |
 
-- Python 3.10+
-- Redis (if using distributed mode)
-- Environment variables configured (see `.env.example`)
+## GPT-compatible endpoints
 
-## Quick Start
+`gpt` uses the OpenAI chat completions shape. Point `OPENAI_BASE_URL` at compatible gateways when needed:
 
-```bash
-# Install dependencies
-pip install -e ".[dev]"
-
-# Copy and configure environment
-cp .env.example .env
-
-# Run the autoapply_agent module
-python -m autoapply_agent --help
+```env
+LLM_ENABLE_ENRICHMENT=true
+LLM_PROVIDER=gpt
+OPENAI_API_KEY=your_key_here
+OPENAI_MODEL=gpt-4o-mini
+OPENAI_BASE_URL=https://api.openai.com/v1
 ```
 
-## Common Scenarios
+## Safety-oriented defaults
 
-### Scenario 1: Basic Workflow Usage
+- Keep `MAX_JOBS_PER_SOURCE` bounded in shared environments.
+- Leave enrichment disabled in CI (`LLM_ENABLE_ENRICHMENT=false`) for deterministic tests.
+- Use explicit `HTTP_USER_AGENT` values for attribution in logs and upstream monitoring.
 
-```python
-from autoapply_agent import Workflow
+## See also
 
-client = Workflow(config)
-result = client.run()
-print(result)
-```
-
-### Scenario 2: Advanced Configuration
-
-```python
-from autoapply_agent.config import Settings
-
-settings = Settings(
-    max_retries=3,
-    timeout=30,
-    log_level="INFO",
-)
-```
-
-## Troubleshooting
-
-| Issue | Cause | Fix |
-|-------|-------|-----|
-| `ConnectionError` | API endpoint unreachable | Check `BASE_URL` in `.env` |
-| `TimeoutError` | Request took too long | Increase `timeout` setting |
-| `AuthError` | Invalid or expired token | Rotate API key |
-
-## See Also
-
-- [README](../README.md)
-- [ARCHITECTURE](../ARCHITECTURE.md)
-- [API Reference](./API.md)
+- [DEPLOYMENT.md](./DEPLOYMENT.md)
+- [TROUBLESHOOTING.md](./TROUBLESHOOTING.md)
