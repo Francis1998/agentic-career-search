@@ -14,6 +14,7 @@ from autoapply_agent.core.time import utc_now
 from autoapply_agent.db.models import Job, Run, RunStatus, SourceConfig, SourceType
 from autoapply_agent.services.agent_decision import AgentDecision, AgentDecisionEngine
 from autoapply_agent.services.events import append_run_event
+from autoapply_agent.services.llm_enrichment import LLMEnrichmentResult, LLMEnrichmentService
 from autoapply_agent.services.planning import DeterministicPlanningService
 from autoapply_agent.services.scoring import DeterministicScoringService
 
@@ -29,6 +30,7 @@ class InProcessWorker:
         adapters: Mapping[SourceType, CareerSourceAdapter],
         scoring_service: DeterministicScoringService,
         planning_service: DeterministicPlanningService,
+        llm_enrichment_service: LLMEnrichmentService | None,
         poll_interval_seconds: float,
         default_timeout_seconds: float,
         max_jobs_per_source: int,
@@ -40,6 +42,7 @@ class InProcessWorker:
             adapters: Source adapters by source type.
             scoring_service: Deterministic score service.
             planning_service: Deterministic planning service.
+            llm_enrichment_service: Optional LLM rationale enricher.
             poll_interval_seconds: Queue polling interval.
             default_timeout_seconds: Default adapter timeout.
             max_jobs_per_source: Per source job cap.
@@ -51,6 +54,7 @@ class InProcessWorker:
             scoring_service=scoring_service,
             planning_service=planning_service,
         )
+        self._llm_enrichment_service = llm_enrichment_service
         self._poll_interval_seconds = poll_interval_seconds
         self._default_timeout_seconds = default_timeout_seconds
         self._max_jobs_per_source = max_jobs_per_source
@@ -220,6 +224,26 @@ class InProcessWorker:
                 return
 
             decision = self._decision_engine.evaluate(job_candidate, run.query)
+            llm_enrichment = None
+            if self._llm_enrichment_service is not None:
+                llm_enrichment = await self._llm_enrichment_service.enrich_job_decision(
+                    job_candidate=job_candidate,
+                    query=run.query,
+                    deterministic_rationale=decision.rationale,
+                )
+                if llm_enrichment is not None:
+                    await append_run_event(
+                        session,
+                        run.id,
+                        "agent.llm_enrichment",
+                        f"LLM enrichment consumed from {llm_enrichment.provider}",
+                        payload={
+                            "source_config_id": source_config.id,
+                            "url": job_candidate.url,
+                            "provider": llm_enrichment.provider,
+                            "model": llm_enrichment.model,
+                        },
+                    )
             await append_run_event(
                 session,
                 run.id,
@@ -243,8 +267,8 @@ class InProcessWorker:
                     company=job_candidate.company,
                     url=job_candidate.url,
                     score=decision.score,
-                    plan_steps=decision.plan_steps,
-                    raw=self._build_job_raw_payload(job_candidate.raw, decision),
+                    plan_steps=self._build_plan_steps(decision, llm_enrichment),
+                    raw=self._build_job_raw_payload(job_candidate.raw, decision, llm_enrichment),
                 )
             )
             inserted_count += 1
@@ -370,12 +394,14 @@ class InProcessWorker:
     def _build_job_raw_payload(
         existing_raw: dict[str, object] | None,
         decision: AgentDecision,
+        llm_enrichment: LLMEnrichmentResult | None,
     ) -> dict[str, object]:
         """Merge source payload with deterministic agent decision trace.
 
         Args:
             existing_raw: Adapter-provided raw payload.
             decision: Decision package from the agent engine.
+            llm_enrichment: Optional provider enrichment result.
 
         Returns:
             Merged raw payload with `agent_decision` details.
@@ -387,4 +413,34 @@ class InProcessWorker:
             "matched_query_terms": decision.matched_query_terms,
             "rationale": decision.rationale,
         }
+        if llm_enrichment is not None:
+            merged_payload["llm_enrichment"] = {
+                "provider": llm_enrichment.provider,
+                "model": llm_enrichment.model,
+                "summary": llm_enrichment.summary,
+            }
         return merged_payload
+
+    @staticmethod
+    def _build_plan_steps(
+        decision: AgentDecision, llm_enrichment: LLMEnrichmentResult | None
+    ) -> list[str]:
+        """Build plan steps with optional LLM-informed recommendation line.
+
+        Args:
+            decision: Deterministic decision result.
+            llm_enrichment: Optional provider enrichment result.
+
+        Returns:
+            Plan steps list for persistence.
+        """
+
+        plan_steps = list(decision.plan_steps)
+        if llm_enrichment is None:
+            return plan_steps
+
+        if llm_enrichment.summary.strip():
+            plan_steps.append(
+                f"LLM insight ({llm_enrichment.provider}): {llm_enrichment.summary.strip()}"
+            )
+        return plan_steps

@@ -11,6 +11,7 @@ from autoapply_agent.adapters.base import JobCandidate
 from autoapply_agent.adapters.greenhouse import GreenhouseAdapter
 from autoapply_agent.core.config import Settings
 from autoapply_agent.main import create_app
+from autoapply_agent.services.llm_enrichment import LLMEnrichmentResult, LLMEnrichmentService
 
 if TYPE_CHECKING:
     from _pytest.capture import CaptureFixture
@@ -144,3 +145,81 @@ def test_cancel_queued_run(
         assert events_response.status_code == 200
         event_types = [entry["event_type"] for entry in events_response.json()]
         assert "run.cancelled" in event_types
+
+
+async def _fake_llm_enrichment(
+    self: LLMEnrichmentService,
+    job_candidate: JobCandidate,
+    query: str | None,
+    deterministic_rationale: list[str],
+) -> LLMEnrichmentResult:
+    """Return deterministic LLM enrichment for integration coverage."""
+
+    del self, query, deterministic_rationale
+    return LLMEnrichmentResult(
+        provider="gemini",
+        model="gemini-test",
+        summary=f"Strong match for role {job_candidate.title}.",
+    )
+
+
+def test_run_lifecycle_with_llm_enrichment_event(
+    sqlite_database_url: str,
+    monkeypatch: MockerFixture,
+) -> None:
+    """Worker emits LLM enrichment event and persists LLM fields when enabled."""
+
+    monkeypatch.setattr(GreenhouseAdapter, "fetch_jobs", _fake_greenhouse_fetch)
+    monkeypatch.setattr(LLMEnrichmentService, "enrich_job_decision", _fake_llm_enrichment)
+
+    app = create_app(
+        Settings(
+            APP_NAME="autoapply-integration-test-llm",
+            DATABASE_URL=sqlite_database_url,
+            WORKER_POLL_INTERVAL_SECONDS=0.05,
+            HTTP_TIMEOUT_SECONDS=0.5,
+            MAX_JOBS_PER_SOURCE=5,
+            HTTP_USER_AGENT="integration-test-agent",
+            ENABLE_WORKER=True,
+            ENVIRONMENT="test",
+            LLM_ENABLE_ENRICHMENT=True,
+            LLM_PROVIDER="gemini",
+            GEMINI_API_KEY="dummy-key",
+        )
+    )
+    with TestClient(app) as client:
+        source_response = client.post(
+            "/source-configs",
+            json={
+                "name": "integration-greenhouse-llm",
+                "source_type": "greenhouse",
+                "base_url": "https://boards.greenhouse.io/embed/job_board?for=example",
+            },
+        )
+        assert source_response.status_code == 201
+
+        run_response = client.post("/runs", json={"query": "python backend"})
+        assert run_response.status_code == 201
+        run_id = run_response.json()["id"]
+
+        status_payload: dict[str, Any] = {}
+        for _ in range(60):
+            status_response = client.get(f"/runs/{run_id}")
+            assert status_response.status_code == 200
+            status_payload = status_response.json()
+            if status_payload["status"] in {"completed", "failed", "cancelled"}:
+                break
+            time.sleep(0.05)
+
+        assert status_payload["status"] == "completed"
+
+        events_response = client.get(f"/runs/{run_id}/events")
+        assert events_response.status_code == 200
+        event_types = [entry["event_type"] for entry in events_response.json()]
+        assert "agent.llm_enrichment" in event_types
+
+        jobs_response = client.get(f"/jobs?run_id={run_id}")
+        assert jobs_response.status_code == 200
+        jobs = jobs_response.json()
+        assert len(jobs) == 1
+        assert jobs[0]["raw"]["llm_enrichment"]["provider"] == "gemini"

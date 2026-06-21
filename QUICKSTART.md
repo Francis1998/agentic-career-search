@@ -65,7 +65,19 @@ curl -s "http://127.0.0.1:8000/jobs?run_id=$RUN_ID"
 curl -s -X POST "http://127.0.0.1:8000/runs/$RUN_ID/cancel"
 ```
 
-## 7) Local quality checks
+## 7) Optional: enable LLM provider enrichment
+
+Add to `.env` before starting the API:
+
+```env
+LLM_ENABLE_ENRICHMENT=true
+LLM_PROVIDER=gemini   # or kimi / claude
+GEMINI_API_KEY=your_key_here
+```
+
+When enabled, run events include `agent.llm_enrichment`, and job payloads contain `llm_enrichment`.
+
+## 8) Local quality checks
 
 ```bash
 uv run ruff check .

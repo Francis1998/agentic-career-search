@@ -19,6 +19,7 @@ from autoapply_agent.core.config import settings as default_settings
 from autoapply_agent.db.base import Base
 from autoapply_agent.db.models import SourceType
 from autoapply_agent.db.session import create_engine, create_session_factory
+from autoapply_agent.services.llm_enrichment import LLMEnrichmentService
 from autoapply_agent.services.planning import DeterministicPlanningService
 from autoapply_agent.services.scoring import DeterministicScoringService
 from autoapply_agent.services.worker import InProcessWorker
@@ -63,6 +64,9 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
         async with engine.begin() as connection:
             await connection.run_sync(Base.metadata.create_all)
 
+        llm_enrichment_service = (
+            LLMEnrichmentService(active_settings) if active_settings.llm_enable_enrichment else None
+        )
         worker = InProcessWorker(
             session_factory=session_factory,
             adapters={
@@ -71,6 +75,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
             },
             scoring_service=DeterministicScoringService(),
             planning_service=DeterministicPlanningService(),
+            llm_enrichment_service=llm_enrichment_service,
             poll_interval_seconds=active_settings.worker_poll_interval_seconds,
             default_timeout_seconds=active_settings.http_timeout_seconds,
             max_jobs_per_source=active_settings.max_jobs_per_source,

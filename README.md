@@ -17,6 +17,11 @@ Built to demonstrate real agent engineering, not just prompt wrappers:
 - traceable agent decisions with rationale,
 - deterministic, testable behavior under CI.
 
+LLM provider integration is supported for decision enrichment, including:
+- **Gemini API** responses,
+- **Kimi (Moonshot) API** responses,
+- **Claude API** responses.
+
 ## Demo Preview
 
 ![Agentic Career Search demo](assets/demo/agentic-career-search-demo.gif)
@@ -39,6 +44,7 @@ This repository is designed as a portfolio-grade AI agent systems project:
 
 - **Agent loop orchestration** with durable run/event memory.
 - **Decision engine** that emits score, priority tier, and rationale for each candidate.
+- **LLM augmentation layer** that consumes provider outputs from Gemini, Kimi, or Claude.
 - **Tool abstraction layer** for heterogeneous web sources (`Greenhouse`, `Lever`).
 - **Operational controls** including cancellation, timeouts, bounded ingestion, and health probes.
 - **Engineering rigor** with strict typing, linting, integration tests, and GitHub Actions.
@@ -64,6 +70,7 @@ For each discovered job, the system persists:
 - triage priority (`high|medium|low`),
 - matched query terms,
 - rationale lines explaining the decision,
+- optional LLM enrichment summary from configured provider,
 - execution-ready action plan steps.
 
 ## API Surface
@@ -107,10 +114,20 @@ Then inspect:
 - `/runs/{run_id}/events` for agent decisions
 - `/jobs?run_id={run_id}` for scored + planned output
 
+To enable LLM consumption in code, set:
+
+```env
+LLM_ENABLE_ENRICHMENT=true
+LLM_PROVIDER=gemini   # or kimi / claude
+```
+
+Then add the corresponding API key in `.env` (see `CONFIGURATION.md`).
+
 ## Project Structure
 
 - `src/autoapply_agent/` core application
 - `src/autoapply_agent/services/agent_decision.py` decision engine
+- `src/autoapply_agent/services/llm_enrichment.py` Gemini/Kimi/Claude provider integration
 - `src/autoapply_agent/services/worker.py` autonomous run processor
 - `src/autoapply_agent/adapters/` external source tools
 - `tests/` unit + integration coverage
