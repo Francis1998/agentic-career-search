@@ -1,0 +1,9 @@
+Alembic scaffold is ready.
+
+Create an initial migration with:
+
+    uv run alembic revision --autogenerate -m "initial schema"
+
+Apply migrations with:
+
+    uv run alembic upgrade head
