@@ -17,8 +17,13 @@ Built to demonstrate real agent engineering, not just prompt wrappers:
 - traceable agent decisions with rationale,
 - deterministic, testable behavior under CI.
 
+## Demo Preview
+
+![Agentic Career Search demo](assets/demo/agentic-career-search-demo.gif)
+
 ## Table of Contents
 
+- [Demo Preview](#demo-preview)
 - [Showcase Value](#showcase-value)
 - [System Flow](#system-flow)
 - [What The Agent Produces](#what-the-agent-produces)
@@ -125,3 +130,9 @@ Then inspect:
 - `SAFETY.md` guardrails and responsible use
 - `PROMPTS.md` copy-paste AI prompts for repo recreation and upgrade tasks
 - `DAILY_IMPROVEMENTS.md` rolling cron-driven improvement history
+
+## Regenerate Demo GIF
+
+```bash
+./scripts/generate_demo_gif.sh
+```
