@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 """Health check script for agentic-career-search."""
+
 import sys
+
 import requests
 
 BASE_URL = "http://localhost:8000"
+
 
 def check_health() -> bool:
     """Check if the service is healthy."""
@@ -18,6 +21,7 @@ def check_health() -> bool:
     except requests.ConnectionError:
         print("✗ Service not reachable")
         return False
+
 
 if __name__ == "__main__":
     sys.exit(0 if check_health() else 1)
