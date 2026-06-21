@@ -1,5 +1,15 @@
 # ARCHITECTURE
 
+```mermaid
+flowchart TD
+    API[FastAPI API] --> QUEUE[Run queue state in DB]
+    QUEUE --> WORKER[InProcessWorker]
+    WORKER --> ADAPTERS[Greenhouse/Lever adapters]
+    ADAPTERS --> ENGINE[AgentDecisionEngine]
+    ENGINE --> STORE[RunEvent + Job persistence]
+    STORE --> API
+```
+
 ## Components
 
 - **API Layer** (`autoapply_agent.api`): FastAPI routes for health, source config, run lifecycle, and jobs listing.
@@ -9,6 +19,14 @@
 - **Domain Services** (`autoapply_agent.services.scoring`, `planning`): deterministic policy primitives used by the decision engine.
 - **Persistence** (`autoapply_agent.db`): SQLAlchemy async models/session with SQLite.
 
+## Agent Loop
+
+The system follows an explicit Observe -> Decide -> Act loop:
+
+1. **Observe:** source adapters fetch and parse public posting pages.
+2. **Decide:** decision engine computes score, priority tier, matched terms, and rationale.
+3. **Act:** worker persists job + decision trace and emits timeline events for API consumers.
+
 ## Run Lifecycle
 
 1. Client creates run (`POST /runs`) -> run status `queued`, event `run.created`.
@@ -17,12 +35,28 @@
 4. Worker persists source and summary events.
 5. Run reaches terminal state: `completed`, `cancelled`, or `failed`.
 
+## Run State Transitions
+
+| From | To | Trigger |
+|---|---|---|
+| `queued` | `running` | Worker claim succeeds |
+| `queued` | `cancelled` | API cancel requested before claim |
+| `running` | `completed` | All enabled sources processed |
+| `running` | `cancelled` | Cancellation observed by worker loop |
+| `running` | `failed` | Unhandled execution error |
+
 ## Persistence Model
 
 - `Run`: lifecycle state and user query.
 - `RunEvent`: ordered event stream for observability.
 - `SourceConfig`: source adapter configuration.
 - `Job`: normalized job snapshot tied to run, including `agent_decision` trace in `raw`.
+
+## Event Contracts
+
+- `run.created`, `run.started`, `run.completed`, `run.failed`, `run.cancelled`
+- `source.started`, `source.completed`, `source.failed`, `source.unsupported`
+- `agent.decision` with score, priority tier, and matched terms
 
 ## Migrations
 

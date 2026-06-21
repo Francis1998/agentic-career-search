@@ -17,6 +17,17 @@ Built to demonstrate real agent engineering, not just prompt wrappers:
 - traceable agent decisions with rationale,
 - deterministic, testable behavior under CI.
 
+## Table of Contents
+
+- [Showcase Value](#showcase-value)
+- [System Flow](#system-flow)
+- [What The Agent Produces](#what-the-agent-produces)
+- [API Surface](#api-surface)
+- [Quick Demo](#quick-demo)
+- [Project Structure](#project-structure)
+- [Safety and Scope](#safety-and-scope)
+- [Additional Docs](#additional-docs)
+
 ## Showcase Value
 
 This repository is designed as a portfolio-grade AI agent systems project:
@@ -66,7 +77,7 @@ For each discovered job, the system persists:
 ```bash
 uv venv
 source .venv/bin/activate
-uv pip install -e ".[dev]"
+uv sync --extra dev --frozen
 uv run uvicorn autoapply_agent.main:app --reload
 ```
 
@@ -112,3 +123,4 @@ Then inspect:
 - `CONFIGURATION.md` runtime settings
 - `ARCHITECTURE.md` component design and lifecycle
 - `SAFETY.md` guardrails and responsible use
+- `PROMPTS.md` copy-paste AI prompts for repo recreation and upgrade tasks
