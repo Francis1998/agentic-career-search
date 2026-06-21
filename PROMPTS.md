@@ -80,3 +80,22 @@ Style:
 ```text
 Recreate this project as a new repo with stronger AI-agent architecture, deterministic decision tracing, production-grade docs/CI/tests, and push it to GitHub with polished About metadata and portfolio-ready README.
 ```
+
+## 5) Branch-Safe Merge Prompt (Protect README and docs)
+
+```text
+Before making new changes, check the latest remote master/main and verify whether README or docs updates were overridden.
+
+Branch strategy requirements:
+1. Never merge directly from master/main into working changes.
+2. Create a dedicated integration branch (for example: `merge/integration-readme-recovery`).
+3. Pull latest master/main into that integration branch.
+4. Auto-merge conflict resolution in favor of preserving the newest intended README/docs improvements.
+5. If conflicts are non-trivial, resolve them explicitly and keep claims aligned to actual code.
+6. Validate lint/type/tests after merge resolution.
+7. Push the integration branch and merge from that branch into target branch via PR-style flow.
+
+Output requirements:
+- Show what changed in README/docs after merge.
+- Confirm master/main was not directly merged into target without the integration branch.
+```
