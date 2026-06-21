@@ -44,9 +44,13 @@ The system follows an explicit Observe -> Decide -> Act loop:
 |---|---|---|
 | `queued` | `running` | Worker claim succeeds |
 | `queued` | `cancelled` | API cancel requested before claim |
+| `running` | `cancel_requested` | API cancel while run is active |
 | `running` | `completed` | All enabled sources processed |
-| `running` | `cancelled` | Cancellation observed by worker loop |
+| `running` | `cancelled` | Worker observes `cancel_requested` flag |
 | `running` | `failed` | Unhandled execution error |
+| `cancel_requested` | `cancelled` | Worker marks cancellation during processing |
+
+When no enabled source configs match a run, the worker sets `completed` and emits `run.no_sources` without emitting `run.completed`.
 
 ## Persistence Model
 
@@ -58,6 +62,9 @@ The system follows an explicit Observe -> Decide -> Act loop:
 ## Event Contracts
 
 - `run.created`, `run.started`, `run.completed`, `run.failed`, `run.cancelled`
+- `run.no_sources` — run completed with no matching enabled sources (does not emit `run.completed`)
+- `run.cancel_requested` — cancel flagged while run is active
+- `run.cancel_ignored` — cancel requested on a terminal run
 - `source.started`, `source.completed`, `source.failed`, `source.unsupported`
 - `agent.decision` with score, priority tier, and matched terms
 - `agent.llm_enrichment` with provider/model metadata when LLM integration is enabled
