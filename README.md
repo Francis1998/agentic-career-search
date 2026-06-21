@@ -26,9 +26,18 @@ LLM provider integration is supported for decision enrichment, including:
 
 ![Agentic Career Search demo](assets/demo/agentic-career-search-demo.gif)
 
+### Demo Gallery
+
+| Demo | Preview |
+|---|---|
+| Core Agent Loop | ![Core agent loop demo](assets/demo/agentic-career-search-demo.gif) |
+| LLM Provider Flow | ![LLM provider flow demo](assets/demo/llm-provider-flow.gif) |
+| Ops Reliability Loop | ![Ops reliability loop demo](assets/demo/ops-reliability-loop.gif) |
+
 ## Table of Contents
 
 - [Demo Preview](#demo-preview)
+- [Demo Gallery](#demo-gallery)
 - [Showcase Value](#showcase-value)
 - [System Flow](#system-flow)
 - [What The Agent Produces](#what-the-agent-produces)
