@@ -1,53 +1,67 @@
 # agentic-career-search
 
-An AI-agent-oriented backend for autonomous job discovery workflows.  
-This project showcases practical agent engineering: goal-driven run orchestration, source adapters, scoring and planning policies, durable event traces, cancellation control, and production-minded verification.
+<p align="left">
+  <a href="https://github.com/Francis1998/agentic-career-search/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/Francis1998/agentic-career-search/actions/workflows/ci.yml/badge.svg"></a>
+  <img alt="Python 3.11+" src="https://img.shields.io/badge/python-3.11%2B-3776AB">
+  <img alt="FastAPI" src="https://img.shields.io/badge/framework-FastAPI-009688">
+  <img alt="SQLite" src="https://img.shields.io/badge/database-SQLite-003B57">
+  <img alt="License" src="https://img.shields.io/badge/status-active_agentic_build-6A5ACD">
+</p>
 
-## Why This Is Agentic
+An autonomous AI-agent orchestration backend for job discovery.
 
-- **Goal-driven execution:** each run represents an explicit objective (`query + sources`) processed by a worker loop.
-- **Observe -> Decide -> Act loop:** adapters observe external pages, services score and plan actions, worker persists outcomes.
-- **Tool-using architecture:** source adapters are pluggable tools (`Greenhouse`, `Lever`) behind a stable interface.
-- **Memory and traceability:** run and event persistence create a full decision trail for every agent step.
-- **Control and safety:** cancellable runs, bounded scope, timeouts, and deterministic behavior for repeatability.
+Built to demonstrate real agent engineering, not just prompt wrappers:
+- explicit run lifecycle state machine,
+- Observe -> Decide -> Act execution loop,
+- pluggable tool adapters for external sources,
+- traceable agent decisions with rationale,
+- deterministic, testable behavior under CI.
 
-## AI Agent Skills Demonstrated
+## Showcase Value
 
-- **Orchestration design:** lifecycle state machine (`queued`, `running`, `completed`, `failed`, `cancelled`).
-- **Agent infrastructure:** in-process async worker that claims, executes, and records jobs atomically.
-- **Multi-tool integration:** adapter abstraction for heterogeneous external job sources.
-- **Decision layer engineering:** deterministic scoring and planning services for explainable action policy.
-- **Reliability engineering:** typed models, structured events, health endpoints, CI checks, and integration tests.
+This repository is designed as a portfolio-grade AI agent systems project:
 
-## Current Capabilities
+- **Agent loop orchestration** with durable run/event memory.
+- **Decision engine** that emits score, priority tier, and rationale for each candidate.
+- **Tool abstraction layer** for heterogeneous web sources (`Greenhouse`, `Lever`).
+- **Operational controls** including cancellation, timeouts, bounded ingestion, and health probes.
+- **Engineering rigor** with strict typing, linting, integration tests, and GitHub Actions.
 
-- Async FastAPI API for source configs, runs, events, jobs, and health endpoints.
-- Background run executor with persisted run-event sequencing.
-- Public career-page ingestion from Greenhouse and Lever.
-- Normalized job records with score and plan output.
-- SQLite + SQLAlchemy async persistence with Alembic scaffold.
-- CI with lint (`ruff`), type checks (`mypy`), and tests (`pytest`).
+## System Flow
+
+```mermaid
+flowchart LR
+    A[API: POST /runs] --> B[Run queued]
+    B --> C[Worker claims run]
+    C --> D[Source adapters fetch jobs]
+    D --> E[AgentDecisionEngine evaluate]
+    E --> F[Persist jobs + agent_decision trace]
+    F --> G[Emit run events timeline]
+    G --> H[API: GET /runs/:id/events, GET /jobs]
+```
+
+## What The Agent Produces
+
+For each discovered job, the system persists:
+- normalized job payload,
+- deterministic relevance score,
+- triage priority (`high|medium|low`),
+- matched query terms,
+- rationale lines explaining the decision,
+- execution-ready action plan steps.
 
 ## API Surface
 
-- `POST /source-configs` create source tool configs.
-- `GET /source-configs` list configured sources.
-- `POST /runs` queue an autonomous run.
-- `GET /runs/{run_id}` inspect run state.
-- `GET /runs/{run_id}/events` inspect full agent event timeline.
-- `POST /runs/{run_id}/cancel` request cancellation.
-- `GET /jobs` list extracted and planned job outputs.
-- `GET /health/live` and `GET /health/ready`.
+- `POST /source-configs` create source adapter config
+- `GET /source-configs` list configured sources
+- `POST /runs` queue autonomous discovery run
+- `GET /runs/{run_id}` inspect lifecycle state
+- `GET /runs/{run_id}/events` inspect agent timeline
+- `POST /runs/{run_id}/cancel` request cancellation
+- `GET /jobs` inspect extracted + evaluated jobs
+- `GET /health/live` and `GET /health/ready`
 
-## Repository Layout
-
-- `src/autoapply_agent/` application package
-- `tests/` unit and integration tests
-- `scripts/` local helper scripts
-- `alembic/` migration scaffold
-- `.github/workflows/` CI pipeline
-
-## Local Development (uv)
+## Quick Demo
 
 ```bash
 uv venv
@@ -56,15 +70,45 @@ uv pip install -e ".[dev]"
 uv run uvicorn autoapply_agent.main:app --reload
 ```
 
-Open API docs at <http://127.0.0.1:8000/docs>.
+In a second terminal:
 
-## Portfolio Positioning
+```bash
+curl -X POST "http://127.0.0.1:8000/source-configs" \
+  -H "content-type: application/json" \
+  -d '{
+    "name": "demo-greenhouse",
+    "source_type": "greenhouse",
+    "base_url": "https://boards.greenhouse.io/embed/job_board?for=example"
+  }'
 
-If you want to demonstrate AI agent engineering in interviews, this repo highlights:
+curl -X POST "http://127.0.0.1:8000/runs" \
+  -H "content-type: application/json" \
+  -d '{"query":"python backend remote"}'
+```
 
-- explicit agent loop design over prompt-only demos,
-- robust state and observability over black-box automation,
-- extensible tool adapters over one-off scripts,
-- and verification discipline (lint/type/test/CI) for real-world delivery.
+Then inspect:
+- `/docs` for OpenAPI
+- `/runs/{run_id}/events` for agent decisions
+- `/jobs?run_id={run_id}` for scored + planned output
 
-For full setup and operating guidance, see `QUICKSTART.md`, `CONFIGURATION.md`, `SAFETY.md`, and `ARCHITECTURE.md`.
+## Project Structure
+
+- `src/autoapply_agent/` core application
+- `src/autoapply_agent/services/agent_decision.py` decision engine
+- `src/autoapply_agent/services/worker.py` autonomous run processor
+- `src/autoapply_agent/adapters/` external source tools
+- `tests/` unit + integration coverage
+- `.github/workflows/ci.yml` lint/type/test pipeline
+
+## Safety and Scope
+
+- Public-page discovery automation only.
+- No credentialed auto-application submission in this codebase.
+- See `SAFETY.md` for operational boundaries.
+
+## Additional Docs
+
+- `QUICKSTART.md` setup walkthrough
+- `CONFIGURATION.md` runtime settings
+- `ARCHITECTURE.md` component design and lifecycle
+- `SAFETY.md` guardrails and responsible use
