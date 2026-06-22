@@ -9,6 +9,9 @@ CLONES_DIR="$AUTOMATION_DIR/clones"
 mkdir -p "$AUTOMATION_DIR"
 mkdir -p "$CLONES_DIR"
 
+# Daily Cursor automation prompt (copy into Cursor cron Instructions):
+#   docs/DAILY_MAINTAINER_PROMPT.md
+
 export PATH="$HOME/.local/bin:$HOME/.cargo/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
 
 REPO_ENTRIES=(

@@ -99,3 +99,15 @@ Output requirements:
 - Show what changed in README/docs after merge.
 - Confirm master/main was not directly merged into target without the integration branch.
 ```
+
+## 6) Daily Maintainer (Francis1998 Cron Automation)
+
+Canonical prompt lives at [`docs/DAILY_MAINTAINER_PROMPT.md`](docs/DAILY_MAINTAINER_PROMPT.md).
+Copy the fenced block from that file into the Cursor automation **Instructions** field.
+
+Standing repo-specific requirement (must stay in the prompt):
+
+- **nexus-llm-router:** keep README, `router/model_ids.py`, default catalog, routing
+  strategies, and adapter cost tables on current provider SKUs — not legacy ids like
+  `gpt-4o`, `claude-3-5-sonnet`, or `gemini-1.5-*`. Ship catalog upgrades via PR
+  with regression tests when stale.
