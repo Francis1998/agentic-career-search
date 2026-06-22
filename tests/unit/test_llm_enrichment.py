@@ -75,6 +75,14 @@ def test_enrichment_returns_none_when_gpt_key_missing() -> None:
     assert enrichment is None
 
 
+def test_settings_default_gpt_model_uses_latest_stack() -> None:
+    """Default GPT-compatible model tracks the current agentic stack."""
+
+    settings = Settings(APP_NAME="test", DATABASE_URL="sqlite+aiosqlite:///./test.db")
+
+    assert settings.openai_model == "gpt-5.5"
+
+
 def test_normalize_text_handles_string_and_list() -> None:
     """Normalize text helper handles both direct and segmented content."""
 

@@ -40,7 +40,7 @@ class Settings(BaseSettings):
     claude_model: str = Field(default="claude-3-5-sonnet-latest", alias="CLAUDE_MODEL")
 
     openai_api_key: str | None = Field(default=None, alias="OPENAI_API_KEY")
-    openai_model: str = Field(default="gpt-4o-mini", alias="OPENAI_MODEL")
+    openai_model: str = Field(default="gpt-5.5", alias="OPENAI_MODEL")
     openai_base_url: str = Field(default="https://api.openai.com/v1", alias="OPENAI_BASE_URL")
 
 
