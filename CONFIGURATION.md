@@ -22,7 +22,7 @@ Configuration is environment-variable driven via `pydantic-settings`.
 | `CLAUDE_API_KEY` | _empty_ | Anthropic Claude API key |
 | `CLAUDE_MODEL` | `claude-3-5-sonnet-latest` | Claude model |
 | `OPENAI_API_KEY` | _empty_ | GPT / OpenAI-compatible API key |
-| `OPENAI_MODEL` | `gpt-4o-mini` | GPT model name |
+| `OPENAI_MODEL` | `gpt-5.5` | GPT model name |
 | `OPENAI_BASE_URL` | `https://api.openai.com/v1` | OpenAI-compatible base URL |
 
 ## Recommended Profiles
@@ -80,7 +80,7 @@ CLAUDE_MODEL=claude-3-5-sonnet-latest
 LLM_ENABLE_ENRICHMENT=true
 LLM_PROVIDER=gpt
 OPENAI_API_KEY=your_key_here
-OPENAI_MODEL=gpt-4o-mini
+OPENAI_MODEL=gpt-5.5
 OPENAI_BASE_URL=https://api.openai.com/v1
 ```
 

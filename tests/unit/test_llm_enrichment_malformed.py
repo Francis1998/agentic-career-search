@@ -125,3 +125,30 @@ def test_openai_compatible_empty_choices_returns_none(monkeypatch: MonkeyPatch) 
     )
 
     assert result is None
+
+
+def test_claude_non_object_content_chunks_return_none(monkeypatch: MonkeyPatch) -> None:
+    """A 200 Claude response with malformed content chunks must fall back to None."""
+    settings = Settings(
+        APP_NAME="test",
+        DATABASE_URL="sqlite+aiosqlite:///./test.db",
+        LLM_ENABLE_ENRICHMENT=True,
+        LLM_PROVIDER="claude",
+        CLAUDE_API_KEY="dummy-key",
+    )
+    monkeypatch.setattr(
+        llm_enrichment.httpx,
+        "AsyncClient",
+        lambda *args, **kwargs: _FakeAsyncClient({"content": [None, "not-a-chunk"]}),
+    )
+    service = LLMEnrichmentService(settings)
+
+    result = asyncio.run(
+        service.enrich_job_decision(
+            job_candidate=_candidate(),
+            query="agentic career search",
+            deterministic_rationale=["deterministic baseline"],
+        )
+    )
+
+    assert result is None

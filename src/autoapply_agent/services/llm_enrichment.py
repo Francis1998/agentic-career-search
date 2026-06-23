@@ -209,11 +209,16 @@ class LLMEnrichmentService:
         return " ".join(text_segments) or None
 
     @staticmethod
-    def _extract_anthropic_text(chunks: list[dict[str, object]]) -> str | None:
+    def _extract_anthropic_text(chunks: object) -> str | None:
         """Extract text content from Anthropic message content chunks."""
+
+        if not isinstance(chunks, list):
+            return None
 
         segments: list[str] = []
         for chunk in chunks:
+            if not isinstance(chunk, dict):
+                continue
             if chunk.get("type") == "text":
                 text_value = chunk.get("text")
                 if isinstance(text_value, str) and text_value.strip():

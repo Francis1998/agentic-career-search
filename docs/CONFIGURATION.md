@@ -21,7 +21,7 @@ This page captures deployment-specific guidance that complements the root variab
 LLM_ENABLE_ENRICHMENT=true
 LLM_PROVIDER=gpt
 OPENAI_API_KEY=your_key_here
-OPENAI_MODEL=gpt-4o-mini
+OPENAI_MODEL=gpt-5.5
 OPENAI_BASE_URL=https://api.openai.com/v1
 ```
 
