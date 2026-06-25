@@ -25,7 +25,8 @@ class DeterministicPlanningService:
             Ordered plan steps.
         """
 
-        query_hint = query.strip() if query else "target role requirements"
+        stripped_query = query.strip() if query else ""
+        query_hint = stripped_query or "target role requirements"
         company_text = job_candidate.company or "the employer"
 
         return [
