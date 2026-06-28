@@ -126,6 +126,44 @@ def test_run_lifecycle_complete_with_worker(
         assert jobs[0]["raw"]["agent_decision"]["priority_tier"] in {"low", "medium", "high"}
 
 
+def test_run_with_no_matching_sources_emits_no_sources_event(
+    sqlite_database_url: str,
+) -> None:
+    """Create a run with no matching sources and verify terminal event semantics."""
+
+    app = create_app(_build_settings(sqlite_database_url, enable_worker=True))
+    with TestClient(app) as client:
+        run_response = client.post(
+            "/runs",
+            json={"query": "python backend", "source_config_ids": [999_999]},
+        )
+        assert run_response.status_code == 201
+        run_id = run_response.json()["id"]
+
+        status_payload: dict[str, Any] = {}
+        for _ in range(60):
+            status_response = client.get(f"/runs/{run_id}")
+            assert status_response.status_code == 200
+            status_payload = status_response.json()
+            if status_payload["status"] in {"completed", "failed", "cancelled"}:
+                break
+            time.sleep(0.05)
+
+        assert status_payload["status"] == "completed"
+
+        events_response = client.get(f"/runs/{run_id}/events")
+        assert events_response.status_code == 200
+        event_types = [entry["event_type"] for entry in events_response.json()]
+        assert "run.created" in event_types
+        assert "run.started" in event_types
+        assert "run.no_sources" in event_types
+        assert "run.completed" not in event_types
+
+        jobs_response = client.get(f"/jobs?run_id={run_id}")
+        assert jobs_response.status_code == 200
+        assert jobs_response.json() == []
+
+
 def test_cancel_queued_run(
     sqlite_database_url: str,
 ) -> None:
