@@ -51,3 +51,39 @@ def test_query_tokens_increase_score() -> None:
     matched_score = scoring_service.score(candidate, "data engineer")
 
     assert matched_score > unmatched_score
+
+
+def test_match_terms_uses_word_boundaries() -> None:
+    """A query term must match a whole word, not an arbitrary substring."""
+
+    scoring_service = DeterministicScoringService()
+    candidate = JobCandidate(
+        external_id="js-1",
+        title="Senior JavaScript Engineer",
+        location="Remote",
+        company="example.com",
+        url="https://example.com/jobs/js-1",
+        raw=None,
+    )
+
+    matched_terms = scoring_service.match_terms(candidate, "java")
+
+    assert matched_terms == []
+
+
+def test_match_terms_matches_distinct_words() -> None:
+    """Whole-word query terms present in the candidate text should match."""
+
+    scoring_service = DeterministicScoringService()
+    candidate = JobCandidate(
+        external_id="js-2",
+        title="Senior JavaScript Engineer",
+        location="Remote",
+        company="example.com",
+        url="https://example.com/jobs/js-2",
+        raw=None,
+    )
+
+    matched_terms = scoring_service.match_terms(candidate, "javascript engineer")
+
+    assert matched_terms == ["engineer", "javascript"]

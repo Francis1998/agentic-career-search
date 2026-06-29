@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
+import re
 from hashlib import sha256
 
 from autoapply_agent.adapters.base import JobCandidate
+
+_WORD_PATTERN = re.compile(r"[a-z0-9]+")
 
 
 class DeterministicScoringService:
@@ -53,7 +56,8 @@ class DeterministicScoringService:
             ]
             if token
         ).lower()
-        return [token for token in normalized_query_tokens if token in searchable_text]
+        searchable_words = set(_WORD_PATTERN.findall(searchable_text))
+        return [token for token in normalized_query_tokens if token in searchable_words]
 
     @staticmethod
     def _tokenize(query: str | None) -> list[str]:
