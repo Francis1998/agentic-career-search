@@ -15,12 +15,12 @@ Configuration is environment-variable driven via `pydantic-settings`.
 | `LLM_PROVIDER` | `gemini` | Active LLM provider: `gemini`, `kimi`, `claude`, `gpt` |
 | `LLM_TIMEOUT_SECONDS` | `12.0` | LLM API timeout in seconds |
 | `GEMINI_API_KEY` | _empty_ | Gemini API key |
-| `GEMINI_MODEL` | `gemini-2.5-flash` | Gemini model |
+| `GEMINI_MODEL` | `gemini-3.5-flash` | Gemini model |
 | `KIMI_API_KEY` | _empty_ | Kimi (Moonshot) API key |
-| `KIMI_MODEL` | `moonshot-v1-8k` | Kimi model |
+| `KIMI_MODEL` | `kimi-k2` | Kimi model |
 | `KIMI_BASE_URL` | `https://api.moonshot.cn/v1` | Kimi base URL |
 | `CLAUDE_API_KEY` | _empty_ | Anthropic Claude API key |
-| `CLAUDE_MODEL` | `claude-3-5-sonnet-latest` | Claude model |
+| `CLAUDE_MODEL` | `claude-sonnet-4-6` | Claude model |
 | `OPENAI_API_KEY` | _empty_ | GPT / OpenAI-compatible API key |
 | `OPENAI_MODEL` | `gpt-5.5` | GPT model name |
 | `OPENAI_BASE_URL` | `https://api.openai.com/v1` | OpenAI-compatible base URL |
@@ -52,7 +52,7 @@ ENABLE_WORKER=true
 LLM_ENABLE_ENRICHMENT=true
 LLM_PROVIDER=gemini
 GEMINI_API_KEY=your_key_here
-GEMINI_MODEL=gemini-2.5-flash
+GEMINI_MODEL=gemini-3.5-flash
 ```
 
 ### LLM enrichment enabled (Kimi example)
@@ -61,7 +61,7 @@ GEMINI_MODEL=gemini-2.5-flash
 LLM_ENABLE_ENRICHMENT=true
 LLM_PROVIDER=kimi
 KIMI_API_KEY=your_key_here
-KIMI_MODEL=moonshot-v1-8k
+KIMI_MODEL=kimi-k2
 KIMI_BASE_URL=https://api.moonshot.cn/v1
 ```
 
@@ -71,7 +71,7 @@ KIMI_BASE_URL=https://api.moonshot.cn/v1
 LLM_ENABLE_ENRICHMENT=true
 LLM_PROVIDER=claude
 CLAUDE_API_KEY=your_key_here
-CLAUDE_MODEL=claude-3-5-sonnet-latest
+CLAUDE_MODEL=claude-sonnet-4-6
 ```
 
 ### LLM enrichment enabled (GPT example)
