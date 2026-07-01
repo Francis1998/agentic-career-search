@@ -53,6 +53,8 @@ class GreenhouseAdapter(CareerSourceAdapter):
             Parsed jobs list.
         """
 
+        if max_jobs <= 0:
+            return []
         soup = BeautifulSoup(html, "html.parser")
         anchors = list(soup.select("div.opening a, section.opening a, a.opening"))
         if not anchors:

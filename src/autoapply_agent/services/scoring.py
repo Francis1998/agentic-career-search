@@ -72,5 +72,5 @@ class DeterministicScoringService:
 
         if not query:
             return []
-        tokens = [token.strip().lower() for token in query.split() if token.strip()]
+        tokens = _WORD_PATTERN.findall(query.lower())
         return sorted(set(tokens))

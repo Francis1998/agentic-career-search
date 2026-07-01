@@ -53,6 +53,8 @@ class LeverAdapter(CareerSourceAdapter):
             Parsed jobs list.
         """
 
+        if max_jobs <= 0:
+            return []
         soup = BeautifulSoup(html, "html.parser")
         anchors = list(soup.select("div.posting a.posting-title, div.posting a"))
         if not anchors:

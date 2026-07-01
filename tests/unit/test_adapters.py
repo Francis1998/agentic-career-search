@@ -57,3 +57,25 @@ def test_lever_parser_extracts_jobs() -> None:
     assert jobs[0].title == "Data Engineer"
     assert jobs[0].external_id == "abc-987"
     assert jobs[0].location == "Austin, TX"
+
+
+def test_greenhouse_parser_honors_zero_max_jobs() -> None:
+    """A non-positive max_jobs must yield no candidates, not one."""
+
+    adapter = GreenhouseAdapter(user_agent="test-agent")
+    jobs = adapter._parse_html(
+        "https://boards.greenhouse.io/embed/job_board?for=example",
+        GREENHOUSE_SAMPLE_HTML,
+        max_jobs=0,
+    )
+
+    assert jobs == []
+
+
+def test_lever_parser_honors_zero_max_jobs() -> None:
+    """A non-positive max_jobs must yield no candidates, not one."""
+
+    adapter = LeverAdapter(user_agent="test-agent")
+    jobs = adapter._parse_html("https://jobs.lever.co/company", LEVER_SAMPLE_HTML, max_jobs=0)
+
+    assert jobs == []
