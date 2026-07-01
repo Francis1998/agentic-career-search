@@ -87,3 +87,39 @@ def test_match_terms_matches_distinct_words() -> None:
     matched_terms = scoring_service.match_terms(candidate, "javascript engineer")
 
     assert matched_terms == ["engineer", "javascript"]
+
+
+def test_match_terms_normalizes_query_punctuation() -> None:
+    """Punctuation attached to query terms must not defeat matching."""
+
+    scoring_service = DeterministicScoringService()
+    candidate = JobCandidate(
+        external_id="js-3",
+        title="Senior JavaScript Engineer",
+        location="Remote",
+        company="example.com",
+        url="https://example.com/jobs/js-3",
+        raw=None,
+    )
+
+    matched_terms = scoring_service.match_terms(candidate, "javascript, engineer!")
+
+    assert matched_terms == ["engineer", "javascript"]
+
+
+def test_match_terms_splits_compound_query_tokens() -> None:
+    """Compound query tokens should split on non-word characters before matching."""
+
+    scoring_service = DeterministicScoringService()
+    candidate = JobCandidate(
+        external_id="js-4",
+        title="Senior Data Engineer",
+        location="Remote",
+        company="example.com",
+        url="https://example.com/jobs/js-4",
+        raw=None,
+    )
+
+    matched_terms = scoring_service.match_terms(candidate, "data-engineer")
+
+    assert matched_terms == ["data", "engineer"]
