@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from autoapply_agent.adapters.base import company_from_url
 from autoapply_agent.adapters.greenhouse import GreenhouseAdapter
 from autoapply_agent.adapters.lever import LeverAdapter
 
@@ -79,3 +80,16 @@ def test_lever_parser_honors_zero_max_jobs() -> None:
     jobs = adapter._parse_html("https://jobs.lever.co/company", LEVER_SAMPLE_HTML, max_jobs=0)
 
     assert jobs == []
+
+
+def test_company_from_url_strips_only_leading_www() -> None:
+    """Only a leading ``www.`` prefix should be stripped from the host.
+
+    A host that carries ``www`` as a non-leading DNS label (for example
+    ``careers.www.acme.com``) must be preserved verbatim. The previous
+    implementation used ``str.replace`` which removed the ``www.`` substring
+    anywhere in the host, corrupting such identifiers.
+    """
+
+    assert company_from_url("https://www.acme.com/jobs") == "acme.com"
+    assert company_from_url("https://careers.www.acme.com/jobs") == "careers.www.acme.com"
