@@ -90,4 +90,4 @@ def company_from_url(base_url: str) -> str:
     """
 
     host = urlparse(base_url).hostname or "unknown"
-    return host.replace("www.", "")
+    return host.removeprefix("www.")
