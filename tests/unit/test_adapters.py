@@ -82,6 +82,39 @@ def test_lever_parser_honors_zero_max_jobs() -> None:
     assert jobs == []
 
 
+GREENHOUSE_SLUG_HTML = """
+<div class=\"opening\">
+  <a href=\"/example/jobs/senior-engineer-2024\">Senior Engineer</a>
+  <span class=\"location\">Remote</span>
+</div>
+<div class=\"opening\">
+  <a href=\"/example/jobs/98765\">Staff Engineer</a>
+  <span class=\"location\">Remote</span>
+</div>
+"""
+
+
+def test_greenhouse_external_id_ignores_embedded_slug_digits() -> None:
+    """A title slug year must not be misread as a numeric job id.
+
+    Greenhouse job ids are pure-numeric path segments (or ``gh_jid`` query
+    params). A slug such as ``senior-engineer-2024`` previously yielded the
+    embedded digits ``2024`` (a year), which is not an id. Only a fully numeric
+    trailing segment should be treated as an external id.
+    """
+
+    adapter = GreenhouseAdapter(user_agent="test-agent")
+    jobs = adapter._parse_html(
+        "https://boards.greenhouse.io/example",
+        GREENHOUSE_SLUG_HTML,
+        max_jobs=10,
+    )
+
+    by_title = {job.title: job for job in jobs}
+    assert by_title["Senior Engineer"].external_id is None
+    assert by_title["Staff Engineer"].external_id == "98765"
+
+
 def test_company_from_url_strips_only_leading_www() -> None:
     """Only a leading ``www.`` prefix should be stripped from the host.
 

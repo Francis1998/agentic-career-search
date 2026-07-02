@@ -120,9 +120,8 @@ class GreenhouseAdapter(CareerSourceAdapter):
         path_parts = [part for part in parsed.path.split("/") if part]
         if path_parts:
             trailing = path_parts[-1]
-            digits = "".join(character for character in trailing if character.isdigit())
-            if digits:
-                return digits
+            if trailing.isdigit():
+                return trailing
         return None
 
     @staticmethod
