@@ -77,12 +77,12 @@ class GreenhouseAdapter(CareerSourceAdapter):
                 continue
             seen_urls.add(absolute_url)
 
-            location_node = anchor.find_next("span", class_="location") or anchor.find_parent(
-                class_="opening"
-            )
+            opening_root = anchor.find_parent(class_="opening")
             location_text = None
-            if location_node is not None:
-                location_text = location_node.get_text(strip=True)
+            if opening_root is not None:
+                location_node = opening_root.select_one("span.location")
+                if location_node is not None:
+                    location_text = location_node.get_text(strip=True)
 
             jobs.append(
                 JobCandidate(

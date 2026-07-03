@@ -115,6 +115,38 @@ def test_greenhouse_external_id_ignores_embedded_slug_digits() -> None:
     assert by_title["Staff Engineer"].external_id == "98765"
 
 
+GREENHOUSE_MISSING_LOCATION_HTML = """
+<div class=\"opening\">
+  <a href=\"/example/jobs/111\">First Role</a>
+</div>
+<div class=\"opening\">
+  <a href=\"/example/jobs/222\">Second Role</a>
+  <span class=\"location\">Berlin</span>
+</div>
+"""
+
+
+def test_greenhouse_location_is_scoped_to_its_opening() -> None:
+    """A posting without its own location must not inherit a sibling's location.
+
+    Location lookup previously used ``anchor.find_next`` which scans the whole
+    document forward, so an opening lacking a ``span.location`` wrongly adopted
+    the location of the next opening. Location must be resolved only within the
+    posting's own ``div.opening`` container.
+    """
+
+    adapter = GreenhouseAdapter(user_agent="test-agent")
+    jobs = adapter._parse_html(
+        "https://boards.greenhouse.io/example",
+        GREENHOUSE_MISSING_LOCATION_HTML,
+        max_jobs=10,
+    )
+
+    by_title = {job.title: job for job in jobs}
+    assert by_title["First Role"].location is None
+    assert by_title["Second Role"].location == "Berlin"
+
+
 def test_company_from_url_strips_only_leading_www() -> None:
     """Only a leading ``www.`` prefix should be stripped from the host.
 
