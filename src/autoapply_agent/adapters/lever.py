@@ -83,8 +83,8 @@ class LeverAdapter(CareerSourceAdapter):
             location_text = None
             if posting_root is not None:
                 location_node = posting_root.select_one(
-                    "span.sort-by-location, div.posting-categories"
-                )
+                    "span.sort-by-location"
+                ) or posting_root.select_one("div.posting-categories")
                 if location_node is not None:
                     location_text = location_node.get_text(" ", strip=True)
 
