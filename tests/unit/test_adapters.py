@@ -147,6 +147,38 @@ def test_greenhouse_location_is_scoped_to_its_opening() -> None:
     assert by_title["Second Role"].location == "Berlin"
 
 
+LEVER_APPLY_BUTTON_HTML = """
+<div class=\"posting\">
+  <a class=\"posting-title\" href=\"/company/uuid-1\"><h5>Backend Engineer</h5></a>
+  <div class=\"posting-apply\">
+    <a class=\"posting-btn-submit\" href=\"/company/uuid-1/apply\">Apply</a>
+  </div>
+</div>
+"""
+
+
+def test_lever_parser_ignores_apply_button_anchor() -> None:
+    """The per-posting apply button must not be parsed as a separate job.
+
+    Lever list pages render an ``Apply`` anchor inside every ``div.posting``
+    whose href is the posting URL with a trailing ``/apply`` segment. The
+    ``div.posting a`` selector previously collected it, yielding a phantom
+    candidate titled ``Apply`` that duplicated the real posting's location.
+    Only the genuine posting anchor should survive.
+    """
+
+    adapter = LeverAdapter(user_agent="test-agent")
+    jobs = adapter._parse_html(
+        "https://jobs.lever.co/company",
+        LEVER_APPLY_BUTTON_HTML,
+        max_jobs=10,
+    )
+
+    assert len(jobs) == 1
+    assert jobs[0].title == "Backend Engineer"
+    assert jobs[0].url == "https://jobs.lever.co/company/uuid-1"
+
+
 def test_company_from_url_strips_only_leading_www() -> None:
     """Only a leading ``www.`` prefix should be stripped from the host.
 
