@@ -147,6 +147,70 @@ def test_greenhouse_location_is_scoped_to_its_opening() -> None:
     assert by_title["Second Role"].location == "Berlin"
 
 
+LEVER_APPLY_BUTTON_HTML = """
+<div class=\"posting\">
+  <a class=\"posting-title\" href=\"/company/uuid-1\"><h5>Backend Engineer</h5></a>
+  <div class=\"posting-apply\">
+    <a class=\"posting-btn-submit\" href=\"/company/uuid-1/apply\">Apply</a>
+  </div>
+</div>
+"""
+
+
+def test_lever_parser_ignores_apply_button_anchor() -> None:
+    """The per-posting apply button must not be parsed as a separate job.
+
+    Lever list pages render an ``Apply`` anchor inside every ``div.posting``
+    whose href is the posting URL with a trailing ``/apply`` segment. The
+    ``div.posting a`` selector previously collected it, yielding a phantom
+    candidate titled ``Apply`` that duplicated the real posting's location.
+    Only the genuine posting anchor should survive.
+    """
+
+    adapter = LeverAdapter(user_agent="test-agent")
+    jobs = adapter._parse_html(
+        "https://jobs.lever.co/company",
+        LEVER_APPLY_BUTTON_HTML,
+        max_jobs=10,
+    )
+
+    assert len(jobs) == 1
+    assert jobs[0].title == "Backend Engineer"
+    assert jobs[0].url == "https://jobs.lever.co/company/uuid-1"
+
+
+LEVER_CATEGORIES_HTML = """
+<div class=\"posting\">
+  <a class=\"posting-title\" href=\"/company/uuid-2\"><h5>Data Scientist</h5></a>
+  <div class=\"posting-categories\">
+    <span class=\"sort-by-time posting-category\">Full-time</span>
+    <span class=\"sort-by-location posting-category\">San Francisco</span>
+  </div>
+</div>
+"""
+
+
+def test_lever_location_prefers_specific_location_span() -> None:
+    """Location must come from the location span, not the whole categories block.
+
+    Lever nests ``span.sort-by-location`` inside ``div.posting-categories``
+    beside commitment/team spans. A grouped ``select_one`` picks the element
+    that appears first in document order, which is the parent categories block,
+    so location previously absorbed commitment text (``Full-time San
+    Francisco``). The dedicated location span must be preferred when present.
+    """
+
+    adapter = LeverAdapter(user_agent="test-agent")
+    jobs = adapter._parse_html(
+        "https://jobs.lever.co/company",
+        LEVER_CATEGORIES_HTML,
+        max_jobs=10,
+    )
+
+    assert len(jobs) == 1
+    assert jobs[0].location == "San Francisco"
+
+
 def test_company_from_url_strips_only_leading_www() -> None:
     """Only a leading ``www.`` prefix should be stripped from the host.
 

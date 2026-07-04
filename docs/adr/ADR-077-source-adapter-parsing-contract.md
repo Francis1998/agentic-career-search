@@ -37,6 +37,22 @@ Adapters MUST honor the following field-derivation contract:
    prohibited, so a posting without its own location resolves to `None` rather
    than borrowing a sibling's.
 
+3. **Only genuine posting anchors become candidates.**
+   Lever list pages render an `Apply` button anchor inside each `div.posting`
+   whose href is the posting URL plus a trailing `/apply` segment. Anchors whose
+   final path segment is `apply` are action links, not postings, and MUST be
+   skipped. Otherwise they surface as a phantom candidate titled `Apply` that
+   duplicates the real posting's location.
+
+4. **`location` prefers the most specific node available.**
+   When a container nests a dedicated location element beside other metadata
+   (Lever wraps `span.sort-by-location` inside `div.posting-categories` next to
+   commitment/team spans), the specific element MUST be preferred. A grouped
+   `select_one` returns the element first in document order — the parent block —
+   which pollutes `location` with unrelated text (`Full-time San Francisco`).
+   The dedicated location span is queried first, with the broader categories
+   block used only as a fallback.
+
 ## Consequences
 
 - A missing `external_id` or `location` is represented as `None`, never as a

@@ -73,6 +73,8 @@ class LeverAdapter(CareerSourceAdapter):
             if not href or not title:
                 continue
             absolute_url = urljoin(base_url, href)
+            if self._is_apply_link(absolute_url):
+                continue
             if absolute_url in seen_urls:
                 continue
             seen_urls.add(absolute_url)
@@ -81,8 +83,8 @@ class LeverAdapter(CareerSourceAdapter):
             location_text = None
             if posting_root is not None:
                 location_node = posting_root.select_one(
-                    "span.sort-by-location, div.posting-categories"
-                )
+                    "span.sort-by-location"
+                ) or posting_root.select_one("div.posting-categories")
                 if location_node is not None:
                     location_text = location_node.get_text(" ", strip=True)
 
@@ -100,6 +102,26 @@ class LeverAdapter(CareerSourceAdapter):
                 break
 
         return jobs
+
+    @staticmethod
+    def _is_apply_link(job_url: str) -> bool:
+        """Report whether a Lever URL points at an apply action, not a posting.
+
+        Lever list pages render an ``Apply`` button anchor inside each
+        ``div.posting`` alongside the posting-title link. Its href is the
+        posting URL with a trailing ``/apply`` segment. Treating it as a
+        distinct posting produces a phantom job titled ``Apply`` that shares the
+        real posting's location. Such anchors must be ignored.
+
+        Args:
+            job_url: Absolute candidate URL.
+
+        Returns:
+            True when the URL's final path segment is ``apply``.
+        """
+
+        parts = [part for part in urlparse(job_url).path.split("/") if part]
+        return bool(parts) and parts[-1].lower() == "apply"
 
     @staticmethod
     def _extract_external_id(job_url: str) -> str | None:
