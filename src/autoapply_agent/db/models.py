@@ -27,6 +27,7 @@ class SourceType(StrEnum):
 
     GREENHOUSE = "greenhouse"
     LEVER = "lever"
+    JSONLD = "jsonld"
 
 
 class RunStatus(StrEnum):

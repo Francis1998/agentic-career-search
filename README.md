@@ -79,6 +79,30 @@ This repository follows the requested standards:
 - `GET /jobs` inspect normalized, scored, and enriched outputs
 - `GET /health/live` and `GET /health/ready`
 
+## Supported job sources
+
+Each `SourceConfig` selects a source adapter by `source_type`:
+
+| `source_type` | Adapter | How it parses | Best for |
+|---|---|---|---|
+| `greenhouse` | `GreenhouseAdapter` | Scrapes `div.opening` anchors on public Greenhouse boards | Greenhouse-hosted boards |
+| `lever` | `LeverAdapter` | Scrapes `div.posting` anchors on public Lever pages | Lever-hosted boards |
+| `jsonld` | `JsonLdAdapter` | Reads embedded `schema.org/JobPosting` JSON-LD | **Any** board emitting Google-Jobs structured data (Ashby, SmartRecruiters, Workable, custom career sites, ...) |
+
+The `jsonld` adapter is vendor-neutral: modern ATS platforms publish
+`<script type="application/ld+json">` `JobPosting` payloads so their roles appear
+in Google Jobs, so a single adapter covers boards that would otherwise each need
+a bespoke scraper. It understands bare objects, arrays, `@graph`/`ItemList`
+containers, `TELECOMMUTE` remote roles, and `PropertyValue` identifiers, and it
+skips malformed blocks instead of failing the whole page.
+
+```bash
+# Register a JSON-LD source
+curl -X POST localhost:8000/source-configs \
+  -H 'content-type: application/json' \
+  -d '{"name":"acme-careers","source_type":"jsonld","base_url":"https://acme.example.com/careers"}'
+```
+
 ## Quick start
 
 ```bash

@@ -4,7 +4,7 @@
 flowchart TD
     API[FastAPI API] --> QUEUE[Run queue state in DB]
     QUEUE --> WORKER[InProcessWorker]
-    WORKER --> ADAPTERS[Greenhouse/Lever adapters]
+    WORKER --> ADAPTERS[Greenhouse/Lever/JSON-LD adapters]
     ADAPTERS --> ENGINE[AgentDecisionEngine]
     ENGINE --> LLM[LLMEnrichmentService]
     ENGINE --> STORE[RunEvent + Job persistence]
@@ -16,7 +16,7 @@ flowchart TD
 
 - **API Layer** (`autoapply_agent.api`): FastAPI routes for health, source config, run lifecycle, and jobs listing.
 - **Worker** (`autoapply_agent.services.worker`): in-process async polling loop that claims queued runs.
-- **Adapters** (`autoapply_agent.adapters`): Greenhouse and Lever HTTP parsers.
+- **Adapters** (`autoapply_agent.adapters`): Greenhouse and Lever HTML parsers plus a vendor-neutral `schema.org/JobPosting` JSON-LD parser (`jsonld`).
 - **Agent Decision Engine** (`autoapply_agent.services.agent_decision`): deterministic scoring + rationale + priority + planning synthesis.
 - **LLM Enrichment Service** (`autoapply_agent.services.llm_enrichment`): optional Gemini/Kimi/Claude/GPT summary augmentation for decision traces.
 - **Domain Services** (`autoapply_agent.services.scoring`, `planning`): deterministic policy primitives used by the decision engine.

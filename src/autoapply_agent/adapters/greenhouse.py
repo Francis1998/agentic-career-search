@@ -69,7 +69,7 @@ class GreenhouseAdapter(CareerSourceAdapter):
         seen_urls: set[str] = set()
         for anchor in anchors:
             href = self._normalize_href(anchor.get("href"))
-            title = anchor.get_text(strip=True)
+            title = anchor.get_text(" ", strip=True)
             if not href or not title:
                 continue
             absolute_url = urljoin(base_url, href)
@@ -82,7 +82,7 @@ class GreenhouseAdapter(CareerSourceAdapter):
             if opening_root is not None:
                 location_node = opening_root.select_one("span.location")
                 if location_node is not None:
-                    location_text = location_node.get_text(strip=True)
+                    location_text = location_node.get_text(" ", strip=True)
 
             jobs.append(
                 JobCandidate(

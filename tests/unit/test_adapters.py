@@ -211,6 +211,36 @@ def test_lever_location_prefers_specific_location_span() -> None:
     assert jobs[0].location == "San Francisco"
 
 
+GREENHOUSE_NESTED_MARKUP_HTML = """
+<div class=\"opening\">
+  <a href=\"/example/jobs/555\">Senior <span>Backend</span> Engineer</a>
+  <span class=\"location\">San <em>Francisco</em></span>
+</div>
+"""
+
+
+def test_greenhouse_preserves_word_boundaries_in_nested_markup() -> None:
+    """Nested inline elements in a title/location must not collapse words.
+
+    Greenhouse renders some titles and locations with nested inline markup
+    (for example ``Senior <span>Backend</span> Engineer``). Extracting text with
+    ``get_text(strip=True)`` concatenates the child strings with no separator,
+    producing ``SeniorBackendEngineer``. Text extraction must join with a space
+    so adjacent words stay separated, matching the Lever adapter's behavior.
+    """
+
+    adapter = GreenhouseAdapter(user_agent="test-agent")
+    jobs = adapter._parse_html(
+        "https://boards.greenhouse.io/example",
+        GREENHOUSE_NESTED_MARKUP_HTML,
+        max_jobs=10,
+    )
+
+    assert len(jobs) == 1
+    assert jobs[0].title == "Senior Backend Engineer"
+    assert jobs[0].location == "San Francisco"
+
+
 def test_company_from_url_strips_only_leading_www() -> None:
     """Only a leading ``www.`` prefix should be stripped from the host.
 
