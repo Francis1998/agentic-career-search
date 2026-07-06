@@ -154,6 +154,54 @@ def test_kimi_empty_choices_returns_none(monkeypatch: MonkeyPatch) -> None:
     assert result is None
 
 
+def test_openai_compatible_structured_content_parts_are_joined(monkeypatch: MonkeyPatch) -> None:
+    """A 200 response whose ``message.content`` is a content-part list must parse.
+
+    OpenAI-compatible gateways (LiteLLM, vLLM, OpenRouter) may return
+    ``choices[0].message.content`` as a list of structured parts, e.g.
+    ``[{"type": "text", "text": "Strong fit."}]`` rather than a bare string.
+    The normalizer previously only joined list items that were themselves
+    strings, so such structured payloads yielded no summary and enrichment was
+    silently dropped. The text of each part must be extracted and joined.
+    """
+    settings = Settings(
+        APP_NAME="test",
+        DATABASE_URL="sqlite+aiosqlite:///./test.db",
+        LLM_ENABLE_ENRICHMENT=True,
+        LLM_PROVIDER="gpt",
+        OPENAI_API_KEY="dummy-key",
+    )
+    payload = {
+        "choices": [
+            {
+                "message": {
+                    "content": [
+                        {"type": "text", "text": "Strong platform fit."},
+                        {"type": "text", "text": "Remote friendly."},
+                    ]
+                }
+            }
+        ]
+    }
+    monkeypatch.setattr(
+        llm_enrichment.httpx,
+        "AsyncClient",
+        lambda *args, **kwargs: _FakeAsyncClient(payload),
+    )
+    service = LLMEnrichmentService(settings)
+
+    result = asyncio.run(
+        service.enrich_job_decision(
+            job_candidate=_candidate(),
+            query="platform engineering",
+            deterministic_rationale=["deterministic baseline"],
+        )
+    )
+
+    assert result is not None
+    assert result.summary == "Strong platform fit. Remote friendly."
+
+
 def test_claude_non_object_content_chunks_return_none(monkeypatch: MonkeyPatch) -> None:
     """A 200 Claude response with malformed content chunks must fall back to None."""
     settings = Settings(
