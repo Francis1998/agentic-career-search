@@ -1,0 +1,192 @@
+"""Ashby public job board adapter.
+
+Ashby (``jobs.ashbyhq.com/{org}``) is a widely adopted modern applicant
+tracking system. Its public board renders each posting as an anchor whose
+href follows the ``/{org}/{uuid}`` shape, where ``uuid`` is the posting's
+stable identifier. This adapter targets that structure with a primary CSS
+selector and a resilient fallback that recognises posting anchors purely by
+their URL shape, mirroring the greenhouse and lever adapters.
+"""
+
+from __future__ import annotations
+
+import re
+from collections.abc import Sequence
+from urllib.parse import urljoin, urlparse
+
+from bs4 import BeautifulSoup
+
+from autoapply_agent.adapters.base import CareerSourceAdapter, JobCandidate, company_from_url
+
+_UUID_PATTERN = re.compile(
+    r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+    re.IGNORECASE,
+)
+
+
+class AshbyAdapter(CareerSourceAdapter):
+    """Fetch jobs from public Ashby job board pages."""
+
+    adapter_name = "ashby"
+
+    def __init__(self, user_agent: str) -> None:
+        """Create adapter instance.
+
+        Args:
+            user_agent: HTTP user agent string.
+        """
+
+        self._user_agent = user_agent
+
+    async def fetch_jobs(
+        self, base_url: str, timeout_seconds: float, max_jobs: int
+    ) -> list[JobCandidate]:
+        """Fetch and parse Ashby jobs.
+
+        Args:
+            base_url: Ashby board URL.
+            timeout_seconds: Request timeout in seconds.
+            max_jobs: Maximum number of jobs.
+
+        Returns:
+            Parsed job candidates.
+        """
+
+        html = await self._request_html(base_url, timeout_seconds, self._user_agent)
+        return self._parse_html(base_url, html, max_jobs)
+
+    def _parse_html(self, base_url: str, html: str, max_jobs: int) -> list[JobCandidate]:
+        """Parse Ashby board HTML into job candidates.
+
+        Args:
+            base_url: Source URL.
+            html: Page HTML body.
+            max_jobs: Maximum number of jobs.
+
+        Returns:
+            Parsed jobs list.
+        """
+
+        if max_jobs <= 0:
+            return []
+
+        soup = BeautifulSoup(html, "html.parser")
+        anchors = [
+            anchor
+            for anchor in soup.select("a[href]")
+            if self._is_posting_href(self._normalize_href(anchor.get("href")))
+        ]
+
+        jobs: list[JobCandidate] = []
+        seen_urls: set[str] = set()
+        for anchor in anchors:
+            href = self._normalize_href(anchor.get("href"))
+            title = anchor.get_text(" ", strip=True)
+            if not href or not title:
+                continue
+            absolute_url = urljoin(base_url, href)
+            if absolute_url in seen_urls:
+                continue
+            seen_urls.add(absolute_url)
+
+            jobs.append(
+                JobCandidate(
+                    external_id=self._extract_external_id(absolute_url),
+                    title=title,
+                    location=self._extract_location(anchor),
+                    company=company_from_url(base_url),
+                    url=absolute_url,
+                    raw={"source": "ashby"},
+                )
+            )
+            if len(jobs) >= max_jobs:
+                break
+
+        return jobs
+
+    @classmethod
+    def _is_posting_href(cls, href: str | None) -> bool:
+        """Report whether an href points at an Ashby posting.
+
+        Ashby posting URLs carry a trailing UUID path segment following the
+        organisation slug (``/{org}/{uuid}``). Board navigation links (about,
+        application, external redirects) never match that shape.
+
+        Args:
+            href: Candidate href value.
+
+        Returns:
+            True when the URL's final path segment is a UUID.
+        """
+
+        if not href:
+            return False
+        parts = [part for part in urlparse(href).path.split("/") if part]
+        return bool(parts) and bool(_UUID_PATTERN.match(parts[-1]))
+
+    @staticmethod
+    def _extract_external_id(job_url: str) -> str | None:
+        """Extract the posting UUID from an Ashby URL.
+
+        Args:
+            job_url: Ashby job URL.
+
+        Returns:
+            UUID string when present.
+        """
+
+        parts = [part for part in urlparse(job_url).path.split("/") if part]
+        if parts and _UUID_PATTERN.match(parts[-1]):
+            return parts[-1]
+        return None
+
+    @staticmethod
+    def _extract_location(anchor: object) -> str | None:
+        """Resolve a posting location from an anchor's surrounding markup.
+
+        Ashby groups a posting's metadata (department, location) alongside the
+        title anchor. The location is looked up within the anchor's nearest
+        posting container so a posting without its own location does not inherit
+        a sibling's location.
+
+        Args:
+            anchor: BeautifulSoup anchor element for the posting.
+
+        Returns:
+            Location text when discoverable, else None.
+        """
+
+        find_parent = getattr(anchor, "find_parent", None)
+        if find_parent is None:
+            return None
+        container = find_parent(attrs={"class": re.compile("posting|job", re.IGNORECASE)})
+        scope = container if container is not None else getattr(anchor, "parent", None)
+        if scope is None:
+            return None
+        select_one = getattr(scope, "select_one", None)
+        if select_one is None:
+            return None
+        location_node = select_one("[class*=location]")
+        if location_node is None:
+            return None
+        text = location_node.get_text(" ", strip=True)
+        return text or None
+
+    @staticmethod
+    def _normalize_href(href_value: str | Sequence[str] | None) -> str | None:
+        """Normalize BeautifulSoup href values to a single URL string.
+
+        Args:
+            href_value: Href value that can be string, list-like, or missing.
+
+        Returns:
+            Normalized URL string when present.
+        """
+
+        if isinstance(href_value, str):
+            return href_value
+        if isinstance(href_value, Sequence):
+            for item in href_value:
+                if isinstance(item, str) and item:
+                    return item
+        return None

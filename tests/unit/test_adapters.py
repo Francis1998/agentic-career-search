@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from autoapply_agent.adapters.ashby import AshbyAdapter
 from autoapply_agent.adapters.base import company_from_url
 from autoapply_agent.adapters.greenhouse import GreenhouseAdapter
 from autoapply_agent.adapters.lever import LeverAdapter
@@ -239,6 +240,92 @@ def test_greenhouse_preserves_word_boundaries_in_nested_markup() -> None:
     assert len(jobs) == 1
     assert jobs[0].title == "Senior Backend Engineer"
     assert jobs[0].location == "San Francisco"
+
+
+ASHBY_SAMPLE_HTML = """
+<div class=\"job-posting\">
+  <a href=\"/acme/2b1e9d4c-4f2a-4c3d-9a1b-1234567890ab\"><h3>Staff Platform Engineer</h3></a>
+  <div class=\"posting-location\">Remote (US)</div>
+</div>
+<div class=\"job-posting\">
+  <a href=\"/acme/9f8e7d6c-5b4a-4a3b-8c2d-abcdef123456\"><h3>Product Designer</h3></a>
+  <div class=\"posting-location\">New York, NY</div>
+</div>
+<a href=\"/acme/about\">About Us</a>
+<a href=\"https://acme.example.com/privacy\">Privacy</a>
+"""
+
+
+def test_ashby_parser_extracts_jobs() -> None:
+    """Ashby parser should extract posting fields and skip nav links."""
+
+    adapter = AshbyAdapter(user_agent="test-agent")
+    jobs = adapter._parse_html("https://jobs.ashbyhq.com/acme", ASHBY_SAMPLE_HTML, max_jobs=10)
+
+    by_title = {job.title: job for job in jobs}
+    assert set(by_title) == {"Staff Platform Engineer", "Product Designer"}
+    assert by_title["Staff Platform Engineer"].external_id == (
+        "2b1e9d4c-4f2a-4c3d-9a1b-1234567890ab"
+    )
+    assert by_title["Staff Platform Engineer"].location == "Remote (US)"
+    assert by_title["Staff Platform Engineer"].url == (
+        "https://jobs.ashbyhq.com/acme/2b1e9d4c-4f2a-4c3d-9a1b-1234567890ab"
+    )
+    assert by_title["Product Designer"].location == "New York, NY"
+
+
+def test_ashby_parser_ignores_non_posting_links() -> None:
+    """Only anchors whose trailing path segment is a UUID are postings.
+
+    Ashby board pages render navigation and legal links (``/acme/about``,
+    external privacy pages) alongside postings. Those must be ignored so they
+    do not surface as phantom job candidates; a posting is identified purely by
+    its ``/{org}/{uuid}`` URL shape.
+    """
+
+    adapter = AshbyAdapter(user_agent="test-agent")
+    nav_only_html = """
+    <a href=\"/acme/about\">About Us</a>
+    <a href=\"/acme/teams/engineering\">Engineering</a>
+    <a href=\"https://acme.example.com/privacy\">Privacy</a>
+    """
+    jobs = adapter._parse_html("https://jobs.ashbyhq.com/acme", nav_only_html, max_jobs=10)
+
+    assert jobs == []
+
+
+def test_ashby_parser_honors_zero_max_jobs() -> None:
+    """A non-positive max_jobs must yield no candidates, not one."""
+
+    adapter = AshbyAdapter(user_agent="test-agent")
+    jobs = adapter._parse_html("https://jobs.ashbyhq.com/acme", ASHBY_SAMPLE_HTML, max_jobs=0)
+
+    assert jobs == []
+
+
+def test_ashby_location_is_scoped_to_its_posting() -> None:
+    """A posting without its own location must not inherit a sibling's location.
+
+    Location lookup is scoped to each posting's own container. A posting that
+    omits a location element must resolve to ``None`` rather than borrowing the
+    next posting's location.
+    """
+
+    adapter = AshbyAdapter(user_agent="test-agent")
+    html = """
+    <div class=\"job-posting\">
+      <a href=\"/acme/2b1e9d4c-4f2a-4c3d-9a1b-1234567890ab\"><h3>First Role</h3></a>
+    </div>
+    <div class=\"job-posting\">
+      <a href=\"/acme/9f8e7d6c-5b4a-4a3b-8c2d-abcdef123456\"><h3>Second Role</h3></a>
+      <div class=\"posting-location\">Berlin</div>
+    </div>
+    """
+    jobs = adapter._parse_html("https://jobs.ashbyhq.com/acme", html, max_jobs=10)
+
+    by_title = {job.title: job for job in jobs}
+    assert by_title["First Role"].location is None
+    assert by_title["Second Role"].location == "Berlin"
 
 
 def test_company_from_url_strips_only_leading_www() -> None:
