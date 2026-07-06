@@ -227,13 +227,33 @@ class LLMEnrichmentService:
 
     @staticmethod
     def _normalize_text(value: object) -> str | None:
-        """Normalize a provider response text into a compact string."""
+        """Normalize a provider response text into a compact string.
+
+        OpenAI-compatible gateways (LiteLLM, vLLM, OpenRouter) may return
+        ``message.content`` either as a bare string or as a list of structured
+        content parts such as ``[{"type": "text", "text": "..."}]``. Both bare
+        string list items and structured part dicts are supported so a
+        structured payload is not silently discarded.
+
+        Args:
+            value: Raw content value from the provider response.
+
+        Returns:
+            Joined, stripped text when derivable, else None.
+        """
 
         if isinstance(value, str):
             normalized = value.strip()
             return normalized or None
         if isinstance(value, list):
-            segments = [item.strip() for item in value if isinstance(item, str) and item.strip()]
+            segments: list[str] = []
+            for item in value:
+                if isinstance(item, str) and item.strip():
+                    segments.append(item.strip())
+                elif isinstance(item, dict):
+                    text_value = item.get("text")
+                    if isinstance(text_value, str) and text_value.strip():
+                        segments.append(text_value.strip())
             if segments:
                 return " ".join(segments)
         return None

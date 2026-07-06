@@ -87,7 +87,8 @@ Each `SourceConfig` selects a source adapter by `source_type`:
 |---|---|---|---|
 | `greenhouse` | `GreenhouseAdapter` | Scrapes `div.opening` anchors on public Greenhouse boards | Greenhouse-hosted boards |
 | `lever` | `LeverAdapter` | Scrapes `div.posting` anchors on public Lever pages | Lever-hosted boards |
-| `jsonld` | `JsonLdAdapter` | Reads embedded `schema.org/JobPosting` JSON-LD | **Any** board emitting Google-Jobs structured data (Ashby, SmartRecruiters, Workable, custom career sites, ...) |
+| `ashby` | `AshbyAdapter` | Recognises `jobs.ashbyhq.com/{org}/{uuid}` posting anchors by URL shape | Ashby-hosted boards |
+| `jsonld` | `JsonLdAdapter` | Reads embedded `schema.org/JobPosting` JSON-LD | **Any** board emitting Google-Jobs structured data (SmartRecruiters, Workable, custom career sites, ...) |
 
 The `jsonld` adapter is vendor-neutral: modern ATS platforms publish
 `<script type="application/ld+json">` `JobPosting` payloads so their roles appear
