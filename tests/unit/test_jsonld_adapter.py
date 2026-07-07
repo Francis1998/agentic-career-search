@@ -93,6 +93,36 @@ def test_jsonld_parses_graph_and_remote_and_list_type() -> None:
     assert by_title["Data Scientist"].location == "Berlin, DE"
 
 
+REMOTE_LIST_TYPE_HTML = """
+<script type="application/ld+json">
+{
+  "@type": "JobPosting",
+  "title": "Remote Platform Engineer",
+  "url": "https://acme.example.com/jobs/remote-1",
+  "jobLocationType": ["TELECOMMUTE"]
+}
+</script>
+"""
+
+
+def test_jsonld_marks_remote_when_location_type_is_a_list() -> None:
+    """A list-valued ``jobLocationType`` of ``TELECOMMUTE`` must resolve to Remote.
+
+    JSON-LD permits any property to be expressed as an array, so a remote-only
+    posting may carry ``"jobLocationType": ["TELECOMMUTE"]`` instead of the
+    scalar string. Such postings have no ``jobLocation`` block, so failing to
+    recognise the list form leaves the location unset entirely.
+    """
+
+    adapter = JsonLdAdapter(user_agent="test-agent")
+    jobs = adapter._parse_html(
+        "https://acme.example.com/careers", REMOTE_LIST_TYPE_HTML, max_jobs=10
+    )
+
+    assert len(jobs) == 1
+    assert jobs[0].location == "Remote"
+
+
 MALFORMED_HTML = """
 <script type="application/ld+json">{ this is not valid json </script>
 <script type="application/ld+json">

@@ -29,6 +29,7 @@ class SourceType(StrEnum):
     LEVER = "lever"
     JSONLD = "jsonld"
     ASHBY = "ashby"
+    WORKABLE = "workable"
 
 
 class RunStatus(StrEnum):

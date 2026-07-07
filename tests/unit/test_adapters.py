@@ -8,6 +8,7 @@ from autoapply_agent.adapters.ashby import AshbyAdapter
 from autoapply_agent.adapters.base import company_from_url
 from autoapply_agent.adapters.greenhouse import GreenhouseAdapter
 from autoapply_agent.adapters.lever import LeverAdapter
+from autoapply_agent.adapters.workable import WorkableAdapter
 
 if TYPE_CHECKING:
     from _pytest.capture import CaptureFixture
@@ -322,6 +323,85 @@ def test_ashby_location_is_scoped_to_its_posting() -> None:
     </div>
     """
     jobs = adapter._parse_html("https://jobs.ashbyhq.com/acme", html, max_jobs=10)
+
+    by_title = {job.title: job for job in jobs}
+    assert by_title["First Role"].location is None
+    assert by_title["Second Role"].location == "Berlin"
+
+
+WORKABLE_SAMPLE_HTML = """
+<div class=\"job-posting\">
+  <a href=\"/acme/j/07C67F9E9F/\"><h3>Senior Backend Engineer</h3></a>
+  <div class=\"job-location\">Remote (EU)</div>
+</div>
+<div class=\"job-posting\">
+  <a href=\"/acme/j/1A2B3C4D5E/\"><h3>Product Manager</h3></a>
+  <div class=\"job-location\">London, UK</div>
+</div>
+<a href=\"/acme/about\">About Us</a>
+<a href=\"https://acme.example.com/privacy\">Privacy</a>
+"""
+
+
+def test_workable_parser_extracts_jobs() -> None:
+    """Workable parser should extract posting fields and skip nav links."""
+
+    adapter = WorkableAdapter(user_agent="test-agent")
+    jobs = adapter._parse_html("https://apply.workable.com/acme", WORKABLE_SAMPLE_HTML, max_jobs=10)
+
+    by_title = {job.title: job for job in jobs}
+    assert set(by_title) == {"Senior Backend Engineer", "Product Manager"}
+    assert by_title["Senior Backend Engineer"].external_id == "07C67F9E9F"
+    assert by_title["Senior Backend Engineer"].location == "Remote (EU)"
+    assert by_title["Senior Backend Engineer"].url == (
+        "https://apply.workable.com/acme/j/07C67F9E9F/"
+    )
+    assert by_title["Product Manager"].location == "London, UK"
+
+
+def test_workable_parser_ignores_non_posting_links() -> None:
+    """Only anchors with a ``/j/{shortcode}`` segment pair are postings.
+
+    Workable board pages render navigation and legal links (``/acme/about``,
+    external privacy pages) alongside postings. Those must be ignored so they
+    do not surface as phantom job candidates; a posting is identified purely by
+    its ``/{company}/j/{shortcode}`` URL shape.
+    """
+
+    adapter = WorkableAdapter(user_agent="test-agent")
+    nav_only_html = """
+    <a href=\"/acme/about\">About Us</a>
+    <a href=\"/acme/departments/engineering\">Engineering</a>
+    <a href=\"https://acme.example.com/privacy\">Privacy</a>
+    """
+    jobs = adapter._parse_html("https://apply.workable.com/acme", nav_only_html, max_jobs=10)
+
+    assert jobs == []
+
+
+def test_workable_parser_honors_zero_max_jobs() -> None:
+    """A non-positive max_jobs must yield no candidates, not one."""
+
+    adapter = WorkableAdapter(user_agent="test-agent")
+    jobs = adapter._parse_html("https://apply.workable.com/acme", WORKABLE_SAMPLE_HTML, max_jobs=0)
+
+    assert jobs == []
+
+
+def test_workable_location_is_scoped_to_its_posting() -> None:
+    """A posting without its own location must not inherit a sibling's location."""
+
+    adapter = WorkableAdapter(user_agent="test-agent")
+    html = """
+    <div class=\"job-posting\">
+      <a href=\"/acme/j/07C67F9E9F/\"><h3>First Role</h3></a>
+    </div>
+    <div class=\"job-posting\">
+      <a href=\"/acme/j/1A2B3C4D5E/\"><h3>Second Role</h3></a>
+      <div class=\"job-location\">Berlin</div>
+    </div>
+    """
+    jobs = adapter._parse_html("https://apply.workable.com/acme", html, max_jobs=10)
 
     by_title = {job.title: job for job in jobs}
     assert by_title["First Role"].location is None

@@ -6,6 +6,11 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `WorkableAdapter` (`source_type: workable`): a dedicated adapter for public
+  Workable job boards (`apply.workable.com/{company}`). Postings are recognised
+  purely by their `/{company}/j/{shortcode}` URL shape, so board navigation and
+  legal links are ignored and the posting shortcode is captured as the
+  `external_id`. See ADR-080.
 - `AshbyAdapter` (`source_type: ashby`): a dedicated adapter for public Ashby
   job boards (`jobs.ashbyhq.com/{org}`). Postings are recognised purely by their
   `/{org}/{uuid}` URL shape, so board navigation and legal links are ignored and
@@ -16,6 +21,10 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   sites) is supported without a bespoke scraper. See ADR-078.
 
 ### Fixed
+- `JsonLdAdapter` left the location unset for remote-only postings that expressed
+  `jobLocationType` as a single-element list (`["TELECOMMUTE"]`) rather than the
+  bare string. JSON-LD permits any property to be an array, so both forms are
+  now recognised and resolve to `Remote`.
 - LLM enrichment silently dropped summaries when an OpenAI-compatible gateway
   (LiteLLM, vLLM, OpenRouter) returned `choices[0].message.content` as a list of
   structured content parts (`[{"type": "text", "text": ...}]`) instead of a bare
