@@ -45,6 +45,12 @@ async def _insert_defaults(session: AsyncSession) -> None:
                 base_url="https://jobs.lever.co/example",
                 enabled=True,
             ),
+            SourceConfig(
+                name="example-workable",
+                source_type=SourceType.WORKABLE.value,
+                base_url="https://apply.workable.com/example",
+                enabled=True,
+            ),
         ]
     )
 
