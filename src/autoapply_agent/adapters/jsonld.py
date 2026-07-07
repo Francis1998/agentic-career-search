@@ -167,7 +167,7 @@ class JsonLdAdapter(CareerSourceAdapter):
         )
 
         location = cls._extract_location(node.get("jobLocation"))
-        if location is None and node.get("jobLocationType") == "TELECOMMUTE":
+        if location is None and cls._is_remote(node.get("jobLocationType")):
             location = "Remote"
 
         company = cls._extract_company(node.get("hiringOrganization")) or company_from_url(base_url)
@@ -180,6 +180,27 @@ class JsonLdAdapter(CareerSourceAdapter):
             url=absolute_url,
             raw={"source": "jsonld"},
         )
+
+    @staticmethod
+    def _is_remote(job_location_type: object) -> bool:
+        """Report whether a ``jobLocationType`` value denotes a remote role.
+
+        JSON-LD permits any property to be expressed either as a scalar or as an
+        array of values, so ``TELECOMMUTE`` may arrive as the bare string or
+        wrapped in a list. Both forms must be recognised.
+
+        Args:
+            job_location_type: Raw ``jobLocationType`` value from a posting.
+
+        Returns:
+            True when any value equals ``TELECOMMUTE``.
+        """
+
+        if isinstance(job_location_type, str):
+            return job_location_type == "TELECOMMUTE"
+        if isinstance(job_location_type, list):
+            return "TELECOMMUTE" in job_location_type
+        return False
 
     @staticmethod
     def _extract_identifier(identifier: object) -> str | None:
