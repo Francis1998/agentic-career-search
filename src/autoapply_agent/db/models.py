@@ -30,6 +30,7 @@ class SourceType(StrEnum):
     JSONLD = "jsonld"
     ASHBY = "ashby"
     WORKABLE = "workable"
+    RECRUITEE = "recruitee"
 
 
 class RunStatus(StrEnum):

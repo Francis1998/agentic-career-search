@@ -51,6 +51,12 @@ async def _insert_defaults(session: AsyncSession) -> None:
                 base_url="https://apply.workable.com/example",
                 enabled=True,
             ),
+            SourceConfig(
+                name="example-recruitee",
+                source_type=SourceType.RECRUITEE.value,
+                base_url="https://example.recruitee.com",
+                enabled=True,
+            ),
         ]
     )
 

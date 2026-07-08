@@ -8,6 +8,7 @@ from autoapply_agent.adapters.ashby import AshbyAdapter
 from autoapply_agent.adapters.base import company_from_url
 from autoapply_agent.adapters.greenhouse import GreenhouseAdapter
 from autoapply_agent.adapters.lever import LeverAdapter
+from autoapply_agent.adapters.recruitee import RecruiteeAdapter
 from autoapply_agent.adapters.workable import WorkableAdapter
 
 if TYPE_CHECKING:
@@ -419,3 +420,109 @@ def test_company_from_url_strips_only_leading_www() -> None:
 
     assert company_from_url("https://www.acme.com/jobs") == "acme.com"
     assert company_from_url("https://careers.www.acme.com/jobs") == "careers.www.acme.com"
+
+
+GREENHOUSE_FALLBACK_HTML = """
+<a href=\"/example/jobs/12345\">Backend Engineer</a>
+<a href=\"/example/job_alerts\">Get Job Alerts</a>
+<a href=\"/jobseekers/faq\">FAQ for Job Seekers</a>
+"""
+
+
+def test_greenhouse_fallback_ignores_non_posting_job_substrings() -> None:
+    """Fallback matching must not treat ``/job`` substrings as postings.
+
+    When a Greenhouse-style board omits ``.opening`` containers, the adapter
+    falls back to scanning every anchor. The previous fallback accepted any
+    href containing the bare substring ``/job``, so careers navigation links
+    such as ``/job_alerts`` or ``/jobseekers/faq`` surfaced as phantom job
+    candidates. Only anchors exposing a whole ``jobs`` path segment (or a
+    ``gh_jid`` query parameter) are genuine postings.
+    """
+
+    adapter = GreenhouseAdapter(user_agent="test-agent")
+    jobs = adapter._parse_html(
+        "https://boards.greenhouse.io/example",
+        GREENHOUSE_FALLBACK_HTML,
+        max_jobs=10,
+    )
+
+    assert [job.title for job in jobs] == ["Backend Engineer"]
+    assert jobs[0].external_id == "12345"
+
+
+RECRUITEE_SAMPLE_HTML = """
+<div class=\"offer\">
+  <a href=\"/o/senior-backend-engineer\"><h3>Senior Backend Engineer</h3></a>
+  <div class=\"offer-location\">Remote (EU)</div>
+</div>
+<div class=\"offer\">
+  <a href=\"/o/product-manager\"><h3>Product Manager</h3></a>
+  <div class=\"offer-location\">London, UK</div>
+</div>
+"""
+
+
+def test_recruitee_parser_extracts_jobs() -> None:
+    """Recruitee parser should extract posting fields and skip nav links."""
+
+    adapter = RecruiteeAdapter(user_agent="test-agent")
+    jobs = adapter._parse_html("https://acme.recruitee.com", RECRUITEE_SAMPLE_HTML, max_jobs=10)
+
+    by_title = {job.title: job for job in jobs}
+    assert set(by_title) == {"Senior Backend Engineer", "Product Manager"}
+    assert by_title["Senior Backend Engineer"].external_id == "senior-backend-engineer"
+    assert by_title["Senior Backend Engineer"].location == "Remote (EU)"
+    assert by_title["Senior Backend Engineer"].url == (
+        "https://acme.recruitee.com/o/senior-backend-engineer"
+    )
+    assert by_title["Product Manager"].location == "London, UK"
+
+
+def test_recruitee_parser_ignores_non_posting_links() -> None:
+    """Only anchors with an ``/o/{slug}`` segment pair are postings.
+
+    Recruitee careers sites render navigation and legal links (``/about``,
+    ``/teams/engineering``, external privacy pages) alongside postings. Those
+    must be ignored so they do not surface as phantom job candidates; a posting
+    is identified purely by its ``/o/{slug}`` URL shape.
+    """
+
+    adapter = RecruiteeAdapter(user_agent="test-agent")
+    nav_only_html = """
+    <a href=\"/about\">About Us</a>
+    <a href=\"/teams/engineering\">Engineering</a>
+    <a href=\"https://acme.example.com/privacy\">Privacy</a>
+    """
+    jobs = adapter._parse_html("https://acme.recruitee.com", nav_only_html, max_jobs=10)
+
+    assert jobs == []
+
+
+def test_recruitee_parser_honors_zero_max_jobs() -> None:
+    """A non-positive max_jobs must yield no candidates, not one."""
+
+    adapter = RecruiteeAdapter(user_agent="test-agent")
+    jobs = adapter._parse_html("https://acme.recruitee.com", RECRUITEE_SAMPLE_HTML, max_jobs=0)
+
+    assert jobs == []
+
+
+def test_recruitee_location_is_scoped_to_its_posting() -> None:
+    """A posting without its own location must not inherit a sibling's location."""
+
+    adapter = RecruiteeAdapter(user_agent="test-agent")
+    html = """
+    <div class=\"offer\">
+      <a href=\"/o/first-role\"><h3>First Role</h3></a>
+    </div>
+    <div class=\"offer\">
+      <a href=\"/o/second-role\"><h3>Second Role</h3></a>
+      <div class=\"offer-location\">Berlin</div>
+    </div>
+    """
+    jobs = adapter._parse_html("https://acme.recruitee.com", html, max_jobs=10)
+
+    by_title = {job.title: job for job in jobs}
+    assert by_title["First Role"].location is None
+    assert by_title["Second Role"].location == "Berlin"
