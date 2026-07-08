@@ -62,7 +62,7 @@ class GreenhouseAdapter(CareerSourceAdapter):
             anchors = []
             for anchor in fallback_anchors:
                 href = self._normalize_href(anchor.get("href"))
-                if isinstance(href, str) and ("/job" in href or "/jobs/" in href):
+                if isinstance(href, str) and self._looks_like_posting_href(href):
                     anchors.append(anchor)
 
         jobs: list[JobCandidate] = []
@@ -98,6 +98,31 @@ class GreenhouseAdapter(CareerSourceAdapter):
                 break
 
         return jobs
+
+    @staticmethod
+    def _looks_like_posting_href(href: str) -> bool:
+        """Report whether a fallback anchor href points at a Greenhouse posting.
+
+        Greenhouse posting URLs expose a ``jobs`` path segment
+        (``/{board}/jobs/{id}``) or a ``gh_jid`` query parameter (embedded
+        boards). Matching the bare substring ``/job`` was too loose: careers
+        navigation links such as ``/job_alerts`` or ``/jobseekers/faq`` contain
+        it and surfaced as phantom job candidates. Requiring a whole ``jobs``
+        path segment (or the ``gh_jid`` query parameter) keeps only true
+        postings.
+
+        Args:
+            href: Candidate anchor href value.
+
+        Returns:
+            True when the href exposes a ``jobs`` path segment or ``gh_jid``.
+        """
+
+        parsed = urlparse(href)
+        segments = [part for part in parsed.path.split("/") if part]
+        if "jobs" in segments:
+            return True
+        return "gh_jid" in parse_qs(parsed.query)
 
     @staticmethod
     def _extract_external_id(job_url: str) -> str | None:
