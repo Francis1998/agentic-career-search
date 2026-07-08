@@ -6,6 +6,11 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `RecruiteeAdapter` (`source_type: recruitee`): a dedicated adapter for public
+  Recruitee careers sites (`{company}.recruitee.com`). Postings are recognised
+  purely by their `/o/{slug}` URL shape, so careers-site navigation and legal
+  links are ignored and the posting slug is captured as the `external_id`.
+  See ADR-081.
 - `WorkableAdapter` (`source_type: workable`): a dedicated adapter for public
   Workable job boards (`apply.workable.com/{company}`). Postings are recognised
   purely by their `/{company}/j/{shortcode}` URL shape, so board navigation and
@@ -21,6 +26,11 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   sites) is supported without a bespoke scraper. See ADR-078.
 
 ### Fixed
+- `GreenhouseAdapter` fallback anchor matching accepted any href containing the
+  bare substring `/job`, so careers navigation links such as `/job_alerts` or
+  `/jobseekers/faq` surfaced as phantom job candidates on boards that omit
+  `.opening` containers. Matching now requires a whole `jobs` path segment (or a
+  `gh_jid` query parameter), keeping only genuine postings.
 - `JsonLdAdapter` left the location unset for remote-only postings that expressed
   `jobLocationType` as a single-element list (`["TELECOMMUTE"]`) rather than the
   bare string. JSON-LD permits any property to be an array, so both forms are
