@@ -13,6 +13,7 @@ from autoapply_agent.adapters.greenhouse import GreenhouseAdapter
 from autoapply_agent.adapters.jsonld import JsonLdAdapter
 from autoapply_agent.adapters.lever import LeverAdapter
 from autoapply_agent.adapters.recruitee import RecruiteeAdapter
+from autoapply_agent.adapters.smartrecruiters import SmartRecruitersAdapter
 from autoapply_agent.adapters.workable import WorkableAdapter
 from autoapply_agent.api.routes_health import router as health_router
 from autoapply_agent.api.routes_jobs import router as jobs_router
@@ -80,6 +81,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.ASHBY: AshbyAdapter(active_settings.http_user_agent),
                 SourceType.WORKABLE: WorkableAdapter(active_settings.http_user_agent),
                 SourceType.RECRUITEE: RecruiteeAdapter(active_settings.http_user_agent),
+                SourceType.SMARTRECRUITERS: SmartRecruitersAdapter(active_settings.http_user_agent),
             },
             scoring_service=DeterministicScoringService(),
             planning_service=DeterministicPlanningService(),

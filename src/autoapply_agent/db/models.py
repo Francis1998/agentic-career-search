@@ -31,6 +31,7 @@ class SourceType(StrEnum):
     ASHBY = "ashby"
     WORKABLE = "workable"
     RECRUITEE = "recruitee"
+    SMARTRECRUITERS = "smartrecruiters"
 
 
 class RunStatus(StrEnum):
