@@ -2,12 +2,18 @@
 
 from __future__ import annotations
 
+import re
 from collections.abc import Sequence
 from urllib.parse import urljoin, urlparse
 
 from bs4 import BeautifulSoup
 
 from autoapply_agent.adapters.base import CareerSourceAdapter, JobCandidate, company_from_url
+
+_POSTING_ID_PATTERN = re.compile(
+    r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+    re.IGNORECASE,
+)
 
 
 class LeverAdapter(CareerSourceAdapter):
@@ -62,7 +68,7 @@ class LeverAdapter(CareerSourceAdapter):
             anchors = []
             for anchor in fallback_anchors:
                 href = self._normalize_href(anchor.get("href"))
-                if isinstance(href, str) and "/jobs/" in href:
+                if isinstance(href, str) and self._looks_like_posting_href(href):
                     anchors.append(anchor)
 
         jobs: list[JobCandidate] = []
@@ -102,6 +108,35 @@ class LeverAdapter(CareerSourceAdapter):
                 break
 
         return jobs
+
+    @classmethod
+    def _looks_like_posting_href(cls, href: str) -> bool:
+        """Report whether a fallback anchor href points at a Lever posting.
+
+        Lever posting URLs follow the ``/{company}/{postingId}`` shape where
+        ``postingId`` is a UUID (``jobs.lever.co/acme/2fc6...``); the path does
+        not contain a ``jobs`` segment. The previous ``"/jobs/" in href``
+        substring test therefore never matched real Lever postings when the
+        primary ``div.posting`` selector was absent (for example, alternative or
+        client-rendered board markup), silently dropping every posting. This
+        recognises the true posting shape (a trailing UUID segment) while still
+        accepting an explicit whole ``jobs`` path segment used by some embedded
+        board variants.
+
+        Args:
+            href: Candidate anchor href value.
+
+        Returns:
+            True when the href exposes a trailing UUID segment or a ``jobs``
+            path segment.
+        """
+
+        parts = [part for part in urlparse(href).path.split("/") if part]
+        if not parts:
+            return False
+        if _POSTING_ID_PATTERN.match(parts[-1]):
+            return True
+        return "jobs" in parts
 
     @staticmethod
     def _is_apply_link(job_url: str) -> bool:
