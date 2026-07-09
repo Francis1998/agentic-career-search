@@ -9,6 +9,7 @@ from autoapply_agent.adapters.base import company_from_url
 from autoapply_agent.adapters.greenhouse import GreenhouseAdapter
 from autoapply_agent.adapters.lever import LeverAdapter
 from autoapply_agent.adapters.recruitee import RecruiteeAdapter
+from autoapply_agent.adapters.smartrecruiters import SmartRecruitersAdapter
 from autoapply_agent.adapters.workable import WorkableAdapter
 
 if TYPE_CHECKING:
@@ -522,6 +523,141 @@ def test_recruitee_location_is_scoped_to_its_posting() -> None:
     </div>
     """
     jobs = adapter._parse_html("https://acme.recruitee.com", html, max_jobs=10)
+
+    by_title = {job.title: job for job in jobs}
+    assert by_title["First Role"].location is None
+    assert by_title["Second Role"].location == "Berlin"
+
+
+LEVER_CLIENT_RENDERED_HTML = """
+<div class=\"postings-group\">
+  <a href=\"https://jobs.lever.co/company/11111111-1111-4111-8111-111111111111\">
+    Backend Engineer
+  </a>
+  <a href=\"https://jobs.lever.co/company/22222222-2222-4222-8222-222222222222\">
+    Frontend Engineer
+  </a>
+  <a href=\"https://jobs.lever.co/company\">All Jobs</a>
+  <a href=\"https://jobs.lever.co/company/11111111-1111-4111-8111-111111111111/apply\">
+    Apply
+  </a>
+</div>
+"""
+
+
+def test_lever_fallback_recognizes_uuid_posting_urls() -> None:
+    """Fallback must recognise real Lever ``/{company}/{uuid}`` posting URLs.
+
+    When the primary ``div.posting`` selector is absent (alternative or
+    client-rendered board markup), the fallback previously searched for a
+    ``/jobs/`` path segment that real Lever posting URLs never contain, so no
+    postings were surfaced. The fallback must instead recognise the true
+    trailing-UUID posting shape while ignoring the board index link and the
+    per-posting ``/apply`` action anchor.
+    """
+
+    adapter = LeverAdapter(user_agent="test-agent")
+    jobs = adapter._parse_html(
+        "https://jobs.lever.co/company",
+        LEVER_CLIENT_RENDERED_HTML,
+        max_jobs=10,
+    )
+
+    assert {job.url for job in jobs} == {
+        "https://jobs.lever.co/company/11111111-1111-4111-8111-111111111111",
+        "https://jobs.lever.co/company/22222222-2222-4222-8222-222222222222",
+    }
+    assert {job.title for job in jobs} == {"Backend Engineer", "Frontend Engineer"}
+
+
+SMARTRECRUITERS_SAMPLE_HTML = """
+<div class=\"opening-job\">
+  <a href=\"/ExampleCompany/744000123456789-senior-backend-engineer\">
+    <h4>Senior Backend Engineer</h4>
+  </a>
+  <span class=\"job-location\">Remote (EU)</span>
+</div>
+<div class=\"opening-job\">
+  <a href=\"/ExampleCompany/744000987654321\">Product Manager</a>
+  <span class=\"job-location\">London, UK</span>
+</div>
+<a href=\"/ExampleCompany\">All Openings</a>
+<a href=\"/ExampleCompany/search\">Search</a>
+<a href=\"https://example.com/privacy\">Privacy</a>
+"""
+
+
+def test_smartrecruiters_parser_extracts_jobs() -> None:
+    """SmartRecruiters parser should extract posting fields and skip nav links."""
+
+    adapter = SmartRecruitersAdapter(user_agent="test-agent")
+    jobs = adapter._parse_html(
+        "https://jobs.smartrecruiters.com/ExampleCompany",
+        SMARTRECRUITERS_SAMPLE_HTML,
+        max_jobs=10,
+    )
+
+    by_title = {job.title: job for job in jobs}
+    assert set(by_title) == {"Senior Backend Engineer", "Product Manager"}
+    assert by_title["Senior Backend Engineer"].external_id == "744000123456789"
+    assert by_title["Senior Backend Engineer"].location == "Remote (EU)"
+    assert by_title["Senior Backend Engineer"].url == (
+        "https://jobs.smartrecruiters.com/ExampleCompany/744000123456789-senior-backend-engineer"
+    )
+    assert by_title["Product Manager"].external_id == "744000987654321"
+    assert by_title["Product Manager"].location == "London, UK"
+
+
+def test_smartrecruiters_parser_ignores_non_posting_links() -> None:
+    """Only anchors with a numeric ``{jobId}`` segment are postings.
+
+    SmartRecruiters careers sites render navigation and legal links
+    (``/ExampleCompany``, ``/ExampleCompany/search``, external privacy pages)
+    alongside postings. Those must be ignored so they do not surface as phantom
+    job candidates; a posting is identified purely by its numeric ``{jobId}``
+    path segment.
+    """
+
+    adapter = SmartRecruitersAdapter(user_agent="test-agent")
+    nav_only_html = """
+    <a href=\"/ExampleCompany\">All Openings</a>
+    <a href=\"/ExampleCompany/search\">Search</a>
+    <a href=\"https://example.com/privacy\">Privacy</a>
+    """
+    jobs = adapter._parse_html(
+        "https://jobs.smartrecruiters.com/ExampleCompany", nav_only_html, max_jobs=10
+    )
+
+    assert jobs == []
+
+
+def test_smartrecruiters_parser_honors_zero_max_jobs() -> None:
+    """A non-positive max_jobs must yield no candidates, not one."""
+
+    adapter = SmartRecruitersAdapter(user_agent="test-agent")
+    jobs = adapter._parse_html(
+        "https://jobs.smartrecruiters.com/ExampleCompany",
+        SMARTRECRUITERS_SAMPLE_HTML,
+        max_jobs=0,
+    )
+
+    assert jobs == []
+
+
+def test_smartrecruiters_location_is_scoped_to_its_posting() -> None:
+    """A posting without its own location must not inherit a sibling's location."""
+
+    adapter = SmartRecruitersAdapter(user_agent="test-agent")
+    html = """
+    <div class=\"opening-job\">
+      <a href=\"/ExampleCompany/744000111111111\"><h4>First Role</h4></a>
+    </div>
+    <div class=\"opening-job\">
+      <a href=\"/ExampleCompany/744000222222222\"><h4>Second Role</h4></a>
+      <span class=\"job-location\">Berlin</span>
+    </div>
+    """
+    jobs = adapter._parse_html("https://jobs.smartrecruiters.com/ExampleCompany", html, max_jobs=10)
 
     by_title = {job.title: job for job in jobs}
     assert by_title["First Role"].location is None

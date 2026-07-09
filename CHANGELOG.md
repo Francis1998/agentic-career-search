@@ -6,6 +6,11 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `SmartRecruitersAdapter` (`source_type: smartrecruiters`): a dedicated adapter
+  for public SmartRecruiters careers sites (`jobs.smartrecruiters.com/{company}`).
+  Postings are recognised purely by their `/{company}/{jobId}-{slug}` URL shape,
+  so careers-site navigation and legal links are ignored and the numeric posting
+  id is captured as the `external_id`. See ADR-082.
 - `RecruiteeAdapter` (`source_type: recruitee`): a dedicated adapter for public
   Recruitee careers sites (`{company}.recruitee.com`). Postings are recognised
   purely by their `/o/{slug}` URL shape, so careers-site navigation and legal
@@ -26,6 +31,12 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   sites) is supported without a bespoke scraper. See ADR-078.
 
 ### Fixed
+- `LeverAdapter` fallback anchor matching (used when the primary `div.posting`
+  selector is absent, e.g. alternative or client-rendered board markup) searched
+  for a `/jobs/` path segment that real Lever posting URLs
+  (`jobs.lever.co/{company}/{uuid}`) never contain, so every posting was silently
+  dropped. The fallback now recognises the true trailing-UUID posting shape while
+  still accepting a whole `jobs` path segment used by some embedded board variants.
 - `GreenhouseAdapter` fallback anchor matching accepted any href containing the
   bare substring `/job`, so careers navigation links such as `/job_alerts` or
   `/jobseekers/faq` surfaced as phantom job candidates on boards that omit
