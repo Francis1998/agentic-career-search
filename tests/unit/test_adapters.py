@@ -10,6 +10,7 @@ from autoapply_agent.adapters.greenhouse import GreenhouseAdapter
 from autoapply_agent.adapters.lever import LeverAdapter
 from autoapply_agent.adapters.recruitee import RecruiteeAdapter
 from autoapply_agent.adapters.smartrecruiters import SmartRecruitersAdapter
+from autoapply_agent.adapters.teamtailor import TeamtailorAdapter
 from autoapply_agent.adapters.workable import WorkableAdapter
 
 if TYPE_CHECKING:
@@ -662,3 +663,49 @@ def test_smartrecruiters_location_is_scoped_to_its_posting() -> None:
     by_title = {job.title: job for job in jobs}
     assert by_title["First Role"].location is None
     assert by_title["Second Role"].location == "Berlin"
+
+
+def test_smartrecruiters_relocation_note_is_not_read_as_location() -> None:
+    """A ``relocation`` badge must not be mistaken for the posting location.
+
+    The shared location lookup selected any element whose ``class`` merely
+    *contained* the substring ``location`` (``[class*=location]``). A posting
+    that advertises ``relocation`` assistance therefore surfaced that badge as
+    the posting's location even though no real location element was present.
+    The location must be resolved only from a class token that is actually
+    ``location`` (optionally hyphen/underscore-delimited), so a posting with
+    only a ``relocation`` note resolves to ``None``.
+    """
+
+    adapter = SmartRecruitersAdapter(user_agent="test-agent")
+    html = """
+    <div class=\"opening-job\">
+      <a href=\"/ExampleCompany/744000333333333\"><h4>Relocation Role</h4></a>
+      <span class=\"relocation-note\">Relocation assistance available</span>
+    </div>
+    """
+    jobs = adapter._parse_html("https://jobs.smartrecruiters.com/ExampleCompany", html, max_jobs=10)
+
+    assert len(jobs) == 1
+    assert jobs[0].location is None
+
+
+def test_teamtailor_relocation_note_is_not_read_as_location() -> None:
+    """A ``relocation`` badge must not be mistaken for a Teamtailor location.
+
+    Regression guard mirroring
+    ``test_smartrecruiters_relocation_note_is_not_read_as_location`` for the
+    Teamtailor adapter, which shares the same location-resolution helper.
+    """
+
+    adapter = TeamtailorAdapter(user_agent="test-agent")
+    html = """
+    <div class=\"job\">
+      <a href=\"/jobs/1000003-relocation-role\"><h4>Relocation Role</h4></a>
+      <span class=\"relocation-note\">Relocation assistance available</span>
+    </div>
+    """
+    jobs = adapter._parse_html("https://example.teamtailor.com/jobs", html, max_jobs=10)
+
+    assert len(jobs) == 1
+    assert jobs[0].location is None
