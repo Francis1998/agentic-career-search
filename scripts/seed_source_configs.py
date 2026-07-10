@@ -63,6 +63,12 @@ async def _insert_defaults(session: AsyncSession) -> None:
                 base_url="https://jobs.smartrecruiters.com/ExampleCompany",
                 enabled=True,
             ),
+            SourceConfig(
+                name="example-teamtailor",
+                source_type=SourceType.TEAMTAILOR.value,
+                base_url="https://example.teamtailor.com/jobs",
+                enabled=True,
+            ),
         ]
     )
 

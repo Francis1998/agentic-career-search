@@ -6,6 +6,12 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `TeamtailorAdapter` (`source_type: teamtailor`): a dedicated adapter for public
+  Teamtailor careers sites (`{company}.teamtailor.com`). Postings are recognised
+  purely by their terminal `/jobs/{jobId}-{slug}` URL shape (also matched under a
+  custom-domain `/careers` prefix), so the jobs list page, application forms, and
+  navigation links are ignored and the numeric posting id is captured as the
+  `external_id`. See ADR-083.
 - `SmartRecruitersAdapter` (`source_type: smartrecruiters`): a dedicated adapter
   for public SmartRecruiters careers sites (`jobs.smartrecruiters.com/{company}`).
   Postings are recognised purely by their `/{company}/{jobId}-{slug}` URL shape,
