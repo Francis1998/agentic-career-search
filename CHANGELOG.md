@@ -6,6 +6,13 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `PersonioAdapter` (`source_type: personio`): a dedicated adapter for public
+  Personio careers sites (`{tenant}.jobs.personio.de` / `.com`), the dominant
+  ATS across DACH/EU employers. Postings are recognised purely by their terminal
+  *singular* `/job/{jobId}` URL shape (an optional hyphenated title slug may
+  trail the id), so the plural `/jobs` list page, the `/job/{jobId}/apply`
+  application step, and navigation links are ignored and the numeric posting id
+  is captured as the `external_id`. See ADR-084.
 - `TeamtailorAdapter` (`source_type: teamtailor`): a dedicated adapter for public
   Teamtailor careers sites (`{company}.teamtailor.com`). Postings are recognised
   purely by their terminal `/jobs/{jobId}-{slug}` URL shape (also matched under a
@@ -37,6 +44,14 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   sites) is supported without a bespoke scraper. See ADR-078.
 
 ### Fixed
+- Posting location resolution misread a `relocation` badge as the posting's
+  location. The shared lookup selected any element whose `class` merely
+  *contained* the substring `location` (`[class*=location]`), so a posting
+  advertising relocation assistance surfaced that text as its location even when
+  no real location element was present. Location is now resolved only from a
+  `class` token that *is* `location` (optionally hyphen/underscore-delimited,
+  e.g. `job-location`), via a shared `find_location_text` helper reused by the
+  Ashby, Workable, Recruitee, SmartRecruiters, and Teamtailor adapters.
 - `LeverAdapter` fallback anchor matching (used when the primary `div.posting`
   selector is absent, e.g. alternative or client-rendered board markup) searched
   for a `/jobs/` path segment that real Lever posting URLs

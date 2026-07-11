@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
+import re
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from urllib.parse import urlparse
 
 import httpx
+
+_LOCATION_CLASS_TOKEN = re.compile(r"(?:^|[-_])location", re.IGNORECASE)
 
 
 @dataclass(slots=True, frozen=True)
@@ -91,3 +94,42 @@ def company_from_url(base_url: str) -> str:
 
     host = urlparse(base_url).hostname or "unknown"
     return host.removeprefix("www.")
+
+
+def find_location_text(anchor: object, container_class_pattern: re.Pattern[str]) -> str | None:
+    """Resolve a posting location from an anchor's surrounding markup.
+
+    The location is looked up within the anchor's nearest posting container
+    (a ``class`` matching ``container_class_pattern``) so a posting without its
+    own location does not inherit a sibling's location. A location element is
+    identified by a ``class`` token that *is* ``location`` (optionally
+    hyphen/underscore-delimited, e.g. ``job-location`` or ``posting__location``)
+    rather than by any class merely containing the substring ``location`` \u2014 the
+    latter would misread a ``relocation`` badge as the posting's location.
+
+    Args:
+        anchor: BeautifulSoup anchor element for the posting.
+        container_class_pattern: Compiled pattern matching the posting
+            container's ``class``.
+
+    Returns:
+        Location text when discoverable, else None.
+    """
+
+    find_parent = getattr(anchor, "find_parent", None)
+    if find_parent is None:
+        return None
+    container = find_parent(attrs={"class": container_class_pattern})
+    scope = container if container is not None else getattr(anchor, "parent", None)
+    if scope is None:
+        return None
+    find_all = getattr(scope, "find_all", None)
+    if find_all is None:
+        return None
+    for node in find_all(True):
+        classes = node.get("class") or []
+        if any(_LOCATION_CLASS_TOKEN.search(token) for token in classes):
+            text = node.get_text(" ", strip=True)
+            if text:
+                return text
+    return None

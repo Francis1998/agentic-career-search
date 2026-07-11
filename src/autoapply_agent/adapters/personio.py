@@ -1,12 +1,15 @@
-"""Workable public job board adapter.
+"""Personio public careers site adapter.
 
-Workable (``apply.workable.com/{company}``) is a widely adopted applicant
-tracking system. Its public board renders each posting as an anchor whose href
-follows the ``/{company}/j/{shortcode}`` shape, where ``shortcode`` is the
-posting's stable identifier (an uppercase alphanumeric token). This adapter
-targets that structure with a primary CSS selector and a resilient fallback
-that recognises posting anchors purely by their URL shape, mirroring the
-greenhouse, lever, and ashby adapters.
+Personio (``{tenant}.jobs.personio.de`` / ``{tenant}.jobs.personio.com``) is the
+applicant tracking system of choice for a large share of DACH/EU employers. Its
+public careers site renders each posting as an anchor whose href follows the
+``/job/{jobId}`` shape, where ``jobId`` is the posting's stable numeric
+identifier (an optional lowercase, hyphenated title slug may trail the id). Note
+the *singular* ``job`` path segment, which distinguishes Personio posting URLs
+from Teamtailor's plural ``/jobs/{jobId}-{slug}`` shape. This adapter targets
+that structure with a primary CSS selector and a resilient fallback that
+recognises posting anchors purely by their URL shape, mirroring the greenhouse,
+lever, ashby, workable, recruitee, smartrecruiters, and teamtailor adapters.
 """
 
 from __future__ import annotations
@@ -24,14 +27,14 @@ from autoapply_agent.adapters.base import (
     find_location_text,
 )
 
-_SHORTCODE_PATTERN = re.compile(r"^[0-9A-Z]{6,}$")
-_CONTAINER_CLASS_PATTERN = re.compile("posting|job|opening", re.IGNORECASE)
+_JOB_ID_SEGMENT = re.compile(r"^(\d+)(?:-[a-z0-9-]+)?$")
+_CONTAINER_CLASS_PATTERN = re.compile("job|position|posting", re.IGNORECASE)
 
 
-class WorkableAdapter(CareerSourceAdapter):
-    """Fetch jobs from public Workable job board pages."""
+class PersonioAdapter(CareerSourceAdapter):
+    """Fetch jobs from public Personio careers site pages."""
 
-    adapter_name = "workable"
+    adapter_name = "personio"
 
     def __init__(self, user_agent: str) -> None:
         """Create adapter instance.
@@ -45,10 +48,10 @@ class WorkableAdapter(CareerSourceAdapter):
     async def fetch_jobs(
         self, base_url: str, timeout_seconds: float, max_jobs: int
     ) -> list[JobCandidate]:
-        """Fetch and parse Workable jobs.
+        """Fetch and parse Personio jobs.
 
         Args:
-            base_url: Workable board URL.
+            base_url: Personio careers site URL.
             timeout_seconds: Request timeout in seconds.
             max_jobs: Maximum number of jobs.
 
@@ -60,7 +63,7 @@ class WorkableAdapter(CareerSourceAdapter):
         return self._parse_html(base_url, html, max_jobs)
 
     def _parse_html(self, base_url: str, html: str, max_jobs: int) -> list[JobCandidate]:
-        """Parse Workable board HTML into job candidates.
+        """Parse Personio careers HTML into job candidates.
 
         Args:
             base_url: Source URL.
@@ -100,7 +103,7 @@ class WorkableAdapter(CareerSourceAdapter):
                     location=self._extract_location(anchor),
                     company=company_from_url(base_url),
                     url=absolute_url,
-                    raw={"source": "workable"},
+                    raw={"source": "personio"},
                 )
             )
             if len(jobs) >= max_jobs:
@@ -110,49 +113,52 @@ class WorkableAdapter(CareerSourceAdapter):
 
     @classmethod
     def _is_posting_href(cls, href: str | None) -> bool:
-        """Report whether an href points at a Workable posting.
+        """Report whether an href points at a Personio posting.
 
-        Workable posting URLs carry a ``/j/{shortcode}`` path segment pair,
-        where ``shortcode`` is an uppercase alphanumeric identifier. Board
-        navigation links (about, departments, external redirects) never match
-        that shape.
+        Personio posting URLs carry a *singular* ``job`` path segment immediately
+        followed by a numeric ``{jobId}`` segment (``/job/{jobId}``), which must
+        be the terminal path segment. This excludes the application step
+        (``/job/{jobId}/apply``), whose numeric id segment is not terminal, and
+        the plural ``/jobs`` list variants used by other ATSs.
 
         Args:
             href: Candidate href value.
 
         Returns:
-            True when the URL exposes a ``/j/{shortcode}`` segment pair.
+            True when the URL exposes a terminal ``job/{jobId}`` segment pair.
         """
 
         return cls._extract_external_id(href) is not None
 
     @staticmethod
     def _extract_external_id(job_url: str | None) -> str | None:
-        """Extract the posting shortcode from a Workable URL.
+        """Extract the posting job id from a Personio URL.
 
         Args:
-            job_url: Workable job URL or href.
+            job_url: Personio job URL or href.
 
         Returns:
-            Shortcode string when the ``/j/{shortcode}`` shape is present.
+            Numeric job id string when the terminal ``job/{jobId}`` shape is
+            present.
         """
 
         if not job_url:
             return None
         parts = [part for part in urlparse(job_url).path.split("/") if part]
-        for index, part in enumerate(parts[:-1]):
-            if part == "j":
-                candidate = parts[index + 1]
-                if _SHORTCODE_PATTERN.match(candidate):
-                    return candidate
+        for index, part in enumerate(parts):
+            if part != "job" or index + 1 >= len(parts):
+                continue
+            match = _JOB_ID_SEGMENT.match(parts[index + 1])
+            if match and index + 2 == len(parts):
+                return match.group(1)
         return None
 
     @staticmethod
     def _extract_location(anchor: object) -> str | None:
         """Resolve a posting location from an anchor's surrounding markup.
 
-        Workable groups a posting's metadata (department, location) alongside
-        the title anchor. The location is looked up within the anchor's nearest
+        Personio groups a posting's metadata (office, department) alongside the
+        title anchor. The location is looked up within the anchor's nearest
         posting container so a posting without its own location does not inherit
         a sibling's location.
 

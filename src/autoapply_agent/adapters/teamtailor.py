@@ -19,9 +19,15 @@ from urllib.parse import urljoin, urlparse
 
 from bs4 import BeautifulSoup
 
-from autoapply_agent.adapters.base import CareerSourceAdapter, JobCandidate, company_from_url
+from autoapply_agent.adapters.base import (
+    CareerSourceAdapter,
+    JobCandidate,
+    company_from_url,
+    find_location_text,
+)
 
 _JOB_ID_SEGMENT = re.compile(r"^(\d+)(?:-[a-z0-9-]+)?$")
+_CONTAINER_CLASS_PATTERN = re.compile("job|posting|opening", re.IGNORECASE)
 
 
 class TeamtailorAdapter(CareerSourceAdapter):
@@ -163,21 +169,7 @@ class TeamtailorAdapter(CareerSourceAdapter):
             Location text when discoverable, else None.
         """
 
-        find_parent = getattr(anchor, "find_parent", None)
-        if find_parent is None:
-            return None
-        container = find_parent(attrs={"class": re.compile("job|posting|opening", re.IGNORECASE)})
-        scope = container if container is not None else getattr(anchor, "parent", None)
-        if scope is None:
-            return None
-        select_one = getattr(scope, "select_one", None)
-        if select_one is None:
-            return None
-        location_node = select_one("[class*=location]")
-        if location_node is None:
-            return None
-        text = location_node.get_text(" ", strip=True)
-        return text or None
+        return find_location_text(anchor, _CONTAINER_CLASS_PATTERN)
 
     @staticmethod
     def _normalize_href(href_value: str | Sequence[str] | None) -> str | None:

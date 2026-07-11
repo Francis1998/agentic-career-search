@@ -69,6 +69,12 @@ async def _insert_defaults(session: AsyncSession) -> None:
                 base_url="https://example.teamtailor.com/jobs",
                 enabled=True,
             ),
+            SourceConfig(
+                name="example-personio",
+                source_type=SourceType.PERSONIO.value,
+                base_url="https://example.jobs.personio.com",
+                enabled=True,
+            ),
         ]
     )
 
