@@ -12,6 +12,7 @@ from autoapply_agent.adapters.ashby import AshbyAdapter
 from autoapply_agent.adapters.greenhouse import GreenhouseAdapter
 from autoapply_agent.adapters.jsonld import JsonLdAdapter
 from autoapply_agent.adapters.lever import LeverAdapter
+from autoapply_agent.adapters.personio import PersonioAdapter
 from autoapply_agent.adapters.recruitee import RecruiteeAdapter
 from autoapply_agent.adapters.smartrecruiters import SmartRecruitersAdapter
 from autoapply_agent.adapters.teamtailor import TeamtailorAdapter
@@ -84,6 +85,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.RECRUITEE: RecruiteeAdapter(active_settings.http_user_agent),
                 SourceType.SMARTRECRUITERS: SmartRecruitersAdapter(active_settings.http_user_agent),
                 SourceType.TEAMTAILOR: TeamtailorAdapter(active_settings.http_user_agent),
+                SourceType.PERSONIO: PersonioAdapter(active_settings.http_user_agent),
             },
             scoring_service=DeterministicScoringService(),
             planning_service=DeterministicPlanningService(),

@@ -6,6 +6,13 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `PersonioAdapter` (`source_type: personio`): a dedicated adapter for public
+  Personio careers sites (`{tenant}.jobs.personio.de` / `.com`), the dominant
+  ATS across DACH/EU employers. Postings are recognised purely by their terminal
+  *singular* `/job/{jobId}` URL shape (an optional hyphenated title slug may
+  trail the id), so the plural `/jobs` list page, the `/job/{jobId}/apply`
+  application step, and navigation links are ignored and the numeric posting id
+  is captured as the `external_id`. See ADR-084.
 - `TeamtailorAdapter` (`source_type: teamtailor`): a dedicated adapter for public
   Teamtailor careers sites (`{company}.teamtailor.com`). Postings are recognised
   purely by their terminal `/jobs/{jobId}-{slug}` URL shape (also matched under a
