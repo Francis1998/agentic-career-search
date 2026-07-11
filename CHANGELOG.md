@@ -37,6 +37,14 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   sites) is supported without a bespoke scraper. See ADR-078.
 
 ### Fixed
+- Posting location resolution misread a `relocation` badge as the posting's
+  location. The shared lookup selected any element whose `class` merely
+  *contained* the substring `location` (`[class*=location]`), so a posting
+  advertising relocation assistance surfaced that text as its location even when
+  no real location element was present. Location is now resolved only from a
+  `class` token that *is* `location` (optionally hyphen/underscore-delimited,
+  e.g. `job-location`), via a shared `find_location_text` helper reused by the
+  Ashby, Workable, Recruitee, SmartRecruiters, and Teamtailor adapters.
 - `LeverAdapter` fallback anchor matching (used when the primary `div.posting`
   selector is absent, e.g. alternative or client-rendered board markup) searched
   for a `/jobs/` path segment that real Lever posting URLs
