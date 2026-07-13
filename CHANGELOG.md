@@ -5,6 +5,15 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Added
+- `JobviteAdapter` (`source_type: jobvite`): a dedicated adapter for public
+  Jobvite careers sites (`jobs.jobvite.com/{company}`). Postings are recognised
+  purely by their terminal *singular* `/job/{jobId}` URL shape (also matched
+  under a `/careers/{company}` prefix), where `jobId` is a mixed-case
+  alphanumeric id — so the plural `/jobs` list page, the `/job/{jobId}/apply`
+  step, and navigation links are ignored and the id is captured as the
+  `external_id`. See ADR-086.
+
 ### Fixed
 - `JsonLdAdapter`: distinct `JobPosting` blocks that omit their own `url` no
   longer collapse into a single candidate. Such postings previously all fell
