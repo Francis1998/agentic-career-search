@@ -162,6 +162,34 @@ def test_jsonld_deduplicates_by_url() -> None:
     assert jobs[0].title == "Role A"
 
 
+URLLESS_POSTINGS_HTML = """
+<script type="application/ld+json">
+[
+  {"@type": "JobPosting", "title": "Platform Engineer"},
+  {"@type": "JobPosting", "title": "Site Reliability Engineer"}
+]
+</script>
+"""
+
+
+def test_jsonld_keeps_distinct_postings_without_explicit_url() -> None:
+    """Distinct postings that omit their own URL must not collapse under dedup.
+
+    A ``JobPosting`` block need not carry a ``url``; when absent the candidate
+    falls back to ``base_url``. Deduplicating solely on that shared fallback URL
+    silently discarded every url-less posting after the first. Distinct roles
+    must each survive, keyed apart by title.
+    """
+
+    adapter = JsonLdAdapter(user_agent="test-agent")
+    jobs = adapter._parse_html(
+        "https://acme.example.com/careers", URLLESS_POSTINGS_HTML, max_jobs=10
+    )
+
+    assert {job.title for job in jobs} == {"Platform Engineer", "Site Reliability Engineer"}
+    assert all(job.url == "https://acme.example.com/careers" for job in jobs)
+
+
 def test_jsonld_honors_zero_max_jobs() -> None:
     """A non-positive max_jobs must yield no candidates."""
 

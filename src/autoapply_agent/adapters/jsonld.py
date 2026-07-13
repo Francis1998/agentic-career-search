@@ -73,7 +73,7 @@ class JsonLdAdapter(CareerSourceAdapter):
 
         soup = BeautifulSoup(html, "html.parser")
         jobs: list[JobCandidate] = []
-        seen_urls: set[str] = set()
+        seen_keys: set[tuple[str, str]] = set()
         for script in soup.find_all("script", attrs={"type": "application/ld+json"}):
             raw_text = script.string or script.get_text()
             if not raw_text or not raw_text.strip():
@@ -87,9 +87,20 @@ class JsonLdAdapter(CareerSourceAdapter):
                 candidate = self._build_candidate(base_url, node)
                 if candidate is None:
                     continue
-                if candidate.url in seen_urls:
+                # Postings that omit their own ``url`` all fall back to
+                # ``base_url``; keying dedup solely on the URL would collapse
+                # such distinct postings into one. A posting that carries its
+                # own URL is still deduplicated by that URL alone (the URL is
+                # the posting identity), while url-less postings are kept apart
+                # by title so genuinely distinct roles all survive.
+                dedup_key = (
+                    (candidate.url, "")
+                    if candidate.url != base_url
+                    else (base_url, candidate.title)
+                )
+                if dedup_key in seen_keys:
                     continue
-                seen_urls.add(candidate.url)
+                seen_keys.add(dedup_key)
                 jobs.append(candidate)
                 if len(jobs) >= max_jobs:
                     return jobs
