@@ -75,6 +75,12 @@ async def _insert_defaults(session: AsyncSession) -> None:
                 base_url="https://example.jobs.personio.com",
                 enabled=True,
             ),
+            SourceConfig(
+                name="example-bamboohr",
+                source_type=SourceType.BAMBOOHR.value,
+                base_url="https://example.bamboohr.com/careers",
+                enabled=True,
+            ),
         ]
     )
 

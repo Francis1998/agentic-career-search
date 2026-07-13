@@ -5,7 +5,23 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Fixed
+- `JsonLdAdapter`: distinct `JobPosting` blocks that omit their own `url` no
+  longer collapse into a single candidate. Such postings previously all fell
+  back to `base_url` and were discarded after the first by URL deduplication;
+  dedup now keys explicit-url postings by URL and url-less postings by title.
+- Bumped the `pillow` dev-dependency floor to `>=12.3.0` so the scheduled
+  Security Scan (`pip-audit`) no longer fails on the five advisories
+  (PYSEC-2026-2253..2257) affecting the previously resolved 12.2.0.
+
 ### Added
+- `BambooHrAdapter` (`source_type: bamboohr`): the package's first structured-JSON
+  source adapter, for public BambooHR hosted careers boards
+  (`{tenant}.bamboohr.com`). BambooHR careers pages are client-rendered, so the
+  adapter reads the tenant's public `/careers/list` JSON endpoint directly and
+  maps each opening to `/careers/{id}`. Handles object and string locations plus
+  the `isRemote` flag, and skips blank-id rows that would otherwise collapse
+  distinct postings under URL dedup. See ADR-085.
 - `PersonioAdapter` (`source_type: personio`): a dedicated adapter for public
   Personio careers sites (`{tenant}.jobs.personio.de` / `.com`), the dominant
   ATS across DACH/EU employers. Postings are recognised purely by their terminal

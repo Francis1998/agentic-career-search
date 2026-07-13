@@ -93,7 +93,13 @@ Each `SourceConfig` selects a source adapter by `source_type`:
 | `smartrecruiters` | `SmartRecruitersAdapter` | Recognises `jobs.smartrecruiters.com/{company}/{jobId}-{slug}` posting anchors by URL shape | SmartRecruiters-hosted careers sites |
 | `teamtailor` | `TeamtailorAdapter` | Recognises `{company}.teamtailor.com/jobs/{jobId}-{slug}` posting anchors by URL shape | Teamtailor-hosted careers sites |
 | `personio` | `PersonioAdapter` | Recognises `{tenant}.jobs.personio.de`/`.com/job/{jobId}` posting anchors by URL shape | Personio-hosted careers sites (DACH/EU) |
+| `bamboohr` | `BambooHrAdapter` | Reads the public `{tenant}.bamboohr.com/careers/list` **JSON** board and maps each opening to `/careers/{id}` | BambooHR-hosted careers sites (SMB tech/healthcare/services) |
 | `jsonld` | `JsonLdAdapter` | Reads embedded `schema.org/JobPosting` JSON-LD | **Any** board emitting Google-Jobs structured data (SmartRecruiters, custom career sites, ...) |
+
+Unlike the HTML-scraping adapters, `bamboohr` is a structured-JSON source: the
+BambooHR careers page is a client-rendered app, so the adapter reads the tenant's
+public `/careers/list` JSON endpoint directly (stable titles, locations, and
+remote flags) instead of parsing rendered markup.
 
 The `jsonld` adapter is vendor-neutral: modern ATS platforms publish
 `<script type="application/ld+json">` `JobPosting` payloads so their roles appear

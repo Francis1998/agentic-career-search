@@ -34,6 +34,7 @@ class SourceType(StrEnum):
     SMARTRECRUITERS = "smartrecruiters"
     TEAMTAILOR = "teamtailor"
     PERSONIO = "personio"
+    BAMBOOHR = "bamboohr"
 
 
 class RunStatus(StrEnum):
