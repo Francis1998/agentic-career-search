@@ -136,9 +136,15 @@ class JsonLdAdapter(CareerSourceAdapter):
             if isinstance(value, (list, dict)):
                 yield from cls._iter_job_postings(value)
 
-    @staticmethod
-    def _is_job_posting(node: dict[str, object]) -> bool:
+    @classmethod
+    def _is_job_posting(cls, node: dict[str, object]) -> bool:
         """Report whether a JSON-LD object declares the JobPosting type.
+
+        A ``@type`` may be expressed as the bare term (``JobPosting``), a
+        fully-qualified IRI (``https://schema.org/JobPosting``), or a
+        context-prefixed CURIE (``schema:JobPosting``); all three are valid
+        schema.org expressions of the same type, so each must be recognised to
+        avoid silently dropping otherwise valid postings.
 
         Args:
             node: Decoded JSON-LD object.
@@ -149,10 +155,34 @@ class JsonLdAdapter(CareerSourceAdapter):
 
         node_type = node.get("@type")
         if isinstance(node_type, str):
-            return node_type == _JOB_POSTING_TYPE
+            return cls._type_term(node_type) == _JOB_POSTING_TYPE
         if isinstance(node_type, list):
-            return _JOB_POSTING_TYPE in node_type
+            return any(
+                isinstance(item, str) and cls._type_term(item) == _JOB_POSTING_TYPE
+                for item in node_type
+            )
         return False
+
+    @staticmethod
+    def _type_term(node_type: str) -> str:
+        """Reduce a JSON-LD ``@type`` value to its bare local term.
+
+        The local term is the segment after the final ``/`` (IRI form) or ``:``
+        (CURIE form), so ``https://schema.org/JobPosting`` and
+        ``schema:JobPosting`` both reduce to ``JobPosting`` while a bare term is
+        returned unchanged.
+
+        Args:
+            node_type: A single ``@type`` string value.
+
+        Returns:
+            The local term with surrounding whitespace stripped.
+        """
+
+        term = node_type.strip()
+        for separator in ("/", ":"):
+            term = term.rsplit(separator, 1)[-1]
+        return term
 
     @classmethod
     def _build_candidate(cls, base_url: str, node: dict[str, object]) -> JobCandidate | None:

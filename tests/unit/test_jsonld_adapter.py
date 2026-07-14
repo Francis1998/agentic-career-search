@@ -190,6 +190,65 @@ def test_jsonld_keeps_distinct_postings_without_explicit_url() -> None:
     assert all(job.url == "https://acme.example.com/careers" for job in jobs)
 
 
+IRI_AND_CURIE_TYPE_HTML = """
+<script type="application/ld+json">
+{"@type": "http://schema.org/JobPosting", "title": "Staff ML Engineer",
+ "url": "https://acme.example.com/jobs/iri"}
+</script>
+<script type="application/ld+json">
+{"@type": "schema:JobPosting", "title": "Applied Scientist",
+ "url": "https://acme.example.com/jobs/curie"}
+</script>
+<script type="application/ld+json">
+{"@type": ["https://schema.org/JobPosting", "WebPage"], "title": "MLOps Engineer",
+ "url": "https://acme.example.com/jobs/iri-list"}
+</script>
+"""
+
+
+def test_jsonld_recognizes_iri_and_curie_type_forms() -> None:
+    """Fully-qualified IRI and prefixed CURIE ``@type`` forms must be parsed.
+
+    schema.org lets a ``@type`` be written as the bare term, a fully-qualified
+    IRI (``https://schema.org/JobPosting``), or a context-prefixed CURIE
+    (``schema:JobPosting``). Matching only the bare term silently dropped every
+    posting emitted with an IRI/CURIE type, which some real applicant tracking
+    systems produce. All three forms must resolve to a candidate.
+    """
+
+    adapter = JsonLdAdapter(user_agent="test-agent")
+    jobs = adapter._parse_html(
+        "https://acme.example.com/careers", IRI_AND_CURIE_TYPE_HTML, max_jobs=10
+    )
+
+    assert {job.title for job in jobs} == {
+        "Staff ML Engineer",
+        "Applied Scientist",
+        "MLOps Engineer",
+    }
+
+
+def test_jsonld_type_term_ignores_lookalike_types() -> None:
+    """A type whose local term is not exactly ``JobPosting`` must be rejected.
+
+    Reducing an IRI/CURIE to its local term must not over-match unrelated types
+    such as ``SomeJobPosting`` or ``JobPostingList`` that merely embed the term.
+    """
+
+    lookalike_html = (
+        '<script type="application/ld+json">'
+        '{"@type": "SomeJobPosting", "title": "Not A Posting", "url": "https://x/1"}'
+        "</script>"
+        '<script type="application/ld+json">'
+        '{"@type": "https://schema.org/JobPostingList", "title": "Also Not", "url": "https://x/2"}'
+        "</script>"
+    )
+    adapter = JsonLdAdapter(user_agent="test-agent")
+    jobs = adapter._parse_html("https://acme.example.com/careers", lookalike_html, max_jobs=10)
+
+    assert jobs == []
+
+
 def test_jsonld_honors_zero_max_jobs() -> None:
     """A non-positive max_jobs must yield no candidates."""
 

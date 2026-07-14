@@ -15,6 +15,11 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `external_id`. See ADR-086.
 
 ### Fixed
+- `JsonLdAdapter`: `JobPosting` blocks whose `@type` is a fully-qualified IRI
+  (`https://schema.org/JobPosting`) or a context-prefixed CURIE
+  (`schema:JobPosting`) are now recognised. Only the bare `JobPosting` term was
+  matched previously, silently dropping every posting emitted with an IRI/CURIE
+  type. Type matching now compares the local term after the final `/` or `:`.
 - `JsonLdAdapter`: distinct `JobPosting` blocks that omit their own `url` no
   longer collapse into a single candidate. Such postings previously all fell
   back to `base_url` and were discarded after the first by URL deduplication;
