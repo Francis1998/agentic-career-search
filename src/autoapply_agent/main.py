@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from autoapply_agent.adapters.ashby import AshbyAdapter
 from autoapply_agent.adapters.bamboohr import BambooHrAdapter
 from autoapply_agent.adapters.greenhouse import GreenhouseAdapter
+from autoapply_agent.adapters.jobvite import JobviteAdapter
 from autoapply_agent.adapters.jsonld import JsonLdAdapter
 from autoapply_agent.adapters.lever import LeverAdapter
 from autoapply_agent.adapters.personio import PersonioAdapter
@@ -88,6 +89,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.TEAMTAILOR: TeamtailorAdapter(active_settings.http_user_agent),
                 SourceType.PERSONIO: PersonioAdapter(active_settings.http_user_agent),
                 SourceType.BAMBOOHR: BambooHrAdapter(active_settings.http_user_agent),
+                SourceType.JOBVITE: JobviteAdapter(active_settings.http_user_agent),
             },
             scoring_service=DeterministicScoringService(),
             planning_service=DeterministicPlanningService(),

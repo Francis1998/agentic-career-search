@@ -5,7 +5,21 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Added
+- `JobviteAdapter` (`source_type: jobvite`): a dedicated adapter for public
+  Jobvite careers sites (`jobs.jobvite.com/{company}`). Postings are recognised
+  purely by their terminal *singular* `/job/{jobId}` URL shape (also matched
+  under a `/careers/{company}` prefix), where `jobId` is a mixed-case
+  alphanumeric id — so the plural `/jobs` list page, the `/job/{jobId}/apply`
+  step, and navigation links are ignored and the id is captured as the
+  `external_id`. See ADR-086.
+
 ### Fixed
+- `JsonLdAdapter`: `JobPosting` blocks whose `@type` is a fully-qualified IRI
+  (`https://schema.org/JobPosting`) or a context-prefixed CURIE
+  (`schema:JobPosting`) are now recognised. Only the bare `JobPosting` term was
+  matched previously, silently dropping every posting emitted with an IRI/CURIE
+  type. Type matching now compares the local term after the final `/` or `:`.
 - `JsonLdAdapter`: distinct `JobPosting` blocks that omit their own `url` no
   longer collapse into a single candidate. Such postings previously all fell
   back to `base_url` and were discarded after the first by URL deduplication;
