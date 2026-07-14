@@ -81,6 +81,12 @@ async def _insert_defaults(session: AsyncSession) -> None:
                 base_url="https://example.bamboohr.com/careers",
                 enabled=True,
             ),
+            SourceConfig(
+                name="example-jobvite",
+                source_type=SourceType.JOBVITE.value,
+                base_url="https://jobs.jobvite.com/example",
+                enabled=True,
+            ),
         ]
     )
 
