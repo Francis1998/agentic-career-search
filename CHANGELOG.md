@@ -6,6 +6,13 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `IcimsAdapter` (`source_type: icims`): a dedicated adapter for public iCIMS
+  careers portals (`careers-{tenant}.icims.com`, plus vanity-domain proxies).
+  Postings are recognised purely by their `/jobs/{jobId}/{slug}/job` URL shape
+  (terminal literal `job`, numeric id, slug optional) — so the `/jobs/search`
+  grid, the application step, and navigation links are ignored and the numeric
+  id is captured as the `external_id`. Titles fall back to the anchor `title`
+  attribute when the anchor text is empty. See ADR-087.
 - `JobviteAdapter` (`source_type: jobvite`): a dedicated adapter for public
   Jobvite careers sites (`jobs.jobvite.com/{company}`). Postings are recognised
   purely by their terminal *singular* `/job/{jobId}` URL shape (also matched
@@ -15,6 +22,11 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `external_id`. See ADR-086.
 
 ### Fixed
+- `JsonLdAdapter`: a `hiringOrganization` expressed as a (possibly
+  single-element) JSON-LD array now yields its company name instead of being
+  silently dropped. `jobLocation` already handled the array form, but
+  `hiringOrganization` did not, so a wrapped organization name was lost and the
+  company fell back to the host-derived token.
 - `JsonLdAdapter`: `JobPosting` blocks whose `@type` is a fully-qualified IRI
   (`https://schema.org/JobPosting`) or a context-prefixed CURIE
   (`schema:JobPosting`) are now recognised. Only the bare `JobPosting` term was

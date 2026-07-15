@@ -36,6 +36,7 @@ class SourceType(StrEnum):
     PERSONIO = "personio"
     BAMBOOHR = "bamboohr"
     JOBVITE = "jobvite"
+    ICIMS = "icims"
 
 
 class RunStatus(StrEnum):
