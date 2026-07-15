@@ -262,17 +262,30 @@ class JsonLdAdapter(CareerSourceAdapter):
                 return str(value).strip()
         return None
 
-    @staticmethod
-    def _extract_company(organization: object) -> str | None:
+    @classmethod
+    def _extract_company(cls, organization: object) -> str | None:
         """Extract a hiring organization name.
 
+        JSON-LD permits any property to be expressed either as a scalar or as an
+        array of values, so ``hiringOrganization`` may arrive as a bare string,
+        an ``Organization`` object, or a (possibly single-element) list wrapping
+        either form. All must be handled or a wrapped organization name is
+        silently dropped and the posting falls back to the host-derived company.
+
         Args:
-            organization: Either a string or an ``Organization`` object.
+            organization: A string, an ``Organization`` object, or a list of
+                such values.
 
         Returns:
-            Company name when present.
+            First resolvable company name, else None.
         """
 
+        if isinstance(organization, list):
+            for item in organization:
+                resolved = cls._extract_company(item)
+                if resolved:
+                    return resolved
+            return None
         if isinstance(organization, str):
             return organization.strip() or None
         if isinstance(organization, dict):

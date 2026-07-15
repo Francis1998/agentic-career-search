@@ -249,6 +249,37 @@ def test_jsonld_type_term_ignores_lookalike_types() -> None:
     assert jobs == []
 
 
+LIST_HIRING_ORG_HTML = """
+<script type="application/ld+json">
+{
+  "@type": "JobPosting",
+  "title": "Principal Engineer",
+  "url": "https://acme.example.com/jobs/list-org",
+  "hiringOrganization": [{"@type": "Organization", "name": "Acme Labs"}]
+}
+</script>
+"""
+
+
+def test_jsonld_extracts_company_when_hiring_organization_is_a_list() -> None:
+    """A list-wrapped ``hiringOrganization`` must still yield its company name.
+
+    JSON-LD permits any property to be expressed as an array, so a posting may
+    carry ``"hiringOrganization": [{"@type": "Organization", "name": ...}]``.
+    ``jobLocation`` already handled that list form, but ``hiringOrganization``
+    did not: the wrapped organization name was silently dropped and the company
+    fell back to the host-derived token. The real organization name must win.
+    """
+
+    adapter = JsonLdAdapter(user_agent="test-agent")
+    jobs = adapter._parse_html(
+        "https://boards.example.com/careers", LIST_HIRING_ORG_HTML, max_jobs=10
+    )
+
+    assert len(jobs) == 1
+    assert jobs[0].company == "Acme Labs"
+
+
 def test_jsonld_honors_zero_max_jobs() -> None:
     """A non-positive max_jobs must yield no candidates."""
 
