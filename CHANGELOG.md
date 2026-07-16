@@ -6,6 +6,13 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `WorkdayAdapter` (`source_type: workday`): a structured-JSON adapter for public
+  Workday careers boards (`{tenant}.wd{N}.myworkdayjobs.com`). The listing page
+  is a client-rendered SPA, so the adapter POSTs to the public CXS endpoint
+  `/wday/cxs/{tenant}/{site}/jobs` (hard page size 20), maps each
+  `jobPostings[]` entry onto `{origin}/{locale}/{site}{externalPath}`, and
+  captures the trailing `JR…` / `R-…` requisition token as `external_id`. See
+  ADR-088 and `docs/guides/WORKDAY_SOURCE_GUIDE.md`.
 - `IcimsAdapter` (`source_type: icims`): a dedicated adapter for public iCIMS
   careers portals (`careers-{tenant}.icims.com`, plus vanity-domain proxies).
   Postings are recognised purely by their `/jobs/{jobId}/{slug}/job` URL shape
@@ -22,6 +29,12 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `external_id`. See ADR-086.
 
 ### Fixed
+- `JsonLdAdapter`: a `Place.address` expressed as a (possibly single-element)
+  JSON-LD array of `PostalAddress` objects now yields a location string instead
+  of being silently dropped. `jobLocation` already handled a list of Places and
+  `hiringOrganization` handled a list of orgs, but `_place_to_string` required
+  `address` to be a string or dict — leaving `location=None` for otherwise
+  complete postings.
 - `JsonLdAdapter`: a `hiringOrganization` expressed as a (possibly
   single-element) JSON-LD array now yields its company name instead of being
   silently dropped. `jobLocation` already handled the array form, but
