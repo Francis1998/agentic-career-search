@@ -37,6 +37,7 @@ class SourceType(StrEnum):
     BAMBOOHR = "bamboohr"
     JOBVITE = "jobvite"
     ICIMS = "icims"
+    WORKDAY = "workday"
 
 
 class RunStatus(StrEnum):

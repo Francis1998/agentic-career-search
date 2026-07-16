@@ -313,9 +313,13 @@ class JsonLdAdapter(CareerSourceAdapter):
             return None
         return cls._place_to_string(job_location)
 
-    @staticmethod
-    def _place_to_string(place: object) -> str | None:
+    @classmethod
+    def _place_to_string(cls, place: object) -> str | None:
         """Convert a schema.org Place into a compact location string.
+
+        JSON-LD permits any property as an array, so ``address`` may be a bare
+        string, a ``PostalAddress`` object, or a (possibly single-element) list
+        of those. All three shapes are resolved; the first usable entry wins.
 
         Args:
             place: A ``Place`` object.
@@ -326,7 +330,25 @@ class JsonLdAdapter(CareerSourceAdapter):
 
         if not isinstance(place, dict):
             return None
-        address = place.get("address")
+        return cls._address_to_string(place.get("address"))
+
+    @classmethod
+    def _address_to_string(cls, address: object) -> str | None:
+        """Resolve a PostalAddress value that may be a string, object, or list.
+
+        Args:
+            address: A schema.org ``address`` property value.
+
+        Returns:
+            Compact location string when derivable, else None.
+        """
+
+        if isinstance(address, list):
+            for item in address:
+                resolved = cls._address_to_string(item)
+                if resolved:
+                    return resolved
+            return None
         if isinstance(address, str):
             return address.strip() or None
         if not isinstance(address, dict):

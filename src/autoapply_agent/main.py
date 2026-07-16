@@ -20,6 +20,7 @@ from autoapply_agent.adapters.recruitee import RecruiteeAdapter
 from autoapply_agent.adapters.smartrecruiters import SmartRecruitersAdapter
 from autoapply_agent.adapters.teamtailor import TeamtailorAdapter
 from autoapply_agent.adapters.workable import WorkableAdapter
+from autoapply_agent.adapters.workday import WorkdayAdapter
 from autoapply_agent.api.routes_health import router as health_router
 from autoapply_agent.api.routes_jobs import router as jobs_router
 from autoapply_agent.api.routes_runs import router as runs_router
@@ -92,6 +93,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.BAMBOOHR: BambooHrAdapter(active_settings.http_user_agent),
                 SourceType.JOBVITE: JobviteAdapter(active_settings.http_user_agent),
                 SourceType.ICIMS: IcimsAdapter(active_settings.http_user_agent),
+                SourceType.WORKDAY: WorkdayAdapter(active_settings.http_user_agent),
             },
             scoring_service=DeterministicScoringService(),
             planning_service=DeterministicPlanningService(),

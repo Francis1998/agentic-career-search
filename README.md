@@ -96,12 +96,14 @@ Each `SourceConfig` selects a source adapter by `source_type`:
 | `bamboohr` | `BambooHrAdapter` | Reads the public `{tenant}.bamboohr.com/careers/list` **JSON** board and maps each opening to `/careers/{id}` | BambooHR-hosted careers sites (SMB tech/healthcare/services) |
 | `jobvite` | `JobviteAdapter` | Recognises `jobs.jobvite.com/{company}/job/{jobId}` posting anchors by URL shape (terminal singular `job`, alphanumeric id) | Jobvite-hosted careers sites |
 | `icims` | `IcimsAdapter` | Recognises `careers-{tenant}.icims.com/jobs/{jobId}/{slug}/job` posting anchors by URL shape (terminal literal `job`, numeric id; slug optional) | iCIMS-hosted careers portals (enterprise) and vanity-domain proxies |
+| `workday` | `WorkdayAdapter` | POSTs the public `{tenant}.wd{N}.myworkdayjobs.com/wday/cxs/{tenant}/{site}/jobs` **JSON** CXS board (page size 20) and maps each posting to `{origin}/{locale}/{site}{externalPath}` | Workday-hosted enterprise careers sites |
 | `jsonld` | `JsonLdAdapter` | Reads embedded `schema.org/JobPosting` JSON-LD | **Any** board emitting Google-Jobs structured data (SmartRecruiters, custom career sites, ...) |
 
-Unlike the HTML-scraping adapters, `bamboohr` is a structured-JSON source: the
-BambooHR careers page is a client-rendered app, so the adapter reads the tenant's
-public `/careers/list` JSON endpoint directly (stable titles, locations, and
-remote flags) instead of parsing rendered markup.
+Unlike the HTML-scraping adapters, `bamboohr` and `workday` are structured-JSON
+sources: BambooHR and Workday careers pages are client-rendered apps, so those
+adapters read the tenant's public JSON listing endpoints directly (stable titles,
+locations, and ids) instead of parsing rendered markup. Workday uses the public
+CXS POST API — see [`docs/guides/WORKDAY_SOURCE_GUIDE.md`](docs/guides/WORKDAY_SOURCE_GUIDE.md).
 
 The `jsonld` adapter is vendor-neutral: modern ATS platforms publish
 `<script type="application/ld+json">` `JobPosting` payloads so their roles appear

@@ -280,6 +280,47 @@ def test_jsonld_extracts_company_when_hiring_organization_is_a_list() -> None:
     assert jobs[0].company == "Acme Labs"
 
 
+LIST_ADDRESS_HTML = """
+<script type="application/ld+json">
+{
+  "@type": "JobPosting",
+  "title": "Platform Engineer",
+  "url": "https://careers.example.com/jobs/1",
+  "hiringOrganization": {"@type": "Organization", "name": "Acme"},
+  "jobLocation": {
+    "@type": "Place",
+    "address": [{
+      "@type": "PostalAddress",
+      "addressLocality": "Austin",
+      "addressRegion": "TX",
+      "addressCountry": "US"
+    }]
+  }
+}
+</script>
+"""
+
+
+def test_jsonld_extracts_location_when_address_is_a_list() -> None:
+    """A list-wrapped ``Place.address`` must still yield a location string.
+
+    JSON-LD permits any property as an array, so a Place may carry
+    ``"address": [{"@type": "PostalAddress", ...}]``. ``jobLocation`` already
+    handled a list of Places, and ``hiringOrganization`` handled a list of orgs,
+    but ``_place_to_string`` previously required ``address`` to be a string or
+    dict and dropped the list form — leaving ``location=None`` for otherwise
+    complete postings. The first resolvable PostalAddress must win.
+    """
+
+    adapter = JsonLdAdapter(user_agent="test-agent")
+    jobs = adapter._parse_html(
+        "https://careers.example.com/careers", LIST_ADDRESS_HTML, max_jobs=10
+    )
+
+    assert len(jobs) == 1
+    assert jobs[0].location == "Austin, TX, US"
+
+
 def test_jsonld_honors_zero_max_jobs() -> None:
     """A non-positive max_jobs must yield no candidates."""
 
