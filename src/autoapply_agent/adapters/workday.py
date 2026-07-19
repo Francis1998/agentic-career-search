@@ -84,6 +84,7 @@ class WorkdayAdapter(CareerSourceAdapter):
                 board["cxs_url"],
                 board["origin"],
                 board["site"],
+                board["locale"],
                 timeout_seconds,
                 limit=page_limit,
                 offset=offset,
@@ -227,6 +228,7 @@ class WorkdayAdapter(CareerSourceAdapter):
         cxs_url: str,
         origin: str,
         site: str,
+        locale: str,
         timeout_seconds: float,
         *,
         limit: int,
@@ -238,6 +240,8 @@ class WorkdayAdapter(CareerSourceAdapter):
             cxs_url: Fully-qualified CXS listing URL.
             origin: Board origin used for the Referer header.
             site: Site slug used for the Referer header.
+            locale: Board locale segment used for the Referer header (for example
+                ``en-US`` or ``fr-FR``).
             timeout_seconds: Request timeout in seconds.
             limit: Page size (capped at 20 by Workday).
             offset: Zero-based offset into the listing.
@@ -254,7 +258,7 @@ class WorkdayAdapter(CareerSourceAdapter):
             "User-Agent": self._user_agent,
             "Accept": "application/json",
             "Content-Type": "application/json",
-            "Referer": f"{origin}/en-US/{site}",
+            "Referer": f"{origin}/{locale}/{site}",
         }
         body = {
             "appliedFacets": {},

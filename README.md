@@ -97,6 +97,7 @@ Each `SourceConfig` selects a source adapter by `source_type`:
 | `jobvite` | `JobviteAdapter` | Recognises `jobs.jobvite.com/{company}/job/{jobId}` posting anchors by URL shape (terminal singular `job`, alphanumeric id) | Jobvite-hosted careers sites |
 | `icims` | `IcimsAdapter` | Recognises `careers-{tenant}.icims.com/jobs/{jobId}/{slug}/job` posting anchors by URL shape (terminal literal `job`, numeric id; slug optional) | iCIMS-hosted careers portals (enterprise) and vanity-domain proxies |
 | `workday` | `WorkdayAdapter` | POSTs the public `{tenant}.wd{N}.myworkdayjobs.com/wday/cxs/{tenant}/{site}/jobs` **JSON** CXS board (page size 20) and maps each posting to `{origin}/{locale}/{site}{externalPath}` | Workday-hosted enterprise careers sites |
+| `phenom` | `PhenomAdapter` | Recognises Phenom posting anchors via locale-prefixed `/job/{id}` / `/jobs/{id}` path shapes (optional slug) or `jobId` query ids | Phenom (`*.phenompeople.com`) and vanity-domain careers portals |
 | `jsonld` | `JsonLdAdapter` | Reads embedded `schema.org/JobPosting` JSON-LD | **Any** board emitting Google-Jobs structured data (SmartRecruiters, custom career sites, ...) |
 
 Unlike the HTML-scraping adapters, `bamboohr` and `workday` are structured-JSON

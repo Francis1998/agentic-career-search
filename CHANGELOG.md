@@ -6,6 +6,12 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `PhenomAdapter` (`source_type: phenom`): a dedicated adapter for public Phenom
+  (`*.phenompeople.com` and vanity-domain) careers portals. Postings are
+  recognised by locale-prefixed `/job/{id}` / `/jobs/{id}` path shapes
+  (optional slug) or `jobId` / `job_id` query requisitions; apply/login steps
+  and `/jobs/search` grids are ignored. See ADR-091 and
+  `docs/guides/PHENOM_SOURCE_GUIDE.md`.
 - `WorkdayAdapter` (`source_type: workday`): a structured-JSON adapter for public
   Workday careers boards (`{tenant}.wd{N}.myworkdayjobs.com`). The listing page
   is a client-rendered SPA, so the adapter POSTs to the public CXS endpoint
@@ -29,6 +35,9 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `external_id`. See ADR-086.
 
 ### Fixed
+- `WorkdayAdapter`: CXS `Referer` now uses the board's parsed locale (for
+  example `fr-FR`) instead of a hardcoded `en-US`, so non-US careers boards send
+  a matching Referer header.
 - `JsonLdAdapter`: a `Place.address` expressed as a (possibly single-element)
   JSON-LD array of `PostalAddress` objects now yields a location string instead
   of being silently dropped. `jobLocation` already handled a list of Places and

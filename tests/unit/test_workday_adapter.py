@@ -118,3 +118,61 @@ def test_workday_honors_zero_max_jobs() -> None:
     jobs = adapter._parse_payload(board, WORKDAY_SAMPLE_PAYLOAD, max_jobs=0)
 
     assert jobs == []
+
+
+def test_workday_referer_uses_board_locale_not_hardcoded_en_us() -> None:
+    """CXS Referer must mirror the board locale (not a hardcoded ``en-US``)."""
+
+    import asyncio
+    from typing import Any
+
+    from autoapply_agent.adapters import workday as workday_module
+
+    captured: dict[str, Any] = {}
+
+    class _FakeResponse:
+        text = WORKDAY_SAMPLE_PAYLOAD
+
+        def raise_for_status(self) -> None:
+            return None
+
+    class _FakeAsyncClient:
+        def __init__(self, *args: Any, **kwargs: Any) -> None:
+            captured["client_headers"] = kwargs.get("headers")
+
+        async def __aenter__(self) -> _FakeAsyncClient:
+            return self
+
+        async def __aexit__(self, *exc_info: object) -> bool:
+            return False
+
+        async def post(self, *args: Any, **kwargs: Any) -> _FakeResponse:
+            return _FakeResponse()
+
+    adapter = WorkdayAdapter(user_agent="test-agent")
+    board = adapter._parse_board(
+        "https://acme.wd1.myworkdayjobs.com/fr-FR/AcmeCareers"
+    )
+    assert board["locale"] == "fr-FR"
+
+    original_client = workday_module.httpx.AsyncClient
+    workday_module.httpx.AsyncClient = _FakeAsyncClient  # type: ignore[misc,assignment]
+    try:
+        asyncio.run(
+            adapter._request_cxs_page(
+                board["cxs_url"],
+                board["origin"],
+                board["site"],
+                board["locale"],
+                timeout_seconds=5.0,
+                limit=20,
+                offset=0,
+            )
+        )
+    finally:
+        workday_module.httpx.AsyncClient = original_client  # type: ignore[misc]
+
+    assert captured["client_headers"]["Referer"] == (
+        "https://acme.wd1.myworkdayjobs.com/fr-FR/AcmeCareers"
+    )
+    assert "en-US" not in captured["client_headers"]["Referer"]
