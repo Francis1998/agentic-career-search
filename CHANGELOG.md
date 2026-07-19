@@ -6,6 +6,12 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `SuccessFactorsAdapter` (`source_type: successfactors`): a dedicated adapter
+  for public SAP SuccessFactors (`*.successfactors.com` / `*.successfactors.eu`)
+  careers portals. Postings are recognised by `jobId` / `career_job_req_id`
+  query requisitions or terminal `/job/{id}` / `/jobs/{id}` path shapes;
+  apply/login steps are ignored. See ADR-090 and
+  `docs/guides/SUCCESSFACTORS_SOURCE_GUIDE.md`.
 - `WorkdayAdapter` (`source_type: workday`): a structured-JSON adapter for public
   Workday careers boards (`{tenant}.wd{N}.myworkdayjobs.com`). The listing page
   is a client-rendered SPA, so the adapter POSTs to the public CXS endpoint
@@ -29,6 +35,9 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `external_id`. See ADR-086.
 
 ### Fixed
+- `JobviteAdapter`: empty-text posting anchors that expose the role name on the
+  `title` attribute are now kept (mirrors iCIMS `_anchor_title`), instead of
+  being dropped because only visible anchor text was considered.
 - `JsonLdAdapter`: a `Place.address` expressed as a (possibly single-element)
   JSON-LD array of `PostalAddress` objects now yields a location string instead
   of being silently dropped. `jobLocation` already handled a list of Places and
