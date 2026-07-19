@@ -38,6 +38,7 @@ class SourceType(StrEnum):
     JOBVITE = "jobvite"
     ICIMS = "icims"
     WORKDAY = "workday"
+    ORACLE_TALEO = "oracle_taleo"
 
 
 class RunStatus(StrEnum):

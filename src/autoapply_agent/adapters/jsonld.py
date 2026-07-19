@@ -222,25 +222,31 @@ class JsonLdAdapter(CareerSourceAdapter):
             raw={"source": "jsonld"},
         )
 
-    @staticmethod
-    def _is_remote(job_location_type: object) -> bool:
+    @classmethod
+    def _is_remote(cls, job_location_type: object) -> bool:
         """Report whether a ``jobLocationType`` value denotes a remote role.
 
         JSON-LD permits any property to be expressed either as a scalar or as an
-        array of values, so ``TELECOMMUTE`` may arrive as the bare string or
-        wrapped in a list. Both forms must be recognised.
+        array of values, so ``TELECOMMUTE`` may arrive as the bare string, an
+        IRI (``https://schema.org/Telecommute``), a CURIE
+        (``schema:Telecommute``), or wrapped in a list. All forms must be
+        recognised via the same local-term reduction used for ``@type``.
 
         Args:
             job_location_type: Raw ``jobLocationType`` value from a posting.
 
         Returns:
-            True when any value equals ``TELECOMMUTE``.
+            True when any value's local term equals ``TELECOMMUTE``
+            (case-insensitive).
         """
 
         if isinstance(job_location_type, str):
-            return job_location_type == "TELECOMMUTE"
+            return cls._type_term(job_location_type).upper() == "TELECOMMUTE"
         if isinstance(job_location_type, list):
-            return "TELECOMMUTE" in job_location_type
+            return any(
+                isinstance(item, str) and cls._type_term(item).upper() == "TELECOMMUTE"
+                for item in job_location_type
+            )
         return False
 
     @staticmethod
