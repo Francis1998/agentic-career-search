@@ -709,16 +709,13 @@ def test_smartrecruiters_accepts_mixed_case_title_slug() -> None:
       <span class=\"job-location\">Remote (EU)</span>
     </div>
     """
-    jobs = adapter._parse_html(
-        "https://jobs.smartrecruiters.com/ExampleCompany", html, max_jobs=10
-    )
+    jobs = adapter._parse_html("https://jobs.smartrecruiters.com/ExampleCompany", html, max_jobs=10)
 
     assert len(jobs) == 1
     assert jobs[0].external_id == "744000123456789"
     assert jobs[0].title == "Senior Backend Engineer"
     assert jobs[0].url == (
-        "https://jobs.smartrecruiters.com/ExampleCompany/"
-        "744000123456789-Senior-Backend-Engineer"
+        "https://jobs.smartrecruiters.com/ExampleCompany/744000123456789-Senior-Backend-Engineer"
     )
 
 
