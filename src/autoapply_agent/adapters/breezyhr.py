@@ -1,15 +1,14 @@
-"""Teamtailor public careers site adapter.
+"""Breezy HR public careers site adapter.
 
-Teamtailor (``{company}.teamtailor.com``) is a widely adopted applicant
-tracking system. Its public careers site renders each posting as an anchor
-whose href follows the ``/jobs/{jobId}-{slug}`` shape, where ``jobId`` is the
-posting's stable numeric identifier and ``slug`` is an optional hyphenated
-title token (case is not significant). Custom-domain career sites reuse the
-same tail under a ``/careers`` prefix
-(``example.com/careers/jobs/{jobId}-{slug}``). This adapter targets that
-structure with a primary CSS selector and a resilient fallback that recognises
-posting anchors purely by their URL shape, mirroring the greenhouse, lever,
-ashby, workable, recruitee, and smartrecruiters adapters.
+Breezy HR (``{company}.breezy.hr``) is a widely adopted applicant tracking
+system for startups and SMBs. Its public careers site renders each posting as
+an anchor whose href follows the ``/p/{positionId}`` shape (an optional
+hyphenated title slug may trail the id), where ``positionId`` is the posting's
+stable alphanumeric identifier (commonly a 12-character hex token such as
+``8f092b537498``). Application steps (``/p/{positionId}/apply``) and board
+navigation links are excluded. This adapter targets that structure with a
+resilient URL-shape matcher, mirroring the greenhouse, lever, ashby, workable,
+recruitee, smartrecruiters, teamtailor, personio, and jobvite adapters.
 """
 
 from __future__ import annotations
@@ -27,18 +26,17 @@ from autoapply_agent.adapters.base import (
     find_location_text,
 )
 
-# Slug casing is not guaranteed lowercase on every Teamtailor board (some
-# tenants emit Title-Case or mixed-case title tokens). Only the leading numeric
-# jobId is stable identity; the optional hyphenated slug must accept A-Z too or
-# those postings are silently dropped by ``_is_posting_href``.
-_JOB_ID_SEGMENT = re.compile(r"^(\d+)(?:-[A-Za-z0-9-]+)?$")
-_CONTAINER_CLASS_PATTERN = re.compile("job|posting|opening", re.IGNORECASE)
+# Breezy position ids are alphanumeric (often lowercase hex); require a minimum
+# length so short path words are not mistaken for a posting id. An optional
+# hyphenated title slug may trail the id (casing is not significant).
+_POSITION_ID_SEGMENT = re.compile(r"^([A-Za-z0-9]{6,})(?:-[A-Za-z0-9-]+)?$")
+_CONTAINER_CLASS_PATTERN = re.compile("position|job|posting|opening", re.IGNORECASE)
 
 
-class TeamtailorAdapter(CareerSourceAdapter):
-    """Fetch jobs from public Teamtailor careers site pages."""
+class BreezyHrAdapter(CareerSourceAdapter):
+    """Fetch jobs from public Breezy HR careers site pages."""
 
-    adapter_name = "teamtailor"
+    adapter_name = "breezyhr"
 
     def __init__(self, user_agent: str) -> None:
         """Create adapter instance.
@@ -52,10 +50,10 @@ class TeamtailorAdapter(CareerSourceAdapter):
     async def fetch_jobs(
         self, base_url: str, timeout_seconds: float, max_jobs: int
     ) -> list[JobCandidate]:
-        """Fetch and parse Teamtailor jobs.
+        """Fetch and parse Breezy HR jobs.
 
         Args:
-            base_url: Teamtailor careers site URL.
+            base_url: Breezy HR careers site URL.
             timeout_seconds: Request timeout in seconds.
             max_jobs: Maximum number of jobs.
 
@@ -67,7 +65,7 @@ class TeamtailorAdapter(CareerSourceAdapter):
         return self._parse_html(base_url, html, max_jobs)
 
     def _parse_html(self, base_url: str, html: str, max_jobs: int) -> list[JobCandidate]:
-        """Parse Teamtailor careers HTML into job candidates.
+        """Parse Breezy HR careers HTML into job candidates.
 
         Args:
             base_url: Source URL.
@@ -92,7 +90,7 @@ class TeamtailorAdapter(CareerSourceAdapter):
         seen_urls: set[str] = set()
         for anchor in anchors:
             href = self._normalize_href(anchor.get("href"))
-            title = anchor.get_text(" ", strip=True)
+            title = self._anchor_title(anchor)
             if not href or not title:
                 continue
             absolute_url = urljoin(base_url, href)
@@ -107,7 +105,7 @@ class TeamtailorAdapter(CareerSourceAdapter):
                     location=self._extract_location(anchor),
                     company=company_from_url(base_url),
                     url=absolute_url,
-                    raw={"source": "teamtailor"},
+                    raw={"source": "breezyhr"},
                 )
             )
             if len(jobs) >= max_jobs:
@@ -117,54 +115,78 @@ class TeamtailorAdapter(CareerSourceAdapter):
 
     @classmethod
     def _is_posting_href(cls, href: str | None) -> bool:
-        """Report whether an href points at a Teamtailor posting.
+        """Report whether an href points at a Breezy HR posting.
 
-        Teamtailor posting URLs carry a ``jobs`` path segment immediately
-        followed by a numeric ``{jobId}`` segment (``/jobs/{jobId}-{slug}``),
-        which must be the terminal path segment. The optional hyphenated title
-        slug is case-insensitive. This excludes the jobs list page (``/jobs``)
-        and the application form (``/jobs/{jobId}/applications/new``), whose
-        numeric id segment is not terminal. Careers-site navigation links never
-        match that shape.
+        Breezy posting URLs carry a ``p`` path segment immediately followed by a
+        ``{positionId}`` segment (``/p/{positionId}``), which must be the
+        terminal path segment. This excludes the application step
+        (``/p/{positionId}/apply``), whose id segment is not terminal, and board
+        navigation links that never match that shape.
 
         Args:
             href: Candidate href value.
 
         Returns:
-            True when the URL exposes a terminal ``jobs/{jobId}`` segment pair.
+            True when the URL exposes a terminal ``p/{positionId}`` segment pair.
         """
 
         return cls._extract_external_id(href) is not None
 
     @staticmethod
     def _extract_external_id(job_url: str | None) -> str | None:
-        """Extract the posting job id from a Teamtailor URL.
+        """Extract the position id from a Breezy HR URL.
 
         Args:
-            job_url: Teamtailor job URL or href.
+            job_url: Breezy HR job URL or href.
 
         Returns:
-            Numeric job id string when the terminal ``jobs/{jobId}-{slug}``
-            shape is present.
+            Position id string when the terminal ``p/{positionId}`` shape is
+            present.
         """
 
         if not job_url:
             return None
         parts = [part for part in urlparse(job_url).path.split("/") if part]
         for index, part in enumerate(parts):
-            if part != "jobs" or index + 1 >= len(parts):
+            if part != "p" or index + 1 >= len(parts):
                 continue
-            match = _JOB_ID_SEGMENT.match(parts[index + 1])
+            match = _POSITION_ID_SEGMENT.match(parts[index + 1])
             if match and index + 2 == len(parts):
                 return match.group(1)
+        return None
+
+    @classmethod
+    def _anchor_title(cls, anchor: object) -> str | None:
+        """Resolve a posting title from a Breezy HR anchor.
+
+        Prefers visible anchor text and falls back to the ``title`` attribute
+        when the link is icon-only (mirrors iCIMS/Jobvite).
+
+        Args:
+            anchor: BeautifulSoup anchor element for the posting.
+
+        Returns:
+            Title string when discoverable, else None.
+        """
+
+        get_text = getattr(anchor, "get_text", None)
+        if callable(get_text):
+            text = get_text(" ", strip=True)
+            if isinstance(text, str) and text.strip():
+                return text.strip()
+        get = getattr(anchor, "get", None)
+        if get is not None:
+            attr_title = get("title")
+            if isinstance(attr_title, str) and attr_title.strip():
+                return attr_title.strip()
         return None
 
     @staticmethod
     def _extract_location(anchor: object) -> str | None:
         """Resolve a posting location from an anchor's surrounding markup.
 
-        Teamtailor groups a posting's metadata (department, location) alongside
-        the title anchor. The location is looked up within the anchor's nearest
+        Breezy groups a posting's metadata (department, location) alongside the
+        title anchor. The location is looked up within the anchor's nearest
         posting container so a posting without its own location does not inherit
         a sibling's location.
 

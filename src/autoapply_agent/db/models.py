@@ -38,6 +38,7 @@ class SourceType(StrEnum):
     JOBVITE = "jobvite"
     ICIMS = "icims"
     WORKDAY = "workday"
+    BREEZYHR = "breezyhr"
 
 
 class RunStatus(StrEnum):
