@@ -690,6 +690,38 @@ def test_smartrecruiters_relocation_note_is_not_read_as_location() -> None:
     assert jobs[0].location is None
 
 
+def test_smartrecruiters_accepts_mixed_case_title_slug() -> None:
+    """A mixed-case ``{jobId}-{Slug}`` segment must still count as a posting.
+
+    ``_JOB_ID_PATTERN`` previously required the optional title slug to be
+    strictly lowercase (``[a-z0-9-]+``). Some SmartRecruiters boards emit
+    Title-Case or mixed-case slugs (``744000123456789-Senior-Backend-Engineer``);
+    those hrefs failed ``_is_posting_href`` and the openings were silently
+    dropped. The numeric jobId is the identity — slug casing must not matter.
+    """
+
+    adapter = SmartRecruitersAdapter(user_agent="test-agent")
+    html = """
+    <div class=\"opening-job\">
+      <a href=\"/ExampleCompany/744000123456789-Senior-Backend-Engineer\">
+        <h4>Senior Backend Engineer</h4>
+      </a>
+      <span class=\"job-location\">Remote (EU)</span>
+    </div>
+    """
+    jobs = adapter._parse_html(
+        "https://jobs.smartrecruiters.com/ExampleCompany", html, max_jobs=10
+    )
+
+    assert len(jobs) == 1
+    assert jobs[0].external_id == "744000123456789"
+    assert jobs[0].title == "Senior Backend Engineer"
+    assert jobs[0].url == (
+        "https://jobs.smartrecruiters.com/ExampleCompany/"
+        "744000123456789-Senior-Backend-Engineer"
+    )
+
+
 def test_teamtailor_relocation_note_is_not_read_as_location() -> None:
     """A ``relocation`` badge must not be mistaken for a Teamtailor location.
 

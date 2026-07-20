@@ -29,6 +29,10 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `external_id`. See ADR-086.
 
 ### Fixed
+- `SmartRecruitersAdapter`: posting hrefs whose optional title slug uses
+  mixed/Title Case (e.g. `744000123456789-Senior-Backend-Engineer`) are
+  recognised again. The previous `_JOB_ID_PATTERN` required a strictly
+  lowercase slug, so `_is_posting_href` silently dropped those openings.
 - `JsonLdAdapter`: a `Place.address` expressed as a (possibly single-element)
   JSON-LD array of `PostalAddress` objects now yields a location string instead
   of being silently dropped. `jobLocation` already handled a list of Places and

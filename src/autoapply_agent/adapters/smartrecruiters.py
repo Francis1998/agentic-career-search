@@ -4,7 +4,7 @@ SmartRecruiters (``jobs.smartrecruiters.com/{company}``) is a widely adopted
 applicant tracking system. Its public careers site renders each posting as an
 anchor whose href follows the ``/{company}/{jobId}-{slug}`` shape, where
 ``jobId`` is the posting's stable numeric identifier (a long digit string) and
-``slug`` is an optional lowercase, hyphenated title token. This adapter targets
+``slug`` is an optional hyphenated title token (case is not significant). This adapter targets
 that structure with a primary CSS selector and a resilient fallback that
 recognises posting anchors purely by their URL shape, mirroring the greenhouse,
 lever, ashby, workable, and recruitee adapters.
@@ -25,7 +25,11 @@ from autoapply_agent.adapters.base import (
     find_location_text,
 )
 
-_JOB_ID_PATTERN = re.compile(r"^(\d{6,})(?:-[a-z0-9-]+)?$")
+# Slug casing is not guaranteed lowercase on every SmartRecruiters board (some
+# tenants emit Title-Case or mixed-case title tokens). Only the leading numeric
+# jobId is stable identity; the optional hyphenated slug must accept A-Z too or
+# those postings are silently dropped by ``_is_posting_href``.
+_JOB_ID_PATTERN = re.compile(r"^(\d{6,})(?:-[A-Za-z0-9-]+)?$")
 _CONTAINER_CLASS_PATTERN = re.compile("opening|job|posting", re.IGNORECASE)
 
 
@@ -115,9 +119,9 @@ class SmartRecruitersAdapter(CareerSourceAdapter):
 
         SmartRecruiters posting URLs carry a ``{jobId}`` path segment following
         the company slug (``/{company}/{jobId}-{slug}``), where ``jobId`` is a
-        long numeric identifier optionally followed by a hyphenated title slug.
-        Careers-site navigation links (search, about, external redirects) never
-        match that shape.
+        long numeric identifier optionally followed by a hyphenated title slug
+        (slug casing is not significant). Careers-site navigation links (search,
+        about, external redirects) never match that shape.
 
         Args:
             href: Candidate href value.
