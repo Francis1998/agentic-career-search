@@ -95,9 +95,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.JOBVITE: JobviteAdapter(active_settings.http_user_agent),
                 SourceType.ICIMS: IcimsAdapter(active_settings.http_user_agent),
                 SourceType.WORKDAY: WorkdayAdapter(active_settings.http_user_agent),
-                SourceType.SUCCESSFACTORS: SuccessFactorsAdapter(
-                    active_settings.http_user_agent
-                ),
+                SourceType.SUCCESSFACTORS: SuccessFactorsAdapter(active_settings.http_user_agent),
             },
             scoring_service=DeterministicScoringService(),
             planning_service=DeterministicPlanningService(),
