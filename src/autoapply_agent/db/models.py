@@ -39,6 +39,7 @@ class SourceType(StrEnum):
     ICIMS = "icims"
     WORKDAY = "workday"
     ORACLE_TALEO = "oracle_taleo"
+    BREEZYHR = "breezyhr"
 
 
 class RunStatus(StrEnum):
