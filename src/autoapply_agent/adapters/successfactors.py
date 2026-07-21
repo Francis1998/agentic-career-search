@@ -1,24 +1,21 @@
-"""Jobvite public careers site adapter.
+"""SAP SuccessFactors public careers portal adapter.
 
-Jobvite (``jobs.jobvite.com/{company}``) is a widely adopted applicant tracking
-system. Its public careers site renders each posting as an anchor whose href
-follows the ``/{company}/job/{jobId}`` shape (also reachable under a
-``/careers/{company}/job/{jobId}`` prefix), where ``jobId`` is the posting's
-stable mixed-case alphanumeric identifier (for example ``o0rT3fw7``). Note the
-*singular* ``job`` path segment, which distinguishes a posting from the plural
-``/{company}/jobs`` list page, and that the ``jobId`` is the terminal path
-segment, which excludes the application step (``/job/{jobId}/apply``). This
-adapter targets that structure with a resilient URL-shape matcher, mirroring the
-greenhouse, lever, ashby, workable, recruitee, smartrecruiters, teamtailor, and
-personio adapters. Jobvite ids are alphanumeric (unlike Personio's purely
-numeric ids), so a dedicated matcher is used.
+SAP SuccessFactors powers a large share of enterprise career sites. Public
+boards are typically hosted on ``*.successfactors.com`` / ``*.successfactors.eu``
+(and vanity-domain proxies) and expose posting detail pages whose requisition id
+appears as a ``jobId`` / ``career_job_req_id`` query parameter (for example
+``/sfcareer/jobreqcareer?jobId=XXXX&company=YYYY`` or
+``/career?career_job_req_id=XXXX``) or as a terminal numeric/alphanumeric path
+segment under ``/jobs/`` / ``/job/``. Application steps (``mode=apply``,
+``login``, ``apply``) are excluded. This adapter mirrors the iCIMS/Jobvite/
+Taleo URL-shape scrapers used for other enterprise ATS sources.
 """
 
 from __future__ import annotations
 
 import re
 from collections.abc import Sequence
-from urllib.parse import urljoin, urlparse
+from urllib.parse import parse_qs, urljoin, urlparse
 
 from bs4 import BeautifulSoup
 
@@ -29,16 +26,15 @@ from autoapply_agent.adapters.base import (
     find_location_text,
 )
 
-# Jobvite ids are mixed-case alphanumeric tokens (e.g. ``o0rT3fw7``); require a
-# minimum length so short path words are not mistaken for a posting id.
-_JOB_ID_SEGMENT = re.compile(r"^[A-Za-z0-9]{5,}$")
-_CONTAINER_CLASS_PATTERN = re.compile("job|position|posting", re.IGNORECASE)
+_JOB_ID_SEGMENT = re.compile(r"^[A-Za-z0-9_-]{2,64}$")
+_CONTAINER_CLASS_PATTERN = re.compile("job|position|posting|requisition", re.IGNORECASE)
+_APPLY_MARKERS = frozenset({"apply", "login", "signin", "sign-in"})
 
 
-class JobviteAdapter(CareerSourceAdapter):
-    """Fetch jobs from public Jobvite careers site pages."""
+class SuccessFactorsAdapter(CareerSourceAdapter):
+    """Fetch jobs from public SAP SuccessFactors careers portals."""
 
-    adapter_name = "jobvite"
+    adapter_name = "successfactors"
 
     def __init__(self, user_agent: str) -> None:
         """Create adapter instance.
@@ -52,10 +48,10 @@ class JobviteAdapter(CareerSourceAdapter):
     async def fetch_jobs(
         self, base_url: str, timeout_seconds: float, max_jobs: int
     ) -> list[JobCandidate]:
-        """Fetch and parse Jobvite jobs.
+        """Fetch and parse SuccessFactors jobs.
 
         Args:
-            base_url: Jobvite careers site URL.
+            base_url: SuccessFactors careers portal URL.
             timeout_seconds: Request timeout in seconds.
             max_jobs: Maximum number of jobs.
 
@@ -67,7 +63,7 @@ class JobviteAdapter(CareerSourceAdapter):
         return self._parse_html(base_url, html, max_jobs)
 
     def _parse_html(self, base_url: str, html: str, max_jobs: int) -> list[JobCandidate]:
-        """Parse Jobvite careers HTML into job candidates.
+        """Parse SuccessFactors careers HTML into job candidates.
 
         Args:
             base_url: Source URL.
@@ -107,7 +103,7 @@ class JobviteAdapter(CareerSourceAdapter):
                     location=self._extract_location(anchor),
                     company=company_from_url(base_url),
                     url=absolute_url,
-                    raw={"source": "jobvite"},
+                    raw={"source": "successfactors"},
                 )
             )
             if len(jobs) >= max_jobs:
@@ -117,40 +113,57 @@ class JobviteAdapter(CareerSourceAdapter):
 
     @classmethod
     def _is_posting_href(cls, href: str | None) -> bool:
-        """Report whether an href points at a Jobvite posting.
-
-        Jobvite posting URLs carry a *singular* ``job`` path segment immediately
-        followed by a terminal alphanumeric ``{jobId}`` segment
-        (``/{company}/job/{jobId}``). This excludes the plural ``/{company}/jobs``
-        list page and the application step (``/job/{jobId}/apply``), whose id
-        segment is not terminal.
+        """Report whether an href points at a SuccessFactors posting detail page.
 
         Args:
             href: Candidate href value.
 
         Returns:
-            True when the URL exposes a terminal singular ``job/{jobId}`` pair.
+            True when a requisition id can be extracted and the URL is not an
+            apply/login step.
         """
 
         return cls._extract_external_id(href) is not None
 
     @staticmethod
     def _extract_external_id(job_url: str | None) -> str | None:
-        """Extract the posting job id from a Jobvite URL.
+        """Extract the requisition id from a SuccessFactors careers URL.
+
+        Recognises ``jobId`` / ``career_job_req_id`` / ``job_req_id`` query
+        parameters plus path forms ``/jobs/{id}`` and ``/job/{id}``. Apply/login
+        terminals are rejected.
 
         Args:
-            job_url: Jobvite job URL or href.
+            job_url: SuccessFactors job URL or href.
 
         Returns:
-            Alphanumeric job id string when the terminal singular ``job/{jobId}``
-            shape is present.
+            Requisition id string when the posting detail shape is present.
         """
 
         if not job_url:
             return None
-        parts = [part for part in urlparse(job_url).path.split("/") if part]
+        parsed = urlparse(job_url)
+        parts = [part for part in parsed.path.split("/") if part]
+        if parts and parts[-1].lower() in _APPLY_MARKERS:
+            return None
+        query = parse_qs(parsed.query)
+        mode_values = [value.lower() for value in query.get("mode", [])]
+        if "apply" in mode_values:
+            return None
+        job_values = (
+            query.get("jobId")
+            or query.get("career_job_req_id")
+            or query.get("job_req_id")
+            or query.get("job")
+        )
+        if job_values:
+            candidate = job_values[0].strip()
+            if _JOB_ID_SEGMENT.match(candidate):
+                return candidate
         for index, part in enumerate(parts):
-            if part != "job" or index + 1 >= len(parts):
+            if part.lower() not in {"job", "jobs"}:
+                continue
+            if index + 1 >= len(parts):
                 continue
             candidate = parts[index + 1]
             if _JOB_ID_SEGMENT.match(candidate) and index + 2 == len(parts):
@@ -159,10 +172,10 @@ class JobviteAdapter(CareerSourceAdapter):
 
     @classmethod
     def _anchor_title(cls, anchor: object) -> str | None:
-        """Resolve a posting title from a Jobvite anchor.
+        """Resolve a posting title from a SuccessFactors anchor.
 
         Prefers visible anchor text and falls back to the ``title`` attribute
-        when the link is icon-only (mirrors iCIMS).
+        when the link is icon-only (common on SuccessFactors list tables).
 
         Args:
             anchor: BeautifulSoup anchor element for the posting.
@@ -186,11 +199,6 @@ class JobviteAdapter(CareerSourceAdapter):
     @staticmethod
     def _extract_location(anchor: object) -> str | None:
         """Resolve a posting location from an anchor's surrounding markup.
-
-        Jobvite groups a posting's metadata (department, location) alongside the
-        title anchor. The location is looked up within the anchor's nearest
-        posting container so a posting without its own location does not inherit
-        a sibling's location.
 
         Args:
             anchor: BeautifulSoup anchor element for the posting.
