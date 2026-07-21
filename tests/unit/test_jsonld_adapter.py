@@ -328,3 +328,40 @@ def test_jsonld_honors_zero_max_jobs() -> None:
     jobs = adapter._parse_html("https://acme.example.com/careers", SINGLE_POSTING_HTML, max_jobs=0)
 
     assert jobs == []
+
+
+TELECOMMUTE_IRI_HTML = """
+<script type="application/ld+json">
+{
+  "@type": "JobPosting",
+  "title": "Distributed Systems Engineer",
+  "url": "https://careers.example.com/jobs/remote-1",
+  "hiringOrganization": {"@type": "Organization", "name": "Acme"},
+  "jobLocationType": "https://schema.org/Telecommute"
+}
+</script>
+"""
+
+
+def test_jsonld_recognises_telecommute_iri_and_curie() -> None:
+    """IRI/CURIE ``jobLocationType`` values must still map to Remote.
+
+    ``@type`` already reduces IRIs/CURIEs via ``_type_term``, but
+    ``_is_remote`` previously required the exact bare string ``TELECOMMUTE``.
+    Emitters that publish ``https://schema.org/Telecommute`` or
+    ``schema:Telecommute`` were left with ``location=None``.
+    """
+
+    adapter = JsonLdAdapter(user_agent="test-agent")
+    iri_jobs = adapter._parse_html(
+        "https://careers.example.com/careers", TELECOMMUTE_IRI_HTML, max_jobs=10
+    )
+    assert len(iri_jobs) == 1
+    assert iri_jobs[0].location == "Remote"
+
+    curie_html = TELECOMMUTE_IRI_HTML.replace(
+        "https://schema.org/Telecommute", "schema:Telecommute"
+    )
+    curie_jobs = adapter._parse_html("https://careers.example.com/careers", curie_html, max_jobs=10)
+    assert len(curie_jobs) == 1
+    assert curie_jobs[0].location == "Remote"

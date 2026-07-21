@@ -6,6 +6,11 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `OracleTaleoAdapter` (`source_type: oracle_taleo`): a dedicated adapter for
+  public Oracle Taleo (`*.taleo.net`) and Oracle Cloud HCM careers portals.
+  Postings are recognised by `job=` / `jobId` query requisitions or terminal
+  `/job/{id}` / `/jobs/{id}` path shapes; apply/login steps are ignored. See
+  ADR-089 and `docs/guides/ORACLE_TALEO_SOURCE_GUIDE.md`.
 - `WorkdayAdapter` (`source_type: workday`): a structured-JSON adapter for public
   Workday careers boards (`{tenant}.wd{N}.myworkdayjobs.com`). The listing page
   is a client-rendered SPA, so the adapter POSTs to the public CXS endpoint
@@ -29,10 +34,18 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `external_id`. See ADR-086.
 
 ### Fixed
+<<<<<<< HEAD
 - `SmartRecruitersAdapter`: posting hrefs whose optional title slug uses
   mixed/Title Case (e.g. `744000123456789-Senior-Backend-Engineer`) are
   recognised again. The previous `_JOB_ID_PATTERN` required a strictly
   lowercase slug, so `_is_posting_href` silently dropped those openings.
+=======
+- `JsonLdAdapter`: `jobLocationType` values expressed as IRIs
+  (`https://schema.org/Telecommute`) or CURIEs (`schema:Telecommute`) now
+  resolve to `location="Remote"` via the same `_type_term` local-term reduction
+  already used for `@type`, instead of requiring the exact bare string
+  `TELECOMMUTE`.
+>>>>>>> df23666 (feat(adapters): Oracle Taleo source adapter + JSON-LD Telecommute IRI fix)
 - `JsonLdAdapter`: a `Place.address` expressed as a (possibly single-element)
   JSON-LD array of `PostalAddress` objects now yields a location string instead
   of being silently dropped. `jobLocation` already handled a list of Places and

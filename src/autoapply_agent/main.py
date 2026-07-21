@@ -15,6 +15,7 @@ from autoapply_agent.adapters.icims import IcimsAdapter
 from autoapply_agent.adapters.jobvite import JobviteAdapter
 from autoapply_agent.adapters.jsonld import JsonLdAdapter
 from autoapply_agent.adapters.lever import LeverAdapter
+from autoapply_agent.adapters.oracle_taleo import OracleTaleoAdapter
 from autoapply_agent.adapters.personio import PersonioAdapter
 from autoapply_agent.adapters.recruitee import RecruiteeAdapter
 from autoapply_agent.adapters.smartrecruiters import SmartRecruitersAdapter
@@ -94,6 +95,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.JOBVITE: JobviteAdapter(active_settings.http_user_agent),
                 SourceType.ICIMS: IcimsAdapter(active_settings.http_user_agent),
                 SourceType.WORKDAY: WorkdayAdapter(active_settings.http_user_agent),
+                SourceType.ORACLE_TALEO: OracleTaleoAdapter(active_settings.http_user_agent),
             },
             scoring_service=DeterministicScoringService(),
             planning_service=DeterministicPlanningService(),
