@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `FreshteamAdapter` (`source_type: freshteam`): public Freshteam careers boards. See ADR-092 and `docs/guides/FRESHTEAM_SOURCE_GUIDE.md`.
 - `SuccessFactorsAdapter` (`source_type: successfactors`): a dedicated adapter
   for public SAP SuccessFactors (`*.successfactors.com` / `*.successfactors.eu`)
   careers portals. Postings are recognised by `jobId` / `career_job_req_id`

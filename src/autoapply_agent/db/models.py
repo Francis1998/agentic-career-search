@@ -40,6 +40,7 @@ class SourceType(StrEnum):
     WORKDAY = "workday"
     ORACLE_TALEO = "oracle_taleo"
     SUCCESSFACTORS = "successfactors"
+    FRESHTEAM = "freshteam"
 
 
 class RunStatus(StrEnum):
