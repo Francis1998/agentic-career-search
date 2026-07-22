@@ -6,6 +6,12 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `SuccessFactorsAdapter` (`source_type: successfactors`): a dedicated adapter
+  for public SAP SuccessFactors (`*.successfactors.com` / `*.successfactors.eu`)
+  careers portals. Postings are recognised by `jobId` / `career_job_req_id`
+  query requisitions or terminal `/job/{id}` / `/jobs/{id}` path shapes;
+  apply/login steps are ignored. See ADR-090 and
+  `docs/guides/SUCCESSFACTORS_SOURCE_GUIDE.md`.
 - `OracleTaleoAdapter` (`source_type: oracle_taleo`): a dedicated adapter for
   public Oracle Taleo (`*.taleo.net`) and Oracle Cloud HCM careers portals.
   Postings are recognised by `job=` / `jobId` query requisitions or terminal
@@ -34,6 +40,9 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `external_id`. See ADR-086.
 
 ### Fixed
+- `JobviteAdapter`: empty-text posting anchors that expose the role name on the
+  `title` attribute are now kept (mirrors iCIMS `_anchor_title`), instead of
+  being dropped because only visible anchor text was considered.
 <<<<<<< HEAD
 - `SmartRecruitersAdapter`: posting hrefs whose optional title slug uses
   mixed/Title Case (e.g. `744000123456789-Senior-Backend-Engineer`) are

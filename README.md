@@ -98,6 +98,7 @@ Each `SourceConfig` selects a source adapter by `source_type`:
 | `icims` | `IcimsAdapter` | Recognises `careers-{tenant}.icims.com/jobs/{jobId}/{slug}/job` posting anchors by URL shape (terminal literal `job`, numeric id; slug optional) | iCIMS-hosted careers portals (enterprise) and vanity-domain proxies |
 | `workday` | `WorkdayAdapter` | POSTs the public `{tenant}.wd{N}.myworkdayjobs.com/wday/cxs/{tenant}/{site}/jobs` **JSON** CXS board (page size 20) and maps each posting to `{origin}/{locale}/{site}{externalPath}` | Workday-hosted enterprise careers sites |
 | `oracle_taleo` | `OracleTaleoAdapter` | Recognises Taleo/Oracle Cloud posting anchors via `job=` query ids or terminal `/job/{id}` / `/jobs/{id}` path shapes | Oracle Taleo (`*.taleo.net`) and Oracle Cloud HCM careers portals |
+| `successfactors` | `SuccessFactorsAdapter` | Recognises SuccessFactors posting anchors via `jobId` / `career_job_req_id` query ids or terminal `/job/{id}` / `/jobs/{id}` path shapes | SAP SuccessFactors (`*.successfactors.com` / `*.successfactors.eu`) careers portals |
 | `jsonld` | `JsonLdAdapter` | Reads embedded `schema.org/JobPosting` JSON-LD | **Any** board emitting Google-Jobs structured data (SmartRecruiters, custom career sites, ...) |
 
 Unlike the HTML-scraping adapters, `bamboohr` and `workday` are structured-JSON
