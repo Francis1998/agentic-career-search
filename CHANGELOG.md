@@ -6,6 +6,11 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `BreezyHrAdapter` (`source_type: breezyhr`): a dedicated adapter for public
+  Breezy HR careers sites (`{company}.breezy.hr`). Postings are recognised
+  by their terminal `/p/{positionId}` URL shape (optional hyphenated title
+  slug). See ADR-091 and `docs/guides/BREEZYHR_SOURCE_GUIDE.md`.
+
 - `SuccessFactorsAdapter` (`source_type: successfactors`): a dedicated adapter
   for public SAP SuccessFactors (`*.successfactors.com` / `*.successfactors.eu`)
   careers portals. Postings are recognised by `jobId` / `career_job_req_id`
@@ -40,6 +45,9 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `external_id`. See ADR-086.
 
 ### Fixed
+- `TeamtailorAdapter`: mixed-case / Title-Case optional title slugs in
+  `/jobs/{jobId}-{Slug}` posting URLs are now accepted.
+
 - `JobviteAdapter`: empty-text posting anchors that expose the role name on the
   `title` attribute are now kept (mirrors iCIMS `_anchor_title`), instead of
   being dropped because only visible anchor text was considered.
