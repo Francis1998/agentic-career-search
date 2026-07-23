@@ -41,6 +41,7 @@ class SourceType(StrEnum):
     ORACLE_TALEO = "oracle_taleo"
     SUCCESSFACTORS = "successfactors"
     ZOHO_RECRUIT = "zoho_recruit"
+    BREEZYHR = "breezyhr"
 
 
 class RunStatus(StrEnum):

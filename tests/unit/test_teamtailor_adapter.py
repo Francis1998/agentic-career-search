@@ -122,3 +122,30 @@ def test_teamtailor_location_is_scoped_to_its_posting() -> None:
     by_title = {job.title: job for job in jobs}
     assert by_title["First Role"].location is None
     assert by_title["Second Role"].location == "Berlin"
+
+
+def test_teamtailor_accepts_mixed_case_title_slug() -> None:
+    """A mixed-case ``{jobId}-{Slug}`` segment must still count as a posting.
+
+    ``_JOB_ID_SEGMENT`` previously required the optional title slug to be
+    strictly lowercase (``[a-z0-9-]+``). Some Teamtailor boards emit Title-Case
+    or mixed-case slugs (``3681317-Senior-Backend-Engineer``); those hrefs
+    failed ``_is_posting_href`` and the openings were silently dropped. The
+    numeric jobId is the identity — slug casing must not matter.
+    """
+
+    adapter = TeamtailorAdapter(user_agent="test-agent")
+    html = """
+    <div class=\"job\">
+      <a href=\"/jobs/3681317-Senior-Backend-Engineer\">
+        <h4>Senior Backend Engineer</h4>
+      </a>
+      <span class=\"job-location\">Remote (EU)</span>
+    </div>
+    """
+    jobs = adapter._parse_html("https://example.teamtailor.com/jobs", html, max_jobs=10)
+
+    assert len(jobs) == 1
+    assert jobs[0].external_id == "3681317"
+    assert jobs[0].title == "Senior Backend Engineer"
+    assert jobs[0].url == ("https://example.teamtailor.com/jobs/3681317-Senior-Backend-Engineer")
