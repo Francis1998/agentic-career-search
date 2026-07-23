@@ -23,6 +23,7 @@ from autoapply_agent.adapters.successfactors import SuccessFactorsAdapter
 from autoapply_agent.adapters.teamtailor import TeamtailorAdapter
 from autoapply_agent.adapters.workable import WorkableAdapter
 from autoapply_agent.adapters.workday import WorkdayAdapter
+from autoapply_agent.adapters.zoho_recruit import ZohoRecruitAdapter
 from autoapply_agent.api.routes_health import router as health_router
 from autoapply_agent.api.routes_jobs import router as jobs_router
 from autoapply_agent.api.routes_runs import router as runs_router
@@ -98,6 +99,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.WORKDAY: WorkdayAdapter(active_settings.http_user_agent),
                 SourceType.ORACLE_TALEO: OracleTaleoAdapter(active_settings.http_user_agent),
                 SourceType.SUCCESSFACTORS: SuccessFactorsAdapter(active_settings.http_user_agent),
+                SourceType.ZOHO_RECRUIT: ZohoRecruitAdapter(active_settings.http_user_agent),
             },
             scoring_service=DeterministicScoringService(),
             planning_service=DeterministicPlanningService(),

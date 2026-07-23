@@ -6,6 +6,13 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `ZohoRecruitAdapter` (`source_type: zoho_recruit`): a dedicated adapter for
+  public Zoho Recruit (`*.zohorecruit.com`) careers portals and vanity-domain
+  proxies. Postings are recognised by `jobId` / `jid` / `job_id` query ids or
+  terminal `/job/{id}` / `/jobs/{id}` / `/careers/{id}` /
+  `/Jobs/Careers/{id}` path shapes; apply/login steps and `source=apply` /
+  `mode=apply` links are ignored. See ADR-092 and
+  `docs/guides/ZOHO_RECRUIT_SOURCE_GUIDE.md`.
 - `SuccessFactorsAdapter` (`source_type: successfactors`): a dedicated adapter
   for public SAP SuccessFactors (`*.successfactors.com` / `*.successfactors.eu`)
   careers portals. Postings are recognised by `jobId` / `career_job_req_id`
@@ -43,18 +50,15 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - `JobviteAdapter`: empty-text posting anchors that expose the role name on the
   `title` attribute are now kept (mirrors iCIMS `_anchor_title`), instead of
   being dropped because only visible anchor text was considered.
-<<<<<<< HEAD
 - `SmartRecruitersAdapter`: posting hrefs whose optional title slug uses
   mixed/Title Case (e.g. `744000123456789-Senior-Backend-Engineer`) are
   recognised again. The previous `_JOB_ID_PATTERN` required a strictly
   lowercase slug, so `_is_posting_href` silently dropped those openings.
-=======
 - `JsonLdAdapter`: `jobLocationType` values expressed as IRIs
   (`https://schema.org/Telecommute`) or CURIEs (`schema:Telecommute`) now
   resolve to `location="Remote"` via the same `_type_term` local-term reduction
   already used for `@type`, instead of requiring the exact bare string
   `TELECOMMUTE`.
->>>>>>> df23666 (feat(adapters): Oracle Taleo source adapter + JSON-LD Telecommute IRI fix)
 - `JsonLdAdapter`: a `Place.address` expressed as a (possibly single-element)
   JSON-LD array of `PostalAddress` objects now yields a location string instead
   of being silently dropped. `jobLocation` already handled a list of Places and
