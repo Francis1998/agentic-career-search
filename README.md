@@ -100,6 +100,7 @@ Each `SourceConfig` selects a source adapter by `source_type`:
 | `oracle_taleo` | `OracleTaleoAdapter` | Recognises Taleo/Oracle Cloud posting anchors via `job=` query ids or terminal `/job/{id}` / `/jobs/{id}` path shapes | Oracle Taleo (`*.taleo.net`) and Oracle Cloud HCM careers portals |
 | `successfactors` | `SuccessFactorsAdapter` | Recognises SuccessFactors posting anchors via `jobId` / `career_job_req_id` query ids or terminal `/job/{id}` / `/jobs/{id}` path shapes | SAP SuccessFactors (`*.successfactors.com` / `*.successfactors.eu`) careers portals |
 | `zoho_recruit` | `ZohoRecruitAdapter` | Recognises Zoho Recruit posting anchors via `jobId` / `jid` / `job_id` query ids or terminal `/job/{id}` / `/jobs/{id}` / `/careers/{id}` path shapes | Zoho Recruit (`*.zohorecruit.com`) careers portals and vanity-domain proxies |
+| `freshteam` | `FreshteamAdapter` | Recognises Freshteam careers posting anchors by job URL shape | Freshworks Freshteam-hosted careers boards |
 | `jsonld` | `JsonLdAdapter` | Reads embedded `schema.org/JobPosting` JSON-LD | **Any** board emitting Google-Jobs structured data (SmartRecruiters, custom career sites, ...) |
 
 Unlike the HTML-scraping adapters, `bamboohr` and `workday` are structured-JSON
