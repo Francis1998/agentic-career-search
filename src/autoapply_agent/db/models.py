@@ -42,6 +42,7 @@ class SourceType(StrEnum):
     SUCCESSFACTORS = "successfactors"
     ZOHO_RECRUIT = "zoho_recruit"
     JAZZHR = "jazzhr"
+    FRESHTEAM = "freshteam"
 
 
 class RunStatus(StrEnum):
