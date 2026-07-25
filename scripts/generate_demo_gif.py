@@ -250,6 +250,38 @@ def _decks() -> Sequence[Deck]:
                 ),
             ),
         ),
+        Deck(
+            output_filename="jazzhr-source.gif",
+            slides=(
+                Slide(
+                    accent_color=(217, 119, 6),
+                    title="JazzHR Source Adapter",
+                    subtitle="Deterministic discovery for applytojob.com public careers boards",
+                    bullet_points=(
+                        "Registers source_type=jazzhr",
+                        "Parses /apply/{jobId} posting links",
+                    ),
+                ),
+                Slide(
+                    accent_color=(234, 88, 12),
+                    title="URL Shape Matching",
+                    subtitle="Accepts JazzHR posting links with optional human-readable slugs",
+                    bullet_points=(
+                        "/apply/JAZZ-1234",
+                        "/apply/JAZZ-1234/platform-engineer",
+                    ),
+                ),
+                Slide(
+                    accent_color=(194, 65, 12),
+                    title="Clean Candidates",
+                    subtitle="Navigation, search, and deeper application-step links are ignored",
+                    bullet_points=(
+                        "Scoped location extraction",
+                        "Duplicate posting URLs returned once",
+                    ),
+                ),
+            ),
+        ),
     )
 
 
