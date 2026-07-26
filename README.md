@@ -14,6 +14,8 @@ AI-agent backend for autonomous job discovery, explainable decisions, and produc
 
 ![JazzHR Source Adapter](assets/demo/jazzhr-source.gif)
 
+![Phenom People Source Adapter](assets/demo/phenom-source.gif)
+
 ## Why this exists
 
 Most job-search automation demos fail in real usage because they:
@@ -35,7 +37,7 @@ This project solves those issues with explicit agent engineering primitives:
 |---|---|---|
 | Teams can scrape jobs but cannot justify recommendations | Low trust from users and reviewers | `AgentDecisionEngine` stores score, matched terms, priority tier, and rationale |
 | Background runs are hard to debug | Silent failures block iteration speed | Durable run events (`run.*`, `source.*`, `agent.*`) support replay-style troubleshooting |
-| Vendor lock-in around one model provider | High migration cost and brittle integrations | Configurable LLM enrichment supports GPT-style, Claude, Gemini, and Kimi APIs |
+| Vendor lock-in around one model provider | High migration cost and brittle integrations | Configurable LLM enrichment supports GPT-5.5, Claude Sonnet 4.6, Gemini 3.x, and Kimi K2-style APIs |
 | Model/API outages break the entire flow | System appears unreliable | Graceful fallback preserves deterministic baseline output when LLM enrichment is unavailable |
 | Repo quality degrades over time | Contributors lose confidence | CI checks + daily automation loop maintain quality and push incremental improvements |
 
@@ -104,6 +106,7 @@ Each `SourceConfig` selects a source adapter by `source_type`:
 | `zoho_recruit` | `ZohoRecruitAdapter` | Recognises Zoho Recruit posting anchors via `jobId` / `jid` / `job_id` query ids or terminal `/job/{id}` / `/jobs/{id}` / `/careers/{id}` path shapes | Zoho Recruit (`*.zohorecruit.com`) careers portals and vanity-domain proxies |
 | `jazzhr` | `JazzHrAdapter` | Recognises JazzHR posting anchors via `/apply/{jobId}` or `/apply/{jobId}/{slug}` path shapes | JazzHR (`*.applytojob.com/apply`) careers portals and vanity-domain proxies |
 | `breezyhr` | `BreezyHrAdapter` | Recognises `{company}.breezy.hr/p/{positionId}` posting anchors by URL shape (terminal `p`, alphanumeric id; slug optional) | Breezy HR-hosted careers sites (startup/SMB) |
+| `phenom` | `PhenomPeopleAdapter` | Recognises Phenom posting anchors via `/job/{jobId}/{slug}` or `/jobs/{jobId}` path shapes, rejecting list/index/login/apply-step links | Phenom People-hosted enterprise and branded careers sites |
 | `jsonld` | `JsonLdAdapter` | Reads embedded `schema.org/JobPosting` JSON-LD | **Any** board emitting Google-Jobs structured data (SmartRecruiters, custom career sites, ...) |
 
 Unlike the HTML-scraping adapters, `bamboohr` and `workday` are structured-JSON

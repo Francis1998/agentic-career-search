@@ -19,6 +19,7 @@ from autoapply_agent.adapters.jsonld import JsonLdAdapter
 from autoapply_agent.adapters.lever import LeverAdapter
 from autoapply_agent.adapters.oracle_taleo import OracleTaleoAdapter
 from autoapply_agent.adapters.personio import PersonioAdapter
+from autoapply_agent.adapters.phenom import PhenomPeopleAdapter
 from autoapply_agent.adapters.recruitee import RecruiteeAdapter
 from autoapply_agent.adapters.smartrecruiters import SmartRecruitersAdapter
 from autoapply_agent.adapters.successfactors import SuccessFactorsAdapter
@@ -104,6 +105,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.ZOHO_RECRUIT: ZohoRecruitAdapter(active_settings.http_user_agent),
                 SourceType.JAZZHR: JazzHrAdapter(active_settings.http_user_agent),
                 SourceType.BREEZYHR: BreezyHrAdapter(active_settings.http_user_agent),
+                SourceType.PHENOM: PhenomPeopleAdapter(active_settings.http_user_agent),
             },
             scoring_service=DeterministicScoringService(),
             planning_service=DeterministicPlanningService(),

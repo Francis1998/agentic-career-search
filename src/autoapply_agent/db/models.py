@@ -43,6 +43,7 @@ class SourceType(StrEnum):
     ZOHO_RECRUIT = "zoho_recruit"
     JAZZHR = "jazzhr"
     BREEZYHR = "breezyhr"
+    PHENOM = "phenom"
 
 
 class RunStatus(StrEnum):
