@@ -11,12 +11,13 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   proxies. Postings are recognised by `jobId` / `jid` / `job_id` query ids or
   terminal `/job/{id}` / `/jobs/{id}` / `/careers/{id}` /
   `/Jobs/Careers/{id}` path shapes; apply/login steps and `source=apply` /
-  `mode=apply` links are ignored. See ADR-092 and
+  `mode=apply` links are ignored. See ADR-093 and
   `docs/guides/ZOHO_RECRUIT_SOURCE_GUIDE.md`.
 - `BreezyHrAdapter` (`source_type: breezyhr`): a dedicated adapter for public
   Breezy HR careers sites (`{company}.breezy.hr`). Postings are recognised
   by their terminal `/p/{positionId}` URL shape (optional hyphenated title
   slug). See ADR-091 and `docs/guides/BREEZYHR_SOURCE_GUIDE.md`.
+- `FreshteamAdapter` (`source_type: freshteam`): public Freshteam careers boards. See ADR-094 and `docs/guides/FRESHTEAM_SOURCE_GUIDE.md`.
 - `SuccessFactorsAdapter` (`source_type: successfactors`): a dedicated adapter
   for public SAP SuccessFactors (`*.successfactors.com` / `*.successfactors.eu`)
   careers portals. Postings are recognised by `jobId` / `career_job_req_id`
