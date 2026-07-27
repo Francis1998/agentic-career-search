@@ -44,6 +44,7 @@ class SourceType(StrEnum):
     JAZZHR = "jazzhr"
     BREEZYHR = "breezyhr"
     FRESHTEAM = "freshteam"
+    PHENOM = "phenom"
 
 
 class RunStatus(StrEnum):
