@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from autoapply_agent.adapters.ashby import AshbyAdapter
 from autoapply_agent.adapters.bamboohr import BambooHrAdapter
 from autoapply_agent.adapters.breezyhr import BreezyHrAdapter
+from autoapply_agent.adapters.freshteam import FreshteamAdapter
 from autoapply_agent.adapters.greenhouse import GreenhouseAdapter
 from autoapply_agent.adapters.icims import IcimsAdapter
 from autoapply_agent.adapters.jazzhr import JazzHrAdapter
@@ -104,6 +105,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.ZOHO_RECRUIT: ZohoRecruitAdapter(active_settings.http_user_agent),
                 SourceType.JAZZHR: JazzHrAdapter(active_settings.http_user_agent),
                 SourceType.BREEZYHR: BreezyHrAdapter(active_settings.http_user_agent),
+                SourceType.FRESHTEAM: FreshteamAdapter(active_settings.http_user_agent),
             },
             scoring_service=DeterministicScoringService(),
             planning_service=DeterministicPlanningService(),
