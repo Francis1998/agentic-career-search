@@ -6,6 +6,11 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `RipplingAdapter` (`source_type: rippling`): public Rippling careers boards
+  (`*.rippling.com`, especially `ats.rippling.com`). Postings are recognised by
+  terminal `/jobs/{uuid}` detail paths; board indexes, application subpaths,
+  generic navigation, and absolute non-Rippling links are ignored. See ADR-096
+  and `docs/guides/RIPPLING_SOURCE_GUIDE.md`.
 - `ZohoRecruitAdapter` (`source_type: zoho_recruit`): a dedicated adapter for
   public Zoho Recruit (`*.zohorecruit.com`) careers portals and vanity-domain
   proxies. Postings are recognised by `jobId` / `jid` / `job_id` query ids or
