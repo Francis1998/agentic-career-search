@@ -65,9 +65,7 @@ def test_pinpoint_parser_extracts_jobs() -> None:
     assert by_title["Platform Engineer"].location == "Poland"
     assert by_title["Customer Success Manager"].external_id == "53913"
     assert by_title["Customer Success Manager"].location == "London, UK"
-    assert by_title["Customer Success Manager"].url.endswith(
-        "/jobs/53913/customer-success-manager"
-    )
+    assert by_title["Customer Success Manager"].url.endswith("/jobs/53913/customer-success-manager")
 
 
 def test_pinpoint_parser_ignores_non_posting_links() -> None:
