@@ -15,6 +15,12 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   terminal `/jobs/{uuid}` detail paths; board indexes, application subpaths,
   generic navigation, and absolute non-Rippling links are ignored. See ADR-096
   and `docs/guides/RIPPLING_SOURCE_GUIDE.md`.
+  ignored. See ADR-097 and `docs/guides/PHENOM_SOURCE_GUIDE.md`.
+- `PinpointAdapter` (`source_type: pinpoint`): public Pinpoint HR careers boards
+  (`{org}.pinpointhq.com`). Postings are recognised by `/postings/{uuid}`
+  (optional locale prefix) or `/jobs/{jobId}` URL shapes; apply/login steps and
+  board navigation links are ignored. See ADR-097 and
+  `docs/guides/PINPOINT_SOURCE_GUIDE.md`.
 - `ZohoRecruitAdapter` (`source_type: zoho_recruit`): a dedicated adapter for
   public Zoho Recruit (`*.zohorecruit.com`) careers portals and vanity-domain
   proxies. Postings are recognised by `jobId` / `jid` / `job_id` query ids or

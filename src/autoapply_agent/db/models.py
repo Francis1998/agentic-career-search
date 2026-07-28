@@ -46,6 +46,7 @@ class SourceType(StrEnum):
     FRESHTEAM = "freshteam"
     PHENOM = "phenom"
     RIPPLING = "rippling"
+    PINPOINT = "pinpoint"
 
 
 class RunStatus(StrEnum):
