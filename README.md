@@ -108,6 +108,7 @@ Each `SourceConfig` selects a source adapter by `source_type`:
 | `breezyhr` | `BreezyHrAdapter` | Recognises `{company}.breezy.hr/p/{positionId}` posting anchors by URL shape (terminal `p`, alphanumeric id; slug optional) | Breezy HR-hosted careers sites (startup/SMB) |
 | `freshteam` | `FreshteamAdapter` | Recognises Freshteam careers posting anchors by job URL shape | Freshworks Freshteam-hosted careers boards |
 | `phenom` | `PhenomPeopleAdapter` | Recognises Phenom posting anchors via `/job/{jobId}/{slug}` or `/jobs/{jobId}` path shapes, rejecting list/index/login/apply-step links | Phenom People-hosted enterprise and branded careers sites |
+| `rippling` | `RipplingAdapter` | Recognises Rippling posting anchors via terminal `/jobs/{uuid}` paths on `*.rippling.com` domains | Rippling-hosted public careers boards |
 | `jsonld` | `JsonLdAdapter` | Reads embedded `schema.org/JobPosting` JSON-LD | **Any** board emitting Google-Jobs structured data (SmartRecruiters, custom career sites, ...) |
 
 Unlike the HTML-scraping adapters, `bamboohr` and `workday` are structured-JSON
