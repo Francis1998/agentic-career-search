@@ -22,6 +22,7 @@ from autoapply_agent.adapters.oracle_taleo import OracleTaleoAdapter
 from autoapply_agent.adapters.personio import PersonioAdapter
 from autoapply_agent.adapters.phenom import PhenomPeopleAdapter
 from autoapply_agent.adapters.recruitee import RecruiteeAdapter
+from autoapply_agent.adapters.rippling import RipplingAdapter
 from autoapply_agent.adapters.smartrecruiters import SmartRecruitersAdapter
 from autoapply_agent.adapters.successfactors import SuccessFactorsAdapter
 from autoapply_agent.adapters.teamtailor import TeamtailorAdapter
@@ -108,6 +109,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.BREEZYHR: BreezyHrAdapter(active_settings.http_user_agent),
                 SourceType.FRESHTEAM: FreshteamAdapter(active_settings.http_user_agent),
                 SourceType.PHENOM: PhenomPeopleAdapter(active_settings.http_user_agent),
+                SourceType.RIPPLING: RipplingAdapter(active_settings.http_user_agent),
             },
             scoring_service=DeterministicScoringService(),
             planning_service=DeterministicPlanningService(),
