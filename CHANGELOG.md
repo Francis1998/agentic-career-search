@@ -6,6 +6,10 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `PhenomPeopleAdapter` (`source_type: phenom`): a dedicated adapter for public
+  Phenom People careers sites. Postings are recognised by `/job/{id}/{slug}` or
+  `/jobs/{id}` path shapes, while list/index/search/login/apply-step links are
+  ignored. See ADR-095 and `docs/guides/PHENOM_SOURCE_GUIDE.md`.
 - `ZohoRecruitAdapter` (`source_type: zoho_recruit`): a dedicated adapter for
   public Zoho Recruit (`*.zohorecruit.com`) careers portals and vanity-domain
   proxies. Postings are recognised by `jobId` / `jid` / `job_id` query ids or
