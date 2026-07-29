@@ -49,6 +49,7 @@ class SourceType(StrEnum):
     PINPOINT = "pinpoint"
     COMEET = "comeet"
     FOUNTAIN = "fountain"
+    GEM = "gem"
 
 
 class RunStatus(StrEnum):

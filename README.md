@@ -112,6 +112,7 @@ Each `SourceConfig` selects a source adapter by `source_type`:
 | `pinpoint` | `PinpointAdapter` | Recognises Pinpoint HR careers posting anchors by `/postings/{uuid}` or `/jobs/{id}` URL shape | Pinpoint (`*.pinpointhq.com`) careers boards |
 | `comeet` | `ComeetAdapter` | Recognises Comeet careers posting anchors by `/jobs/{company}/{companyId}/{jobSlug}/{jobId}` URL shape | Comeet (`www.comeet.co` / `www.comeet.com`) careers boards |
 | `fountain` | `FountainAdapter` | Recognises Fountain careers posting anchors by `/apply/{company}/{positionId}`, `/apply/{slug}`, `/jobs/{id}`, `/openings/{id}`, or `/positions/{id}` URL shape | Fountain (`*.fountain.com`, `web.fountain.com`) careers boards |
+| `gem` | `GemAdapter` | Recognises Gem careers posting anchors by `jobs.gem.com/{company}/{jobId}`, `/jobs/{jobId}`, `/openings/{id}`, or `{company}.gem.com/careers/...` URL shapes | Gem (`jobs.gem.com` / `*.gem.com`) careers boards |
 | `jsonld` | `JsonLdAdapter` | Reads embedded `schema.org/JobPosting` JSON-LD | **Any** board emitting Google-Jobs structured data (SmartRecruiters, custom career sites, ...) |
 
 Unlike the HTML-scraping adapters, `bamboohr` and `workday` are structured-JSON
