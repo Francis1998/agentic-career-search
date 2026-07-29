@@ -47,6 +47,7 @@ class SourceType(StrEnum):
     PHENOM = "phenom"
     RIPPLING = "rippling"
     PINPOINT = "pinpoint"
+    COMEET = "comeet"
 
 
 class RunStatus(StrEnum):

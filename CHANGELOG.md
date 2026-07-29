@@ -6,6 +6,11 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `ComeetAdapter` (`source_type: comeet`): public Comeet careers boards
+  (`www.comeet.co` / `www.comeet.com`). Postings are recognised by
+  `/jobs/{company}/{companyId}/{jobSlug}/{jobId}` URL shapes; board indexes,
+  apply/login steps, and navigation links are ignored. See ADR-098 and
+  `docs/guides/COMEET_SOURCE_GUIDE.md`.
 - `PhenomPeopleAdapter` (`source_type: phenom`): a dedicated adapter for public
   Phenom People careers sites. Postings are recognised by `/job/{id}/{slug}` or
   `/jobs/{id}` path shapes, while list/index/search/login/apply-step links are

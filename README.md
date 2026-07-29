@@ -110,6 +110,7 @@ Each `SourceConfig` selects a source adapter by `source_type`:
 | `phenom` | `PhenomPeopleAdapter` | Recognises Phenom posting anchors via `/job/{jobId}/{slug}` or `/jobs/{jobId}` path shapes, rejecting list/index/login/apply-step links | Phenom People-hosted enterprise and branded careers sites |
 | `rippling` | `RipplingAdapter` | Recognises Rippling posting anchors via terminal `/jobs/{uuid}` paths on `*.rippling.com` domains | Rippling-hosted public careers boards |
 | `pinpoint` | `PinpointAdapter` | Recognises Pinpoint HR careers posting anchors by `/postings/{uuid}` or `/jobs/{id}` URL shape | Pinpoint (`*.pinpointhq.com`) careers boards |
+| `comeet` | `ComeetAdapter` | Recognises Comeet careers posting anchors by `/jobs/{company}/{companyId}/{jobSlug}/{jobId}` URL shape | Comeet (`www.comeet.co` / `www.comeet.com`) careers boards |
 | `jsonld` | `JsonLdAdapter` | Reads embedded `schema.org/JobPosting` JSON-LD | **Any** board emitting Google-Jobs structured data (SmartRecruiters, custom career sites, ...) |
 
 Unlike the HTML-scraping adapters, `bamboohr` and `workday` are structured-JSON
