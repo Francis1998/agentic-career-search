@@ -12,6 +12,7 @@ from autoapply_agent.adapters.ashby import AshbyAdapter
 from autoapply_agent.adapters.bamboohr import BambooHrAdapter
 from autoapply_agent.adapters.breezyhr import BreezyHrAdapter
 from autoapply_agent.adapters.comeet import ComeetAdapter
+from autoapply_agent.adapters.fountain import FountainAdapter
 from autoapply_agent.adapters.freshteam import FreshteamAdapter
 from autoapply_agent.adapters.greenhouse import GreenhouseAdapter
 from autoapply_agent.adapters.icims import IcimsAdapter
@@ -114,6 +115,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.RIPPLING: RipplingAdapter(active_settings.http_user_agent),
                 SourceType.PINPOINT: PinpointAdapter(active_settings.http_user_agent),
                 SourceType.COMEET: ComeetAdapter(active_settings.http_user_agent),
+                SourceType.FOUNTAIN: FountainAdapter(active_settings.http_user_agent),
             },
             scoring_service=DeterministicScoringService(),
             planning_service=DeterministicPlanningService(),
