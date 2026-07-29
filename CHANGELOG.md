@@ -26,6 +26,12 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   (optional locale prefix) or `/jobs/{jobId}` URL shapes; apply/login steps and
   board navigation links are ignored. See ADR-097 and
   `docs/guides/PINPOINT_SOURCE_GUIDE.md`.
+- `FountainAdapter` (`source_type: fountain`): public Fountain careers boards
+  (`{org}.fountain.com`, `web.fountain.com`). Postings are recognised by
+  `/apply/{company}/{positionId}`, tenant `/apply/{slug}`, or `/jobs/{jobId}`,
+  `/openings/{id}`, and `/positions/{id}` URL shapes; apply confirmation/login
+  steps and board navigation links are ignored. See ADR-099 and
+  `docs/guides/FOUNTAIN_SOURCE_GUIDE.md`.
 - `ZohoRecruitAdapter` (`source_type: zoho_recruit`): a dedicated adapter for
   public Zoho Recruit (`*.zohorecruit.com`) careers portals and vanity-domain
   proxies. Postings are recognised by `jobId` / `jid` / `job_id` query ids or

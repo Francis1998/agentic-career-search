@@ -48,6 +48,7 @@ class SourceType(StrEnum):
     RIPPLING = "rippling"
     PINPOINT = "pinpoint"
     COMEET = "comeet"
+    FOUNTAIN = "fountain"
 
 
 class RunStatus(StrEnum):
