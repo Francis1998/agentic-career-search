@@ -63,9 +63,7 @@ def test_comeet_parser_extracts_jobs() -> None:
     }
     assert by_title["Senior Infrastructure Engineer"].external_id == _JOB_A
     assert by_title["Senior Infrastructure Engineer"].location == "Remote"
-    assert by_title["Senior Infrastructure Engineer"].url == (
-        f"https://www.comeet.co{_PATH_A}"
-    )
+    assert by_title["Senior Infrastructure Engineer"].url == (f"https://www.comeet.co{_PATH_A}")
     assert by_title["Platform Engineer"].external_id == _JOB_B
     assert by_title["Platform Engineer"].location == "Poland"
     assert by_title["Customer Success Manager"].external_id == _JOB_C
