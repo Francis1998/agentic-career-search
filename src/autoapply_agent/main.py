@@ -14,6 +14,7 @@ from autoapply_agent.adapters.breezyhr import BreezyHrAdapter
 from autoapply_agent.adapters.comeet import ComeetAdapter
 from autoapply_agent.adapters.fountain import FountainAdapter
 from autoapply_agent.adapters.freshteam import FreshteamAdapter
+from autoapply_agent.adapters.gem import GemAdapter
 from autoapply_agent.adapters.greenhouse import GreenhouseAdapter
 from autoapply_agent.adapters.icims import IcimsAdapter
 from autoapply_agent.adapters.jazzhr import JazzHrAdapter
@@ -116,6 +117,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.PINPOINT: PinpointAdapter(active_settings.http_user_agent),
                 SourceType.COMEET: ComeetAdapter(active_settings.http_user_agent),
                 SourceType.FOUNTAIN: FountainAdapter(active_settings.http_user_agent),
+                SourceType.GEM: GemAdapter(active_settings.http_user_agent),
             },
             scoring_service=DeterministicScoringService(),
             planning_service=DeterministicPlanningService(),

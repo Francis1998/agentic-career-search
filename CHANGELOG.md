@@ -6,6 +6,12 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `GemAdapter` (`source_type: gem`): public Gem careers boards
+  (`jobs.gem.com` / `{company}.gem.com`). Postings are recognised by
+  `/{company}/{jobId}`, `/jobs/{jobId}`, `/openings/{id}`, and
+  `/careers/...` vanity URL shapes; board indexes, apply/login steps, and
+  navigation links are ignored. See ADR-100 and
+  `docs/guides/GEM_SOURCE_GUIDE.md`.
 - `ComeetAdapter` (`source_type: comeet`): public Comeet careers boards
   (`www.comeet.co` / `www.comeet.com`). Postings are recognised by
   `/jobs/{company}/{companyId}/{jobSlug}/{jobId}` URL shapes; board indexes,
