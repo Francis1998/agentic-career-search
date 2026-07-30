@@ -115,6 +115,7 @@ Each `SourceConfig` selects a source adapter by `source_type`:
 | `gem` | `GemAdapter` | Recognises Gem careers posting anchors by `jobs.gem.com/{company}/{jobId}`, `/jobs/{jobId}`, `/openings/{id}`, or `{company}.gem.com/careers/...` URL shapes | Gem (`jobs.gem.com` / `*.gem.com`) careers boards |
 | `avature` | `AvatureAdapter` | Recognises Avature careers posting anchors by `/JobDetail/{id}`, `/JobDetail.aspx?JobId={id}`, `/careers/{id}`, `/careers/job/{id}`, `/careers/VacancyDetail/{id}`, `/Vacancy/{id}`, or `/vacancies/{id}` URL shapes | Avature-hosted public careers portals |
 | `eightfold` | `EightfoldAdapter` | Recognises Eightfold careers posting anchors by `/careers/job/{id}`, `/careers/job/{id}/{slug}`, `/career_detail/{id}`, `/position/{id}`, or `/jobs/{id}` URL shapes | Eightfold (`*.eightfold.ai`) careers boards |
+| `jobscore` | `JobScoreAdapter` | Recognises JobScore careers posting anchors by `/careers/{company}/jobs/{slug}-{id}`, `/careers/{company}/jobs/{id}`, `/jobs/{id}`, `/jobs/{slug}/{id}`, or `/position(s)/{id}` URL shapes | JobScore (`careers.jobscore.com` / `*.jobscore.com`) careers boards |
 | `jsonld` | `JsonLdAdapter` | Reads embedded `schema.org/JobPosting` JSON-LD | **Any** board emitting Google-Jobs structured data (SmartRecruiters, custom career sites, ...) |
 
 Unlike the HTML-scraping adapters, `bamboohr` and `workday` are structured-JSON

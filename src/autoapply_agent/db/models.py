@@ -52,6 +52,7 @@ class SourceType(StrEnum):
     GEM = "gem"
     AVATURE = "avature"
     EIGHTFOLD = "eightfold"
+    JOBSCORE = "jobscore"
 
 
 class RunStatus(StrEnum):

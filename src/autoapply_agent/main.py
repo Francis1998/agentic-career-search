@@ -20,6 +20,7 @@ from autoapply_agent.adapters.gem import GemAdapter
 from autoapply_agent.adapters.greenhouse import GreenhouseAdapter
 from autoapply_agent.adapters.icims import IcimsAdapter
 from autoapply_agent.adapters.jazzhr import JazzHrAdapter
+from autoapply_agent.adapters.jobscore import JobScoreAdapter
 from autoapply_agent.adapters.jobvite import JobviteAdapter
 from autoapply_agent.adapters.jsonld import JsonLdAdapter
 from autoapply_agent.adapters.lever import LeverAdapter
@@ -122,6 +123,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.GEM: GemAdapter(active_settings.http_user_agent),
                 SourceType.AVATURE: AvatureAdapter(active_settings.http_user_agent),
                 SourceType.EIGHTFOLD: EightfoldAdapter(active_settings.http_user_agent),
+                SourceType.JOBSCORE: JobScoreAdapter(active_settings.http_user_agent),
             },
             scoring_service=DeterministicScoringService(),
             planning_service=DeterministicPlanningService(),
