@@ -114,6 +114,7 @@ Each `SourceConfig` selects a source adapter by `source_type`:
 | `fountain` | `FountainAdapter` | Recognises Fountain careers posting anchors by `/apply/{company}/{positionId}`, `/apply/{slug}`, `/jobs/{id}`, `/openings/{id}`, or `/positions/{id}` URL shape | Fountain (`*.fountain.com`, `web.fountain.com`) careers boards |
 | `gem` | `GemAdapter` | Recognises Gem careers posting anchors by `jobs.gem.com/{company}/{jobId}`, `/jobs/{jobId}`, `/openings/{id}`, or `{company}.gem.com/careers/...` URL shapes | Gem (`jobs.gem.com` / `*.gem.com`) careers boards |
 | `avature` | `AvatureAdapter` | Recognises Avature careers posting anchors by `/JobDetail/{id}`, `/JobDetail.aspx?JobId={id}`, `/careers/{id}`, `/careers/job/{id}`, `/careers/VacancyDetail/{id}`, `/Vacancy/{id}`, or `/vacancies/{id}` URL shapes | Avature-hosted public careers portals |
+| `eightfold` | `EightfoldAdapter` | Recognises Eightfold careers posting anchors by `/careers/job/{id}`, `/careers/job/{id}/{slug}`, `/career_detail/{id}`, `/position/{id}`, or `/jobs/{id}` URL shapes | Eightfold (`*.eightfold.ai`) careers boards |
 | `jsonld` | `JsonLdAdapter` | Reads embedded `schema.org/JobPosting` JSON-LD | **Any** board emitting Google-Jobs structured data (SmartRecruiters, custom career sites, ...) |
 
 Unlike the HTML-scraping adapters, `bamboohr` and `workday` are structured-JSON

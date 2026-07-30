@@ -6,6 +6,12 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `EightfoldAdapter` (`source_type: eightfold`): public Eightfold AI careers
+  boards (`{company}.eightfold.ai`). Postings are recognised by
+  `/careers/job/{id}`, `/careers/job/{id}/{slug}`, `/career_detail/{id}`,
+  `/position/{id}`, and `/jobs/{id}` URL shapes; board indexes, apply/login
+  steps, search facets, and navigation links are ignored. See ADR-102 and
+  `docs/guides/EIGHTFOLD_SOURCE_GUIDE.md`.
 - `AvatureAdapter` (`source_type: avature`): public Avature careers portals.
   Postings are recognised by `/JobDetail/{id}`, `/JobDetail.aspx?JobId={id}`,
   `/careers/{id}`, `/careers/job/{id}`, `/careers/VacancyDetail/{id}`,
