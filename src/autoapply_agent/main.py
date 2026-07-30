@@ -13,6 +13,7 @@ from autoapply_agent.adapters.avature import AvatureAdapter
 from autoapply_agent.adapters.bamboohr import BambooHrAdapter
 from autoapply_agent.adapters.breezyhr import BreezyHrAdapter
 from autoapply_agent.adapters.comeet import ComeetAdapter
+from autoapply_agent.adapters.eightfold import EightfoldAdapter
 from autoapply_agent.adapters.fountain import FountainAdapter
 from autoapply_agent.adapters.freshteam import FreshteamAdapter
 from autoapply_agent.adapters.gem import GemAdapter
@@ -120,6 +121,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.FOUNTAIN: FountainAdapter(active_settings.http_user_agent),
                 SourceType.GEM: GemAdapter(active_settings.http_user_agent),
                 SourceType.AVATURE: AvatureAdapter(active_settings.http_user_agent),
+                SourceType.EIGHTFOLD: EightfoldAdapter(active_settings.http_user_agent),
             },
             scoring_service=DeterministicScoringService(),
             planning_service=DeterministicPlanningService(),

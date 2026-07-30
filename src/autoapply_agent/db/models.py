@@ -51,6 +51,7 @@ class SourceType(StrEnum):
     FOUNTAIN = "fountain"
     GEM = "gem"
     AVATURE = "avature"
+    EIGHTFOLD = "eightfold"
 
 
 class RunStatus(StrEnum):
