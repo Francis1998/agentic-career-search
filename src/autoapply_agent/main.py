@@ -9,6 +9,7 @@ from fastapi import APIRouter, FastAPI
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from autoapply_agent.adapters.ashby import AshbyAdapter
+from autoapply_agent.adapters.avature import AvatureAdapter
 from autoapply_agent.adapters.bamboohr import BambooHrAdapter
 from autoapply_agent.adapters.breezyhr import BreezyHrAdapter
 from autoapply_agent.adapters.comeet import ComeetAdapter
@@ -118,6 +119,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.COMEET: ComeetAdapter(active_settings.http_user_agent),
                 SourceType.FOUNTAIN: FountainAdapter(active_settings.http_user_agent),
                 SourceType.GEM: GemAdapter(active_settings.http_user_agent),
+                SourceType.AVATURE: AvatureAdapter(active_settings.http_user_agent),
             },
             scoring_service=DeterministicScoringService(),
             planning_service=DeterministicPlanningService(),
