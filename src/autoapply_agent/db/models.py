@@ -50,6 +50,7 @@ class SourceType(StrEnum):
     COMEET = "comeet"
     FOUNTAIN = "fountain"
     GEM = "gem"
+    AVATURE = "avature"
 
 
 class RunStatus(StrEnum):

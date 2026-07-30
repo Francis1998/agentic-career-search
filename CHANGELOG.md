@@ -6,6 +6,12 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `AvatureAdapter` (`source_type: avature`): public Avature careers portals.
+  Postings are recognised by `/JobDetail/{id}`, `/JobDetail.aspx?JobId={id}`,
+  `/careers/{id}`, `/careers/job/{id}`, `/careers/VacancyDetail/{id}`,
+  `/Vacancy/{id}`, and `/vacancies/{id}` URL shapes; board indexes,
+  apply/login/RegisterCandidate/about links are ignored. See ADR-103 and
+  `docs/guides/AVATURE_SOURCE_GUIDE.md`.
 - `GemAdapter` (`source_type: gem`): public Gem careers boards
   (`jobs.gem.com` / `{company}.gem.com`). Postings are recognised by
   `/{company}/{jobId}`, `/jobs/{jobId}`, `/openings/{id}`, and
