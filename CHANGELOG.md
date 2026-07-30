@@ -6,6 +6,12 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `JobScoreAdapter` (`source_type: jobscore`): public JobScore careers boards
+  (`careers.jobscore.com` / `*.jobscore.com`). Postings are recognised by
+  `/careers/{company}/jobs/{slug}-{id}`, `/careers/{company}/jobs/{id}`,
+  `/jobs/{id}`, `/jobs/{slug}/{id}`, and `/position(s)/{id}` URL shapes;
+  board indexes, apply/login/signin steps, and navigation links are ignored.
+  See ADR-101 and `docs/guides/JOBSCORE_SOURCE_GUIDE.md`.
 - `EightfoldAdapter` (`source_type: eightfold`): public Eightfold AI careers
   boards (`{company}.eightfold.ai`). Postings are recognised by
   `/careers/job/{id}`, `/careers/job/{id}/{slug}`, `/career_detail/{id}`,
