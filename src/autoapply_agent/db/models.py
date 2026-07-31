@@ -54,6 +54,7 @@ class SourceType(StrEnum):
     EIGHTFOLD = "eightfold"
     JOBSCORE = "jobscore"
     HIREOLOGY = "hireology"
+    DAYFORCE = "dayforce"
 
 
 class RunStatus(StrEnum):

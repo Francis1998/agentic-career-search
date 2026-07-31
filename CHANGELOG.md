@@ -11,6 +11,11 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `/careers/job/{id}`, and `/job/{id}/{slug}` URL shapes; board indexes,
   apply/login/signin steps, and navigation links are ignored. See ADR-104 and
   `docs/guides/HIREOLOGY_SOURCE_GUIDE.md`.
+- `DayforceAdapter` (`source_type: dayforce`): public Dayforce (Ceridian) careers
+  boards (`*.dayforcehcm.com`). Postings are recognised by `/JobDetail/{id}`,
+  `/careers/job/{id}`, `/MyCareer/JobDetail?jobId={id}`, and `/positions/{id}`
+  URL shapes; board indexes, apply/login/signin steps, and navigation links are
+  ignored. See ADR-105 and `docs/guides/DAYFORCE_SOURCE_GUIDE.md`.
 - `JobScoreAdapter` (`source_type: jobscore`): public JobScore careers boards
   (`careers.jobscore.com` / `*.jobscore.com`). Postings are recognised by
   `/careers/{company}/jobs/{slug}-{id}`, `/careers/{company}/jobs/{id}`,
