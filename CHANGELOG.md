@@ -6,6 +6,11 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `HireologyAdapter` (`source_type: hireology`): public Hireology careers boards
+  (`careers.hireology.com`). Postings are recognised by `/jobs/{id}`,
+  `/careers/job/{id}`, and `/job/{id}/{slug}` URL shapes; board indexes,
+  apply/login/signin steps, and navigation links are ignored. See ADR-104 and
+  `docs/guides/HIREOLOGY_SOURCE_GUIDE.md`.
 - `JobScoreAdapter` (`source_type: jobscore`): public JobScore careers boards
   (`careers.jobscore.com` / `*.jobscore.com`). Postings are recognised by
   `/careers/{company}/jobs/{slug}-{id}`, `/careers/{company}/jobs/{id}`,
