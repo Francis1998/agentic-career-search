@@ -20,6 +20,7 @@ from autoapply_agent.adapters.freshteam import FreshteamAdapter
 from autoapply_agent.adapters.gem import GemAdapter
 from autoapply_agent.adapters.greenhouse import GreenhouseAdapter
 from autoapply_agent.adapters.hireology import HireologyAdapter
+from autoapply_agent.adapters.homerun import HomerunAdapter
 from autoapply_agent.adapters.icims import IcimsAdapter
 from autoapply_agent.adapters.jazzhr import JazzHrAdapter
 from autoapply_agent.adapters.jobscore import JobScoreAdapter
@@ -128,6 +129,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.JOBSCORE: JobScoreAdapter(active_settings.http_user_agent),
                 SourceType.HIREOLOGY: HireologyAdapter(active_settings.http_user_agent),
                 SourceType.DAYFORCE: DayforceAdapter(active_settings.http_user_agent),
+                SourceType.HOMERUN: HomerunAdapter(active_settings.http_user_agent),
             },
             scoring_service=DeterministicScoringService(),
             planning_service=DeterministicPlanningService(),

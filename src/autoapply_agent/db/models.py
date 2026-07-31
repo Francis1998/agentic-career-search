@@ -55,6 +55,7 @@ class SourceType(StrEnum):
     JOBSCORE = "jobscore"
     HIREOLOGY = "hireology"
     DAYFORCE = "dayforce"
+    HOMERUN = "homerun"
 
 
 class RunStatus(StrEnum):
