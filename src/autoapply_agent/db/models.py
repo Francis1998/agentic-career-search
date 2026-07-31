@@ -53,6 +53,7 @@ class SourceType(StrEnum):
     AVATURE = "avature"
     EIGHTFOLD = "eightfold"
     JOBSCORE = "jobscore"
+    HIREOLOGY = "hireology"
 
 
 class RunStatus(StrEnum):
