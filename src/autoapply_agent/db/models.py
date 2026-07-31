@@ -54,7 +54,11 @@ class SourceType(StrEnum):
     EIGHTFOLD = "eightfold"
     JOBSCORE = "jobscore"
     HIREOLOGY = "hireology"
+<<<<<<< HEAD
     DAYFORCE = "dayforce"
+=======
+    HOMERUN = "homerun"
+>>>>>>> e609c50 (feat(adapters): add Homerun careers source adapter)
 
 
 class RunStatus(StrEnum):

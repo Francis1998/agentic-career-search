@@ -11,11 +11,19 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `/careers/job/{id}`, and `/job/{id}/{slug}` URL shapes; board indexes,
   apply/login/signin steps, and navigation links are ignored. See ADR-104 and
   `docs/guides/HIREOLOGY_SOURCE_GUIDE.md`.
+<<<<<<< HEAD
 - `DayforceAdapter` (`source_type: dayforce`): public Dayforce (Ceridian) careers
   boards (`*.dayforcehcm.com`). Postings are recognised by `/JobDetail/{id}`,
   `/careers/job/{id}`, `/MyCareer/JobDetail?jobId={id}`, and `/positions/{id}`
   URL shapes; board indexes, apply/login/signin steps, and navigation links are
   ignored. See ADR-105 and `docs/guides/DAYFORCE_SOURCE_GUIDE.md`.
+=======
+- `HomerunAdapter` (`source_type: homerun`): public Homerun careers boards
+  (`*.homerun.co`). Postings are recognised by `/jobs/{id}-{slug}`, `/o/{id}`,
+  and `/vacancies/{id}` URL shapes; board indexes, apply/login/signin/about
+  steps, and navigation links are ignored. See ADR-106 and
+  `docs/guides/HOMERUN_SOURCE_GUIDE.md`.
+>>>>>>> e609c50 (feat(adapters): add Homerun careers source adapter)
 - `JobScoreAdapter` (`source_type: jobscore`): public JobScore careers boards
   (`careers.jobscore.com` / `*.jobscore.com`). Postings are recognised by
   `/careers/{company}/jobs/{slug}-{id}`, `/careers/{company}/jobs/{id}`,
