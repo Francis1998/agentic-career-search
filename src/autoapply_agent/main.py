@@ -128,11 +128,8 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.EIGHTFOLD: EightfoldAdapter(active_settings.http_user_agent),
                 SourceType.JOBSCORE: JobScoreAdapter(active_settings.http_user_agent),
                 SourceType.HIREOLOGY: HireologyAdapter(active_settings.http_user_agent),
-<<<<<<< HEAD
                 SourceType.DAYFORCE: DayforceAdapter(active_settings.http_user_agent),
-=======
                 SourceType.HOMERUN: HomerunAdapter(active_settings.http_user_agent),
->>>>>>> e609c50 (feat(adapters): add Homerun careers source adapter)
             },
             scoring_service=DeterministicScoringService(),
             planning_service=DeterministicPlanningService(),
