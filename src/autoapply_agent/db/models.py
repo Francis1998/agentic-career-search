@@ -59,6 +59,7 @@ class SourceType(StrEnum):
     CLEARCOMPANY = "clearcompany"
     APPLIED = "applied"
 
+
 class RunStatus(StrEnum):
     """Run lifecycle states."""
 
