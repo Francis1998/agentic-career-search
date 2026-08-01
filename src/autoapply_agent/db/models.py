@@ -58,6 +58,7 @@ class SourceType(StrEnum):
     HOMERUN = "homerun"
     CLEARCOMPANY = "clearcompany"
     APPLIED = "applied"
+    RECRUITERFLOW = "recruiterflow"
 
 
 class RunStatus(StrEnum):

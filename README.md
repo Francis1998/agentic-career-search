@@ -121,6 +121,8 @@ Each `SourceConfig` selects a source adapter by `source_type`:
 | `homerun` | `HomerunAdapter` | Recognises Homerun careers posting anchors by `/jobs/{id}-{slug}`, `/o/{id}`, or `/vacancies/{id}` URL shapes | Homerun (`*.homerun.co`) careers boards |
 | `clearcompany` | `ClearCompanyAdapter` | Recognises ClearCompany careers posting anchors by `/careers/job/{id}`, `/careers/{id}`, `/jobs/{id}`, `/job/{id}-{slug}`, or `/position/{id}` URL shapes | ClearCompany (`*.clearcompany.com`) careers boards |
 | `applied` | `AppliedAdapter` | Recognises Applied careers posting anchors by `/jobs/{id}`, `/j/{id}`, `/role/{id}`, `/roles/{id}`, or `/job/{id}` URL shapes | Applied (`*.applied.co`) careers boards || `jsonld` | `JsonLdAdapter` | Reads embedded `schema.org/JobPosting` JSON-LD | **Any** board emitting Google-Jobs structured data (SmartRecruiters, custom career sites, ...) |
+| `recruiterflow` | `RecruiterflowAdapter` | Recognises Recruiterflow careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/job/{id}`, `/openings/{id}`, or `/opening/{id}` URL shapes | Recruiterflow (`*.recruiterflow.com`) careers boards |
+| `jsonld` | `JsonLdAdapter` | Reads embedded `schema.org/JobPosting` JSON-LD | **Any** board emitting Google-Jobs structured data (SmartRecruiters, custom career sites, ...) |
 
 Unlike the HTML-scraping adapters, `bamboohr` and `workday` are structured-JSON
 sources: BambooHR and Workday careers pages are client-rendered apps, so those
