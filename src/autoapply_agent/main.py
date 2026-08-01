@@ -12,6 +12,7 @@ from autoapply_agent.adapters.ashby import AshbyAdapter
 from autoapply_agent.adapters.avature import AvatureAdapter
 from autoapply_agent.adapters.bamboohr import BambooHrAdapter
 from autoapply_agent.adapters.breezyhr import BreezyHrAdapter
+from autoapply_agent.adapters.clearcompany import ClearCompanyAdapter
 from autoapply_agent.adapters.comeet import ComeetAdapter
 from autoapply_agent.adapters.dayforce import DayforceAdapter
 from autoapply_agent.adapters.eightfold import EightfoldAdapter
@@ -130,6 +131,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.HIREOLOGY: HireologyAdapter(active_settings.http_user_agent),
                 SourceType.DAYFORCE: DayforceAdapter(active_settings.http_user_agent),
                 SourceType.HOMERUN: HomerunAdapter(active_settings.http_user_agent),
+                SourceType.CLEARCOMPANY: ClearCompanyAdapter(active_settings.http_user_agent),
             },
             scoring_service=DeterministicScoringService(),
             planning_service=DeterministicPlanningService(),
