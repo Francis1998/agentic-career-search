@@ -119,6 +119,7 @@ Each `SourceConfig` selects a source adapter by `source_type`:
 | `hireology` | `HireologyAdapter` | Recognises Hireology careers posting anchors by `/jobs/{id}`, `/careers/job/{id}`, or `/job/{id}/{slug}` URL shapes | Hireology (`careers.hireology.com`) careers boards |
 | `dayforce` | `DayforceAdapter` | Recognises Dayforce careers posting anchors by `/JobDetail/{id}`, `/careers/job/{id}`, `/MyCareer/JobDetail?jobId={id}`, or `/positions/{id}` URL shapes | Dayforce (`*.dayforcehcm.com`) careers boards |
 | `homerun` | `HomerunAdapter` | Recognises Homerun careers posting anchors by `/jobs/{id}-{slug}`, `/o/{id}`, or `/vacancies/{id}` URL shapes | Homerun (`*.homerun.co`) careers boards |
+| `clearcompany` | `ClearCompanyAdapter` | Recognises ClearCompany careers posting anchors by `/careers/job/{id}`, `/careers/{id}`, `/jobs/{id}`, `/job/{id}-{slug}`, or `/position/{id}` URL shapes | ClearCompany (`*.clearcompany.com`) careers boards |
 | `jsonld` | `JsonLdAdapter` | Reads embedded `schema.org/JobPosting` JSON-LD | **Any** board emitting Google-Jobs structured data (SmartRecruiters, custom career sites, ...) |
 
 Unlike the HTML-scraping adapters, `bamboohr` and `workday` are structured-JSON
