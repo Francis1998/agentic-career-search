@@ -11,7 +11,11 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `/careers/{id}`, `/jobs/{id}`, `/job/{id}-{slug}`, and `/position/{id}` URL
   shapes; board indexes, apply/login/signin/about steps, and navigation links are
   ignored. See ADR-107 and `docs/guides/CLEARCOMPANY_SOURCE_GUIDE.md`.
-- `HireologyAdapter` (`source_type: hireology`): public Hireology careers boards
+- `AppliedAdapter` (`source_type: applied`): public Applied careers boards
+  (`*.applied.co`). Postings are recognised by `/jobs/{id}`, `/j/{id}`,
+  `/role/{id}`, `/roles/{id}`, and `/job/{id}` URL shapes; board indexes,
+  apply/login/signin/about steps, and navigation links are ignored. See ADR-108
+  and `docs/guides/APPLIED_SOURCE_GUIDE.md`.- `HireologyAdapter` (`source_type: hireology`): public Hireology careers boards
   (`careers.hireology.com`). Postings are recognised by `/jobs/{id}`,
   `/careers/job/{id}`, and `/job/{id}/{slug}` URL shapes; board indexes,
   apply/login/signin steps, and navigation links are ignored. See ADR-104 and

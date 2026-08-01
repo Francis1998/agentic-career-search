@@ -8,6 +8,7 @@ from typing import Any
 from fastapi import APIRouter, FastAPI
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from autoapply_agent.adapters.applied import AppliedAdapter
 from autoapply_agent.adapters.ashby import AshbyAdapter
 from autoapply_agent.adapters.avature import AvatureAdapter
 from autoapply_agent.adapters.bamboohr import BambooHrAdapter
@@ -132,7 +133,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.DAYFORCE: DayforceAdapter(active_settings.http_user_agent),
                 SourceType.HOMERUN: HomerunAdapter(active_settings.http_user_agent),
                 SourceType.CLEARCOMPANY: ClearCompanyAdapter(active_settings.http_user_agent),
-            },
+                SourceType.APPLIED: AppliedAdapter(active_settings.http_user_agent),            },
             scoring_service=DeterministicScoringService(),
             planning_service=DeterministicPlanningService(),
             llm_enrichment_service=llm_enrichment_service,

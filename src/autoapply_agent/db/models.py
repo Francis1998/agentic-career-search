@@ -57,7 +57,7 @@ class SourceType(StrEnum):
     DAYFORCE = "dayforce"
     HOMERUN = "homerun"
     CLEARCOMPANY = "clearcompany"
-
+    APPLIED = "applied"
 
 class RunStatus(StrEnum):
     """Run lifecycle states."""
