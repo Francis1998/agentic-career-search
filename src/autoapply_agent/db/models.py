@@ -61,6 +61,7 @@ class SourceType(StrEnum):
     RECRUITERFLOW = "recruiterflow"
     MANATAL = "manatal"
     JOIN = "join"
+    SOFTGARDEN = "softgarden"
 
 
 class RunStatus(StrEnum):
