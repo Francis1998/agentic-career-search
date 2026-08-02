@@ -29,6 +29,7 @@ from autoapply_agent.adapters.jobscore import JobScoreAdapter
 from autoapply_agent.adapters.jobvite import JobviteAdapter
 from autoapply_agent.adapters.jsonld import JsonLdAdapter
 from autoapply_agent.adapters.lever import LeverAdapter
+from autoapply_agent.adapters.manatal import ManatalAdapter
 from autoapply_agent.adapters.oracle_taleo import OracleTaleoAdapter
 from autoapply_agent.adapters.personio import PersonioAdapter
 from autoapply_agent.adapters.phenom import PhenomPeopleAdapter
@@ -136,6 +137,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.CLEARCOMPANY: ClearCompanyAdapter(active_settings.http_user_agent),
                 SourceType.APPLIED: AppliedAdapter(active_settings.http_user_agent),
                 SourceType.RECRUITERFLOW: RecruiterflowAdapter(active_settings.http_user_agent),
+                SourceType.MANATAL: ManatalAdapter(active_settings.http_user_agent),
             },
             scoring_service=DeterministicScoringService(),
             planning_service=DeterministicPlanningService(),
