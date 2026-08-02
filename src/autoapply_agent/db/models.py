@@ -59,6 +59,7 @@ class SourceType(StrEnum):
     CLEARCOMPANY = "clearcompany"
     APPLIED = "applied"
     RECRUITERFLOW = "recruiterflow"
+    MANATAL = "manatal"
 
 
 class RunStatus(StrEnum):
