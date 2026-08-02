@@ -16,6 +16,11 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `/job/{id}`, and `/positions/{id}` URL shapes; board indexes, apply/login/signin/about
   steps, and navigation links are ignored. See ADR-112 and
   `docs/guides/JOIN_SOURCE_GUIDE.md`.
+- `SoftgardenAdapter` (`source_type: softgarden`): public Softgarden careers boards
+  (`*.softgarden.io`). Postings are recognised by `/job/{id}`, `/jobs/{id}`,
+  `/vacancies/{id}`, `/vacancy/{id}`, and `/position/{id}` URL shapes; board
+  indexes, apply/login/signin/about steps, and navigation links are ignored. See
+  ADR-111 and `docs/guides/SOFTGARDEN_SOURCE_GUIDE.md`.
 - `ClearCompanyAdapter` (`source_type: clearcompany`): public ClearCompany careers
   boards (`*.clearcompany.com`). Postings are recognised by `/careers/job/{id}`,
   `/careers/{id}`, `/jobs/{id}`, `/job/{id}-{slug}`, and `/position/{id}` URL
