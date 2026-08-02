@@ -11,6 +11,11 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `/careers/{id}`, `/careers/job/{id}`, and `/openings/{id}` URL shapes; board
   indexes, apply/login/signin/about steps, and navigation links are ignored. See
   ADR-110 and `docs/guides/MANATAL_SOURCE_GUIDE.md`.
+- `JoinAdapter` (`source_type: join`): public Join careers boards (`join.com`).
+  Postings are recognised by `/companies/{slug}/jobs/{id}`, `/jobs/{id}`,
+  `/job/{id}`, and `/positions/{id}` URL shapes; board indexes, apply/login/signin/about
+  steps, and navigation links are ignored. See ADR-112 and
+  `docs/guides/JOIN_SOURCE_GUIDE.md`.
 - `ClearCompanyAdapter` (`source_type: clearcompany`): public ClearCompany careers
   boards (`*.clearcompany.com`). Postings are recognised by `/careers/job/{id}`,
   `/careers/{id}`, `/jobs/{id}`, `/job/{id}-{slug}`, and `/position/{id}` URL
