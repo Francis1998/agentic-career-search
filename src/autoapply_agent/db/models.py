@@ -60,6 +60,7 @@ class SourceType(StrEnum):
     APPLIED = "applied"
     RECRUITERFLOW = "recruiterflow"
     MANATAL = "manatal"
+    JOIN = "join"
 
 
 class RunStatus(StrEnum):
