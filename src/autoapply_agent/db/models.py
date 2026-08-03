@@ -62,6 +62,7 @@ class SourceType(StrEnum):
     MANATAL = "manatal"
     JOIN = "join"
     SOFTGARDEN = "softgarden"
+    FACTORIAL = "factorial"
 
 
 class RunStatus(StrEnum):

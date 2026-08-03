@@ -17,6 +17,7 @@ from autoapply_agent.adapters.clearcompany import ClearCompanyAdapter
 from autoapply_agent.adapters.comeet import ComeetAdapter
 from autoapply_agent.adapters.dayforce import DayforceAdapter
 from autoapply_agent.adapters.eightfold import EightfoldAdapter
+from autoapply_agent.adapters.factorial import FactorialAdapter
 from autoapply_agent.adapters.fountain import FountainAdapter
 from autoapply_agent.adapters.freshteam import FreshteamAdapter
 from autoapply_agent.adapters.gem import GemAdapter
@@ -142,6 +143,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.MANATAL: ManatalAdapter(active_settings.http_user_agent),
                 SourceType.JOIN: JoinAdapter(active_settings.http_user_agent),
                 SourceType.SOFTGARDEN: SoftgardenAdapter(active_settings.http_user_agent),
+                SourceType.FACTORIAL: FactorialAdapter(active_settings.http_user_agent),
             },
             scoring_service=DeterministicScoringService(),
             planning_service=DeterministicPlanningService(),
