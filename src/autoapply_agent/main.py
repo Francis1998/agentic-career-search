@@ -13,6 +13,7 @@ from autoapply_agent.adapters.ashby import AshbyAdapter
 from autoapply_agent.adapters.avature import AvatureAdapter
 from autoapply_agent.adapters.bamboohr import BambooHrAdapter
 from autoapply_agent.adapters.breezyhr import BreezyHrAdapter
+from autoapply_agent.adapters.bullhorn import BullhornAdapter
 from autoapply_agent.adapters.clearcompany import ClearCompanyAdapter
 from autoapply_agent.adapters.comeet import ComeetAdapter
 from autoapply_agent.adapters.dayforce import DayforceAdapter
@@ -146,6 +147,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.SOFTGARDEN: SoftgardenAdapter(active_settings.http_user_agent),
                 SourceType.FACTORIAL: FactorialAdapter(active_settings.http_user_agent),
                 SourceType.UKG: UkgAdapter(active_settings.http_user_agent),
+                SourceType.BULLHORN: BullhornAdapter(active_settings.http_user_agent),
             },
             scoring_service=DeterministicScoringService(),
             planning_service=DeterministicPlanningService(),
