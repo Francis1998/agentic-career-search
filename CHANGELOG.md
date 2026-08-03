@@ -6,6 +6,11 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `UkgAdapter` (`source_type: ukg`): public UKG/UltiPro careers boards
+  (`*.ultipro.com` / `*.ukg.net`). Postings are recognised by `/jobs/{id}`, `/job/{id}`,
+  `/opportunities/{id}`, `/opportunity/{id}`, and `/careers/job/{id}` URL shapes; board
+  indexes, apply/login/signin/about steps, and navigation links are ignored. See
+  ADR-114 and `docs/guides/UKG_SOURCE_GUIDE.md`.
 - `FactorialAdapter` (`source_type: factorial`): public Factorial HR careers boards
   (`*.factorialhr.com`). Postings are recognised by `/jobs/{id}`, `/job/{id}`,
   `/careers/{id}`, `/careers/job/{id}`, and `/open-positions/{id}` URL shapes; board

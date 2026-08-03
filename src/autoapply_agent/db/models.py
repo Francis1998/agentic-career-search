@@ -63,6 +63,7 @@ class SourceType(StrEnum):
     JOIN = "join"
     SOFTGARDEN = "softgarden"
     FACTORIAL = "factorial"
+    UKG = "ukg"
 
 
 class RunStatus(StrEnum):
