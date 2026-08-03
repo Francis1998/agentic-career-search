@@ -64,6 +64,7 @@ class SourceType(StrEnum):
     SOFTGARDEN = "softgarden"
     FACTORIAL = "factorial"
     UKG = "ukg"
+    BULLHORN = "bullhorn"
 
 
 class RunStatus(StrEnum):
