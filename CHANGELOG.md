@@ -6,6 +6,11 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `FactorialAdapter` (`source_type: factorial`): public Factorial HR careers boards
+  (`*.factorialhr.com`). Postings are recognised by `/jobs/{id}`, `/job/{id}`,
+  `/careers/{id}`, `/careers/job/{id}`, and `/open-positions/{id}` URL shapes; board
+  indexes, apply/login/signin/about steps, and navigation links are ignored. See
+  ADR-113 and `docs/guides/FACTORIAL_SOURCE_GUIDE.md`.
 - `ManatalAdapter` (`source_type: manatal`): public Manatal careers boards
   (`*.manatal.com`). Postings are recognised by `/jobs/{id}`, `/job/{id}`,
   `/careers/{id}`, `/careers/job/{id}`, and `/openings/{id}` URL shapes; board

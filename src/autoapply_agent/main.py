@@ -40,6 +40,7 @@ from autoapply_agent.adapters.recruiterflow import RecruiterflowAdapter
 from autoapply_agent.adapters.rippling import RipplingAdapter
 from autoapply_agent.adapters.smartrecruiters import SmartRecruitersAdapter
 from autoapply_agent.adapters.softgarden import SoftgardenAdapter
+from autoapply_agent.adapters.factorial import FactorialAdapter
 from autoapply_agent.adapters.successfactors import SuccessFactorsAdapter
 from autoapply_agent.adapters.teamtailor import TeamtailorAdapter
 from autoapply_agent.adapters.workable import WorkableAdapter
@@ -142,6 +143,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.MANATAL: ManatalAdapter(active_settings.http_user_agent),
                 SourceType.JOIN: JoinAdapter(active_settings.http_user_agent),
                 SourceType.SOFTGARDEN: SoftgardenAdapter(active_settings.http_user_agent),
+                SourceType.FACTORIAL: FactorialAdapter(active_settings.http_user_agent),
             },
             scoring_service=DeterministicScoringService(),
             planning_service=DeterministicPlanningService(),

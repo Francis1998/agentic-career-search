@@ -125,6 +125,7 @@ Each `SourceConfig` selects a source adapter by `source_type`:
 | `manatal` | `ManatalAdapter` | Recognises Manatal careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/openings/{id}` URL shapes | Manatal (`*.manatal.com`) careers boards |
 | `join` | `JoinAdapter` | Recognises Join careers posting anchors by `/companies/{slug}/jobs/{id}`, `/jobs/{id}`, `/job/{id}`, or `/positions/{id}` URL shapes | Join (`join.com`) careers boards |
 | `softgarden` | `SoftgardenAdapter` | Recognises Softgarden careers posting anchors by `/job/{id}`, `/jobs/{id}`, `/vacancies/{id}`, `/vacancy/{id}`, or `/position/{id}` URL shapes | Softgarden (`*.softgarden.io`) careers boards |
+| `factorial` | `FactorialAdapter` | Recognises Factorial HR careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/open-positions/{id}` URL shapes | Factorial (`*.factorialhr.com`) careers boards |
 | `jsonld` | `JsonLdAdapter` | Reads embedded `schema.org/JobPosting` JSON-LD | **Any** board emitting Google-Jobs structured data (SmartRecruiters, custom career sites, ...) |
 
 Unlike the HTML-scraping adapters, `bamboohr` and `workday` are structured-JSON
