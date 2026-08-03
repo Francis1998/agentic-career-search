@@ -17,6 +17,7 @@ from autoapply_agent.adapters.clearcompany import ClearCompanyAdapter
 from autoapply_agent.adapters.comeet import ComeetAdapter
 from autoapply_agent.adapters.dayforce import DayforceAdapter
 from autoapply_agent.adapters.eightfold import EightfoldAdapter
+from autoapply_agent.adapters.factorial import FactorialAdapter
 from autoapply_agent.adapters.fountain import FountainAdapter
 from autoapply_agent.adapters.freshteam import FreshteamAdapter
 from autoapply_agent.adapters.gem import GemAdapter
@@ -40,7 +41,6 @@ from autoapply_agent.adapters.recruiterflow import RecruiterflowAdapter
 from autoapply_agent.adapters.rippling import RipplingAdapter
 from autoapply_agent.adapters.smartrecruiters import SmartRecruitersAdapter
 from autoapply_agent.adapters.softgarden import SoftgardenAdapter
-from autoapply_agent.adapters.factorial import FactorialAdapter
 from autoapply_agent.adapters.successfactors import SuccessFactorsAdapter
 from autoapply_agent.adapters.teamtailor import TeamtailorAdapter
 from autoapply_agent.adapters.workable import WorkableAdapter
