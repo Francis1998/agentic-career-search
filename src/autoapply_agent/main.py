@@ -43,6 +43,7 @@ from autoapply_agent.adapters.smartrecruiters import SmartRecruitersAdapter
 from autoapply_agent.adapters.softgarden import SoftgardenAdapter
 from autoapply_agent.adapters.successfactors import SuccessFactorsAdapter
 from autoapply_agent.adapters.teamtailor import TeamtailorAdapter
+from autoapply_agent.adapters.ukg import UkgAdapter
 from autoapply_agent.adapters.workable import WorkableAdapter
 from autoapply_agent.adapters.workday import WorkdayAdapter
 from autoapply_agent.adapters.zoho_recruit import ZohoRecruitAdapter
@@ -144,6 +145,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.JOIN: JoinAdapter(active_settings.http_user_agent),
                 SourceType.SOFTGARDEN: SoftgardenAdapter(active_settings.http_user_agent),
                 SourceType.FACTORIAL: FactorialAdapter(active_settings.http_user_agent),
+                SourceType.UKG: UkgAdapter(active_settings.http_user_agent),
             },
             scoring_service=DeterministicScoringService(),
             planning_service=DeterministicPlanningService(),
