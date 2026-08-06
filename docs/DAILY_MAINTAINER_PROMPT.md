@@ -20,13 +20,23 @@ Rules:
 - Skip if an equivalent branch/PR already exists or was merged (idempotent)
 - Validate before push: venv + pip install -e ".[dev]" + ruff + pytest; no Docker
 
+EVERY PR MUST ADD A NEW FEATURE (hard requirement):
+- Do not open docs-only, chore-only, badge-only, or test-only PRs.
+- Each PR must ship at least one new user-visible or API-visible capability
+  (new endpoint/field, routing/catalog behavior, tool/adapter behavior,
+  safety control, agent policy, CLI flag, or comparable product surface).
+- Docs and regression tests are required companions to the feature, never the
+  sole change. Feature first → failing regression test → implement → docs.
+- If a repo only needs docs sync, either (a) pair it with a real feature in
+  the same PR, or (b) skip that repo for the run.
+
 Per repo (sequential):
 1. Audit: layout, docs (README/QUICKSTART/CONFIGURATION/SAFETY/ARCHITECTURE), CI,
    .env.example, agentic pillars (decision engine, state machine, event log,
    LLM adapters GPT/Claude/Gemini/Kimi, safety)
-2. Improve with real review: use-case docs, portfolio guides, tests, README
-   showcase, small focused code fixes; each code fix ships a regression test
-   proven to fail before the fix
+2. Improve with real review: ship a small focused feature plus use-case docs,
+   portfolio guides, README showcase, and a regression test proven to fail
+   before the fix
 3. PR workflow: checkout branch → commit → push → open PR → wait for CI green → merge
 4. Suggest (in the PR/report) an updated repo description + topics; do not run
    `gh repo edit` (read-only gh).
@@ -41,8 +51,11 @@ nexus-llm-router — model catalog freshness (required every run):
 - When stale, upgrade catalog + strategies + tests (e.g. gpt-5.5, gpt-4.1-mini,
   claude-sonnet-4-6, claude-haiku-4-5, gemini-3.5-flash) and open a PR.
 - Keep `tests/test_model_catalog.py` passing (README/catalog drift guard).
+- Catalog upgrades count as the required feature for that PR.
 
-Do NOT: backfill scripts, repos outside allowlist, merge before CI green.
+Do NOT: backfill scripts, repos outside allowlist, merge before CI green,
+docs-only or chore-only PRs.
 
-End report: repos processed, PRs opened/skipped/failed, CI results, cap status.
+End report: repos processed, PRs opened/skipped/failed, CI results, cap status,
+and the new feature shipped per PR.
 ```

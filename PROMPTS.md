@@ -105,9 +105,12 @@ Output requirements:
 Canonical prompt lives at [`docs/DAILY_MAINTAINER_PROMPT.md`](docs/DAILY_MAINTAINER_PROMPT.md).
 Copy the fenced block from that file into the Cursor automation **Instructions** field.
 
-Standing repo-specific requirement (must stay in the prompt):
+Standing requirements (must stay in the prompt):
 
+- **Every PR must add a new feature** — no docs-only, chore-only, badge-only, or
+  test-only PRs. Ship a user/API-visible capability; docs and regression tests
+  accompany the feature, never replace it.
 - **nexus-llm-router:** keep README, `router/model_ids.py`, default catalog, routing
   strategies, and adapter cost tables on current provider SKUs — not legacy ids like
-  `gpt-4o`, `claude-3-5-sonnet`, or `gemini-1.5-*`. Ship catalog upgrades via PR
-  with regression tests when stale.
+  `gpt-4o`, `claude-3-5-sonnet`, or `gemini-1.5-*`. Catalog upgrades count as the
+  required feature for that PR.
