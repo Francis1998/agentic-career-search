@@ -23,6 +23,7 @@ from autoapply_agent.adapters.fountain import FountainAdapter
 from autoapply_agent.adapters.freshteam import FreshteamAdapter
 from autoapply_agent.adapters.gem import GemAdapter
 from autoapply_agent.adapters.greenhouse import GreenhouseAdapter
+from autoapply_agent.adapters.hibob import HibobAdapter
 from autoapply_agent.adapters.hireology import HireologyAdapter
 from autoapply_agent.adapters.homerun import HomerunAdapter
 from autoapply_agent.adapters.icims import IcimsAdapter
@@ -150,6 +151,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.UKG: UkgAdapter(active_settings.http_user_agent),
                 SourceType.BULLHORN: BullhornAdapter(active_settings.http_user_agent),
                 SourceType.PAYLOCITY: PaylocityAdapter(active_settings.http_user_agent),
+                SourceType.HIBOB: HibobAdapter(active_settings.http_user_agent),
             },
             scoring_service=DeterministicScoringService(),
             planning_service=DeterministicPlanningService(),
