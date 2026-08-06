@@ -65,6 +65,7 @@ class SourceType(StrEnum):
     FACTORIAL = "factorial"
     UKG = "ukg"
     BULLHORN = "bullhorn"
+    PAYLOCITY = "paylocity"
 
 
 class RunStatus(StrEnum):
