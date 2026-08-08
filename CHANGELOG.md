@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `JobAdderAdapter` (`source_type: jobadder`): public JobAdder careers boards
 - `DoverAdapter` (`source_type: dover`): public Dover careers boards
 - `PolymerAdapter` (`source_type: polymer`): public Polymer careers boards
 - `LoxoAdapter` (`source_type: loxo`): public Loxo careers boards

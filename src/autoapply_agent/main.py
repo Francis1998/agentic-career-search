@@ -29,6 +29,7 @@ from autoapply_agent.adapters.hireology import HireologyAdapter
 from autoapply_agent.adapters.homerun import HomerunAdapter
 from autoapply_agent.adapters.icims import IcimsAdapter
 from autoapply_agent.adapters.jazzhr import JazzHrAdapter
+from autoapply_agent.adapters.jobadder import JobAdderAdapter
 from autoapply_agent.adapters.jobscore import JobScoreAdapter
 from autoapply_agent.adapters.jobvite import JobviteAdapter
 from autoapply_agent.adapters.join import JoinAdapter
@@ -158,6 +159,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.LOXO: LoxoAdapter(active_settings.http_user_agent),
                 SourceType.POLYMER: PolymerAdapter(active_settings.http_user_agent),
                 SourceType.DOVER: DoverAdapter(active_settings.http_user_agent),
+                SourceType.JOBADDER: JobAdderAdapter(active_settings.http_user_agent),
             },
             scoring_service=DeterministicScoringService(),
             planning_service=DeterministicPlanningService(),
