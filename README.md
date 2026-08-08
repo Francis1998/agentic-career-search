@@ -129,6 +129,7 @@ Each `SourceConfig` selects a source adapter by `source_type`:
 | `ukg` | `UkgAdapter` | Recognises UKG/UltiPro careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/opportunities/{id}`, `/opportunity/{id}`, or `/careers/job/{id}` URL shapes | UKG (`*.ultipro.com` / `*.ukg.net`) careers boards |
 | `bullhorn` | `BullhornAdapter` | Recognises Bullhorn careers posting anchors by `/jobs/{id}`, `/Job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/position/{id}` URL shapes | Bullhorn (`*.bullhornstaffing.com`) careers boards |
 | `paylocity` | `PaylocityAdapter` | Recognises Paylocity careers posting anchors by `/jobs/{id}`, `/JobDetails/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/openings/{id}` URL shapes | Paylocity (`*.paylocity.com`) careers boards |
+| `loxo` | `LoxoAdapter` | Recognises Loxo careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/positions/{id}`, `/careers/{id}`, or `/careers/job/{id}` URL shapes | Loxo (`*.loxo.co`) careers boards |
 | `jsonld` | `JsonLdAdapter` | Reads embedded `schema.org/JobPosting` JSON-LD | **Any** board emitting Google-Jobs structured data (SmartRecruiters, custom career sites, ...) |
 | `hibob` | `HibobAdapter` | Recognises HiBob careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/positions/{id}` URL shapes | HiBob (`*.hibob.com`) / Bob careers boards |
 
