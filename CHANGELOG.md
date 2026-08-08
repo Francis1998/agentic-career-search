@@ -6,6 +6,12 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `HibobAdapter` (`source_type: hibob`): public HiBob (Bob) careers boards
+  (`*.hibob.com`). Postings are recognised by `/jobs/{id}`, `/job/{id}`,
+  `/careers/{id}`, `/careers/job/{id}`, and `/positions/{id}` URL shapes; board
+  indexes, apply/login/signin/about steps, and navigation links are ignored. See
+  ADR-118 and `docs/guides/HIBOB_SOURCE_GUIDE.md`.
+
 - `PaylocityAdapter` (`source_type: paylocity`): public Paylocity careers boards
   (`*.paylocity.com`). Postings are recognised by `/jobs/{id}`, `/JobDetails/{id}`,
   `/careers/{id}`, `/careers/job/{id}`, and `/openings/{id}` URL shapes; board

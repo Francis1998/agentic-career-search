@@ -130,6 +130,7 @@ Each `SourceConfig` selects a source adapter by `source_type`:
 | `bullhorn` | `BullhornAdapter` | Recognises Bullhorn careers posting anchors by `/jobs/{id}`, `/Job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/position/{id}` URL shapes | Bullhorn (`*.bullhornstaffing.com`) careers boards |
 | `paylocity` | `PaylocityAdapter` | Recognises Paylocity careers posting anchors by `/jobs/{id}`, `/JobDetails/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/openings/{id}` URL shapes | Paylocity (`*.paylocity.com`) careers boards |
 | `jsonld` | `JsonLdAdapter` | Reads embedded `schema.org/JobPosting` JSON-LD | **Any** board emitting Google-Jobs structured data (SmartRecruiters, custom career sites, ...) |
+| `hibob` | `HibobAdapter` | Recognises HiBob careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/positions/{id}` URL shapes | HiBob (`*.hibob.com`) / Bob careers boards |
 
 Unlike the HTML-scraping adapters, `bamboohr` and `workday` are structured-JSON
 sources: BambooHR and Workday careers pages are client-rendered apps, so those
