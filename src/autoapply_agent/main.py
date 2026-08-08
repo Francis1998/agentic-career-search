@@ -17,6 +17,7 @@ from autoapply_agent.adapters.bullhorn import BullhornAdapter
 from autoapply_agent.adapters.clearcompany import ClearCompanyAdapter
 from autoapply_agent.adapters.comeet import ComeetAdapter
 from autoapply_agent.adapters.dayforce import DayforceAdapter
+from autoapply_agent.adapters.dover import DoverAdapter
 from autoapply_agent.adapters.eightfold import EightfoldAdapter
 from autoapply_agent.adapters.factorial import FactorialAdapter
 from autoapply_agent.adapters.fountain import FountainAdapter
@@ -156,6 +157,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.HIBOB: HibobAdapter(active_settings.http_user_agent),
                 SourceType.LOXO: LoxoAdapter(active_settings.http_user_agent),
                 SourceType.POLYMER: PolymerAdapter(active_settings.http_user_agent),
+                SourceType.DOVER: DoverAdapter(active_settings.http_user_agent),
             },
             scoring_service=DeterministicScoringService(),
             planning_service=DeterministicPlanningService(),
