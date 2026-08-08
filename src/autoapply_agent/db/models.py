@@ -70,6 +70,7 @@ class SourceType(StrEnum):
     LOXO = "loxo"
     POLYMER = "polymer"
     DOVER = "dover"
+    JOBADDER = "jobadder"
 
 
 class RunStatus(StrEnum):
