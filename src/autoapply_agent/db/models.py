@@ -67,6 +67,7 @@ class SourceType(StrEnum):
     BULLHORN = "bullhorn"
     PAYLOCITY = "paylocity"
     HIBOB = "hibob"
+    LOXO = "loxo"
 
 
 class RunStatus(StrEnum):

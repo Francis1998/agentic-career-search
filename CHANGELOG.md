@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `LoxoAdapter` (`source_type: loxo`): public Loxo careers boards
 - `HibobAdapter` (`source_type: hibob`): public HiBob (Bob) careers boards
   (`*.hibob.com`). Postings are recognised by `/jobs/{id}`, `/job/{id}`,
   `/careers/{id}`, `/careers/job/{id}`, and `/positions/{id}` URL shapes; board
