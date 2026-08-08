@@ -6,6 +6,12 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `JobylonAdapter` (`source_type: jobylon`): public Jobylon careers boards
+  (`jobs.jobylon.com`). Postings are recognised by `/jobs/{id}`, `/job/{id}`,
+  `/careers/{id}`, `/careers/job/{id}`, `/positions/{id}`, and
+  `/vacancies/{id}` URL shapes; board indexes, apply/login/signin/about steps,
+  and navigation links are ignored. See ADR-122 and
+  `docs/guides/JOBYLON_SOURCE_GUIDE.md`.
 - `JobAdderAdapter` (`source_type: jobadder`): public JobAdder careers boards
 - `DoverAdapter` (`source_type: dover`): public Dover careers boards
 - `PolymerAdapter` (`source_type: polymer`): public Polymer careers boards
