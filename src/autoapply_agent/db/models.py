@@ -71,6 +71,7 @@ class SourceType(StrEnum):
     POLYMER = "polymer"
     DOVER = "dover"
     JOBADDER = "jobadder"
+    JOBYLON = "jobylon"
 
 
 class RunStatus(StrEnum):
