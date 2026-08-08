@@ -30,9 +30,9 @@ from autoapply_agent.adapters.homerun import HomerunAdapter
 from autoapply_agent.adapters.icims import IcimsAdapter
 from autoapply_agent.adapters.jazzhr import JazzHrAdapter
 from autoapply_agent.adapters.jobadder import JobAdderAdapter
-from autoapply_agent.adapters.jobylon import JobylonAdapter
 from autoapply_agent.adapters.jobscore import JobScoreAdapter
 from autoapply_agent.adapters.jobvite import JobviteAdapter
+from autoapply_agent.adapters.jobylon import JobylonAdapter
 from autoapply_agent.adapters.join import JoinAdapter
 from autoapply_agent.adapters.jsonld import JsonLdAdapter
 from autoapply_agent.adapters.lever import LeverAdapter
