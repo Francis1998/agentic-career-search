@@ -73,6 +73,7 @@ class SourceType(StrEnum):
     JOBADDER = "jobadder"
     JOBYLON = "jobylon"
     CEIPAL = "ceipal"
+    PAGEUP = "pageup"
 
 
 class RunStatus(StrEnum):
