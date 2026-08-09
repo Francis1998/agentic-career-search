@@ -52,6 +52,7 @@ from autoapply_agent.adapters.rippling import RipplingAdapter
 from autoapply_agent.adapters.smartrecruiters import SmartRecruitersAdapter
 from autoapply_agent.adapters.softgarden import SoftgardenAdapter
 from autoapply_agent.adapters.successfactors import SuccessFactorsAdapter
+from autoapply_agent.adapters.talentlyft import TalentLyftAdapter
 from autoapply_agent.adapters.teamtailor import TeamtailorAdapter
 from autoapply_agent.adapters.ukg import UkgAdapter
 from autoapply_agent.adapters.workable import WorkableAdapter
@@ -166,6 +167,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.JOBYLON: JobylonAdapter(active_settings.http_user_agent),
                 SourceType.CEIPAL: CeipalAdapter(active_settings.http_user_agent),
                 SourceType.PAGEUP: PageUpAdapter(active_settings.http_user_agent),
+                SourceType.TALENTLYFT: TalentLyftAdapter(active_settings.http_user_agent),
             },
             scoring_service=DeterministicScoringService(),
             planning_service=DeterministicPlanningService(),

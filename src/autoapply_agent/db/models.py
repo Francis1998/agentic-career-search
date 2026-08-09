@@ -74,6 +74,7 @@ class SourceType(StrEnum):
     JOBYLON = "jobylon"
     CEIPAL = "ceipal"
     PAGEUP = "pageup"
+    TALENTLYFT = "talentlyft"
 
 
 class RunStatus(StrEnum):
