@@ -6,6 +6,12 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `PageUpAdapter` (`source_type: pageup`): public PageUp careers boards
+  (`careers.pageuppeople.com`). Postings are recognised by `/jobs/{id}`, `/job/{id}`,
+  `/careers/{id}`, `/careers/job/{id}`, and
+  `/opportunities/{id}` URL shapes; board indexes, apply/login/signin/about steps,
+  and navigation links are ignored. See ADR-123 and
+  `docs/guides/PAGEUP_SOURCE_GUIDE.md`.
 - `CeipalAdapter` (`source_type: ceipal`): public Ceipal careers boards
   (`jobs.ceipal.com`). Postings are recognised by `/jobs/{id}`, `/job/{id}`,
   `/careers/{id}`, `/careers/job/{id}`, and
