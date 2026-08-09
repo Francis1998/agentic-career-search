@@ -6,6 +6,12 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `CeipalAdapter` (`source_type: ceipal`): public Ceipal careers boards
+  (`jobs.ceipal.com`). Postings are recognised by `/jobs/{id}`, `/job/{id}`,
+  `/careers/{id}`, `/careers/job/{id}`, and
+  `/requisitions/{id}` URL shapes; board indexes, apply/login/signin/about steps,
+  and navigation links are ignored. See ADR-124 and
+  `docs/guides/CEIPAL_SOURCE_GUIDE.md`.
 - `JobylonAdapter` (`source_type: jobylon`): public Jobylon careers boards
   (`jobs.jobylon.com`). Postings are recognised by `/jobs/{id}`, `/job/{id}`,
   `/careers/{id}`, `/careers/job/{id}`, `/positions/{id}`, and

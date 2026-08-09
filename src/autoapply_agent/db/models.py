@@ -72,6 +72,7 @@ class SourceType(StrEnum):
     DOVER = "dover"
     JOBADDER = "jobadder"
     JOBYLON = "jobylon"
+    CEIPAL = "ceipal"
 
 
 class RunStatus(StrEnum):

@@ -14,6 +14,7 @@ from autoapply_agent.adapters.avature import AvatureAdapter
 from autoapply_agent.adapters.bamboohr import BambooHrAdapter
 from autoapply_agent.adapters.breezyhr import BreezyHrAdapter
 from autoapply_agent.adapters.bullhorn import BullhornAdapter
+from autoapply_agent.adapters.ceipal import CeipalAdapter
 from autoapply_agent.adapters.clearcompany import ClearCompanyAdapter
 from autoapply_agent.adapters.comeet import ComeetAdapter
 from autoapply_agent.adapters.dayforce import DayforceAdapter
@@ -162,6 +163,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.DOVER: DoverAdapter(active_settings.http_user_agent),
                 SourceType.JOBADDER: JobAdderAdapter(active_settings.http_user_agent),
                 SourceType.JOBYLON: JobylonAdapter(active_settings.http_user_agent),
+                SourceType.CEIPAL: CeipalAdapter(active_settings.http_user_agent),
             },
             scoring_service=DeterministicScoringService(),
             planning_service=DeterministicPlanningService(),
