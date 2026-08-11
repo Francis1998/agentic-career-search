@@ -75,6 +75,7 @@ class SourceType(StrEnum):
     CEIPAL = "ceipal"
     PAGEUP = "pageup"
     TALENTLYFT = "talentlyft"
+    APPLICANTSTACK = "applicantstack"
 
 
 class RunStatus(StrEnum):
