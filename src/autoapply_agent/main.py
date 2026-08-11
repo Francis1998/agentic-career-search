@@ -8,6 +8,7 @@ from typing import Any
 from fastapi import APIRouter, FastAPI
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from autoapply_agent.adapters.applicantstack import ApplicantStackAdapter
 from autoapply_agent.adapters.applied import AppliedAdapter
 from autoapply_agent.adapters.ashby import AshbyAdapter
 from autoapply_agent.adapters.avature import AvatureAdapter
@@ -168,6 +169,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.CEIPAL: CeipalAdapter(active_settings.http_user_agent),
                 SourceType.PAGEUP: PageUpAdapter(active_settings.http_user_agent),
                 SourceType.TALENTLYFT: TalentLyftAdapter(active_settings.http_user_agent),
+                SourceType.APPLICANTSTACK: ApplicantStackAdapter(active_settings.http_user_agent),
             },
             scoring_service=DeterministicScoringService(),
             planning_service=DeterministicPlanningService(),
