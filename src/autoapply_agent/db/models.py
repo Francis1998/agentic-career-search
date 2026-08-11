@@ -76,6 +76,7 @@ class SourceType(StrEnum):
     PAGEUP = "pageup"
     TALENTLYFT = "talentlyft"
     APPLICANTSTACK = "applicantstack"
+    TRACKERRMS = "trackerrms"
 
 
 class RunStatus(StrEnum):

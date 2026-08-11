@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `TrackerRmsAdapter` (`source_type: trackerrms`): public TrackerRMS careers
 - `ApplicantStackAdapter` (`source_type: applicantstack`): public ApplicantStack
   careers boards (`*.applicantstack.com`). Postings are recognised by
   `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, and

@@ -55,6 +55,7 @@ from autoapply_agent.adapters.softgarden import SoftgardenAdapter
 from autoapply_agent.adapters.successfactors import SuccessFactorsAdapter
 from autoapply_agent.adapters.talentlyft import TalentLyftAdapter
 from autoapply_agent.adapters.teamtailor import TeamtailorAdapter
+from autoapply_agent.adapters.trackerrms import TrackerRmsAdapter
 from autoapply_agent.adapters.ukg import UkgAdapter
 from autoapply_agent.adapters.workable import WorkableAdapter
 from autoapply_agent.adapters.workday import WorkdayAdapter
@@ -170,6 +171,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.PAGEUP: PageUpAdapter(active_settings.http_user_agent),
                 SourceType.TALENTLYFT: TalentLyftAdapter(active_settings.http_user_agent),
                 SourceType.APPLICANTSTACK: ApplicantStackAdapter(active_settings.http_user_agent),
+                SourceType.TRACKERRMS: TrackerRmsAdapter(active_settings.http_user_agent),
             },
             scoring_service=DeterministicScoringService(),
             planning_service=DeterministicPlanningService(),
