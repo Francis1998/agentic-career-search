@@ -77,6 +77,7 @@ class SourceType(StrEnum):
     TALENTLYFT = "talentlyft"
     APPLICANTSTACK = "applicantstack"
     TRACKERRMS = "trackerrms"
+    CAREERPLUG = "careerplug"
 
 
 class RunStatus(StrEnum):

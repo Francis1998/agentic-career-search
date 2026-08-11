@@ -15,6 +15,7 @@ from autoapply_agent.adapters.avature import AvatureAdapter
 from autoapply_agent.adapters.bamboohr import BambooHrAdapter
 from autoapply_agent.adapters.breezyhr import BreezyHrAdapter
 from autoapply_agent.adapters.bullhorn import BullhornAdapter
+from autoapply_agent.adapters.careerplug import CareerPlugAdapter
 from autoapply_agent.adapters.ceipal import CeipalAdapter
 from autoapply_agent.adapters.clearcompany import ClearCompanyAdapter
 from autoapply_agent.adapters.comeet import ComeetAdapter
@@ -172,6 +173,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.TALENTLYFT: TalentLyftAdapter(active_settings.http_user_agent),
                 SourceType.APPLICANTSTACK: ApplicantStackAdapter(active_settings.http_user_agent),
                 SourceType.TRACKERRMS: TrackerRmsAdapter(active_settings.http_user_agent),
+                SourceType.CAREERPLUG: CareerPlugAdapter(active_settings.http_user_agent),
             },
             scoring_service=DeterministicScoringService(),
             planning_service=DeterministicPlanningService(),
