@@ -59,6 +59,7 @@ from autoapply_agent.adapters.talentlyft import TalentLyftAdapter
 from autoapply_agent.adapters.teamtailor import TeamtailorAdapter
 from autoapply_agent.adapters.trackerrms import TrackerRmsAdapter
 from autoapply_agent.adapters.ukg import UkgAdapter
+from autoapply_agent.adapters.vincere import VincereAdapter
 from autoapply_agent.adapters.workable import WorkableAdapter
 from autoapply_agent.adapters.workday import WorkdayAdapter
 from autoapply_agent.adapters.zoho_recruit import ZohoRecruitAdapter
@@ -176,6 +177,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.TRACKERRMS: TrackerRmsAdapter(active_settings.http_user_agent),
                 SourceType.CAREERPLUG: CareerPlugAdapter(active_settings.http_user_agent),
                 SourceType.RECRUITCRM: RecruitCrmAdapter(active_settings.http_user_agent),
+                SourceType.VINCERE: VincereAdapter(active_settings.http_user_agent),
             },
             scoring_service=DeterministicScoringService(),
             planning_service=DeterministicPlanningService(),
