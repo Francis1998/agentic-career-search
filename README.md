@@ -142,6 +142,7 @@ Each `SourceConfig` selects a source adapter by `source_type`:
 | `hibob` | `HibobAdapter` | Recognises HiBob careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/positions/{id}` URL shapes | HiBob (`*.hibob.com`) / Bob careers boards |
 | `trackerrms` | `TrackerRmsAdapter` | Recognises TrackerRMS careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/vacancies/{id}` URL shapes | TrackerRMS (`*.tracker-rms.com` and branded) careers boards |
 | `careerplug` | `CareerPlugAdapter` | Recognises CareerPlug careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/listings/{id}` URL shapes | CareerPlug (`*.careerplug.com`) careers boards |
+| `recruitcrm` | `RecruitCrmAdapter` | Recognises RecruitCRM careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/opening/{id}` URL shapes | RecruitCRM (`*.recruitcrm.io`) careers boards |
 
 Unlike the HTML-scraping adapters, `bamboohr` and `workday` are structured-JSON
 sources: BambooHR and Workday careers pages are client-rendered apps, so those

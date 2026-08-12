@@ -6,6 +6,12 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `RecruitCrmAdapter` (`source_type: recruitcrm`): public RecruitCRM careers
+  boards (`*.recruitcrm.io`). Postings are recognised by
+  `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, and
+  `/opening/{id}` URL shapes; board indexes, apply/login/signin/about steps,
+  and navigation links are ignored. See ADR-129 and
+  `docs/guides/RECRUITCRM_SOURCE_GUIDE.md`.
 - `CareerPlugAdapter` (`source_type: careerplug`): public CareerPlug careers
 - `TrackerRmsAdapter` (`source_type: trackerrms`): public TrackerRMS careers
 - `ApplicantStackAdapter` (`source_type: applicantstack`): public ApplicantStack
