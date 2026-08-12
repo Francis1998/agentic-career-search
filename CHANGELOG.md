@@ -6,6 +6,12 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `VincereAdapter` (`source_type: vincere`): public Vincere careers
+  boards (`*.vincere.io`). Postings are recognised by
+  `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, and
+  `/job-detail/{id}` URL shapes; board indexes, apply/login/signin/about steps,
+  and navigation links are ignored. See ADR-130 and
+  `docs/guides/VINCERE_SOURCE_GUIDE.md`.
 - `RecruitCrmAdapter` (`source_type: recruitcrm`): public RecruitCRM careers
   boards (`*.recruitcrm.io`). Postings are recognised by
   `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, and
