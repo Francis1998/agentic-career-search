@@ -80,6 +80,7 @@ class SourceType(StrEnum):
     CAREERPLUG = "careerplug"
     RECRUITCRM = "recruitcrm"
     VINCERE = "vincere"
+    TRIBEPAD = "tribepad"
 
 
 class RunStatus(StrEnum):
