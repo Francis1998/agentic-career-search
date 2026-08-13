@@ -81,6 +81,7 @@ class SourceType(StrEnum):
     RECRUITCRM = "recruitcrm"
     VINCERE = "vincere"
     TRIBEPAD = "tribepad"
+    CRELATE = "crelate"
 
 
 class RunStatus(StrEnum):
