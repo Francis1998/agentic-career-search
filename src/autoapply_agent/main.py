@@ -34,6 +34,7 @@ from autoapply_agent.adapters.homerun import HomerunAdapter
 from autoapply_agent.adapters.icims import IcimsAdapter
 from autoapply_agent.adapters.jazzhr import JazzHrAdapter
 from autoapply_agent.adapters.jobadder import JobAdderAdapter
+from autoapply_agent.adapters.jobdiva import JobDivaAdapter
 from autoapply_agent.adapters.jobscore import JobScoreAdapter
 from autoapply_agent.adapters.jobvite import JobviteAdapter
 from autoapply_agent.adapters.jobylon import JobylonAdapter
@@ -126,6 +127,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
             session_factory=session_factory,
             adapters={
                 SourceType.GREENHOUSE: GreenhouseAdapter(active_settings.http_user_agent),
+                SourceType.JOBDIVA: JobDivaAdapter(active_settings.http_user_agent),
                 SourceType.LEVER: LeverAdapter(active_settings.http_user_agent),
                 SourceType.JSONLD: JsonLdAdapter(active_settings.http_user_agent),
                 SourceType.ASHBY: AshbyAdapter(active_settings.http_user_agent),

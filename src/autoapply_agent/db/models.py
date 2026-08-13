@@ -82,6 +82,7 @@ class SourceType(StrEnum):
     VINCERE = "vincere"
     TRIBEPAD = "tribepad"
     CRELATE = "crelate"
+    JOBDIVA = "jobdiva"
 
 
 class RunStatus(StrEnum):
