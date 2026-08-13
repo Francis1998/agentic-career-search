@@ -46,6 +46,7 @@ from autoapply_agent.adapters.manatal import ManatalAdapter
 from autoapply_agent.adapters.oracle_taleo import OracleTaleoAdapter
 from autoapply_agent.adapters.pageup import PageUpAdapter
 from autoapply_agent.adapters.paylocity import PaylocityAdapter
+from autoapply_agent.adapters.pcrecruiter import PCRecruiterAdapter
 from autoapply_agent.adapters.personio import PersonioAdapter
 from autoapply_agent.adapters.phenom import PhenomPeopleAdapter
 from autoapply_agent.adapters.pinpoint import PinpointAdapter
@@ -131,6 +132,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.LEVER: LeverAdapter(active_settings.http_user_agent),
                 SourceType.JSONLD: JsonLdAdapter(active_settings.http_user_agent),
                 SourceType.ASHBY: AshbyAdapter(active_settings.http_user_agent),
+                SourceType.PCRECRUITER: PCRecruiterAdapter(active_settings.http_user_agent),
                 SourceType.WORKABLE: WorkableAdapter(active_settings.http_user_agent),
                 SourceType.RECRUITEE: RecruiteeAdapter(active_settings.http_user_agent),
                 SourceType.SMARTRECRUITERS: SmartRecruitersAdapter(active_settings.http_user_agent),

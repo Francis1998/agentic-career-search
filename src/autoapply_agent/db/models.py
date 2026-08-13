@@ -83,6 +83,7 @@ class SourceType(StrEnum):
     TRIBEPAD = "tribepad"
     CRELATE = "crelate"
     JOBDIVA = "jobdiva"
+    PCRECRUITER = "pcrecruiter"
 
 
 class RunStatus(StrEnum):
