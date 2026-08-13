@@ -6,6 +6,12 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `JobDivaAdapter` (`source_type: jobdiva`): public JobDiva careers
+  boards (`*.jobdiva.com`). Postings are recognised by
+  `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, and
+  `/jd/{id}` URL shapes; board indexes, apply/login/signin/about steps,
+  and navigation links are ignored. See ADR-133 and
+  `docs/guides/JOBDIVA_SOURCE_GUIDE.md`.
 - `CrelateAdapter` (`source_type: crelate`): public Crelate careers
   boards (`*.crelate.com`). Postings are recognised by
   `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, and
