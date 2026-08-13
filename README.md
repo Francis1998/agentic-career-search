@@ -145,6 +145,7 @@ Each `SourceConfig` selects a source adapter by `source_type`:
 | `recruitcrm` | `RecruitCrmAdapter` | Recognises RecruitCRM careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/opening/{id}` URL shapes | RecruitCRM (`*.recruitcrm.io`) careers boards |
 | `vincere` | `VincereAdapter` | Recognises Vincere careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/job-detail/{id}` URL shapes | Vincere (`*.vincere.io`) careers boards |
 | `tribepad` | `TribepadAdapter` | Recognises Tribepad careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/vacancy/{id}` URL shapes | Tribepad (`*.tribepad.com`) careers boards |
+| `crelate` | `CrelateAdapter` | Recognises Crelate careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/opportunity/{id}` URL shapes | Crelate (`*.crelate.com`) careers boards |
 
 Unlike the HTML-scraping adapters, `bamboohr` and `workday` are structured-JSON
 sources: BambooHR and Workday careers pages are client-rendered apps, so those
