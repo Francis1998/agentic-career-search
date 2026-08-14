@@ -84,6 +84,7 @@ class SourceType(StrEnum):
     CRELATE = "crelate"
     JOBDIVA = "jobdiva"
     PCRECRUITER = "pcrecruiter"
+    CORNERSTONE = "cornerstone"
 
 
 class RunStatus(StrEnum):
