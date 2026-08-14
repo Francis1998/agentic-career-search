@@ -86,6 +86,7 @@ class SourceType(StrEnum):
     PCRECRUITER = "pcrecruiter"
     CORNERSTONE = "cornerstone"
     BEAMERY = "beamery"
+    EPLOY = "eploy"
 
 
 class RunStatus(StrEnum):

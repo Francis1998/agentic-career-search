@@ -6,6 +6,12 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `EployAdapter` (`source_type: eploy`): public Eploy careers
+  boards (`*.eploy.net`). Postings are recognised by
+  `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, and
+  `/role/{id}` URL shapes; board indexes, apply/login/signin/about steps,
+  and navigation links are ignored. See ADR-137 and
+  `docs/guides/EPLOY_SOURCE_GUIDE.md`.
 - `BeameryAdapter` (`source_type: beamery`): public Beamery careers
   boards (`*.beamery.com`). Postings are recognised by
   `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, and
