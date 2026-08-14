@@ -149,6 +149,7 @@ Each `SourceConfig` selects a source adapter by `source_type`:
 | `jobdiva` | `JobDivaAdapter` | Recognises JobDiva careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/jd/{id}` URL shapes | JobDiva (`*.jobdiva.com`) careers boards |
 | `pcrecruiter` | `PCRecruiterAdapter` | Recognises PCRecruiter careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/requisition/{id}` URL shapes | PCRecruiter (`*.pcrecruiter.com`) careers boards |
 | `cornerstone` | `CornerstoneAdapter` | Recognises Cornerstone careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/opening/{id}` URL shapes | Cornerstone OnDemand (`*.csod.com`) careers boards |
+| `beamery` | `BeameryAdapter` | Recognises Beamery careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/campaign/{id}` URL shapes | Beamery (`*.beamery.com`) careers boards |
 
 Unlike the HTML-scraping adapters, `bamboohr` and `workday` are structured-JSON
 sources: BambooHR and Workday careers pages are client-rendered apps, so those
