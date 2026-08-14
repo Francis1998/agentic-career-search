@@ -13,6 +13,7 @@ from autoapply_agent.adapters.applied import AppliedAdapter
 from autoapply_agent.adapters.ashby import AshbyAdapter
 from autoapply_agent.adapters.avature import AvatureAdapter
 from autoapply_agent.adapters.bamboohr import BambooHrAdapter
+from autoapply_agent.adapters.beamery import BeameryAdapter
 from autoapply_agent.adapters.breezyhr import BreezyHrAdapter
 from autoapply_agent.adapters.bullhorn import BullhornAdapter
 from autoapply_agent.adapters.careerplug import CareerPlugAdapter
@@ -141,6 +142,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.TEAMTAILOR: TeamtailorAdapter(active_settings.http_user_agent),
                 SourceType.PERSONIO: PersonioAdapter(active_settings.http_user_agent),
                 SourceType.BAMBOOHR: BambooHrAdapter(active_settings.http_user_agent),
+                SourceType.BEAMERY: BeameryAdapter(active_settings.http_user_agent),
                 SourceType.JOBVITE: JobviteAdapter(active_settings.http_user_agent),
                 SourceType.ICIMS: IcimsAdapter(active_settings.http_user_agent),
                 SourceType.WORKDAY: WorkdayAdapter(active_settings.http_user_agent),

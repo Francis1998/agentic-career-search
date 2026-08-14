@@ -6,6 +6,12 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `BeameryAdapter` (`source_type: beamery`): public Beamery careers
+  boards (`*.beamery.com`). Postings are recognised by
+  `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, and
+  `/campaign/{id}` URL shapes; board indexes, apply/login/signin/about steps,
+  and navigation links are ignored. See ADR-136 and
+  `docs/guides/BEAMERY_SOURCE_GUIDE.md`.
 - `CornerstoneAdapter` (`source_type: cornerstone`): public Cornerstone OnDemand careers
   boards (`*.csod.com`). Postings are recognised by
   `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, and
