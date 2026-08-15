@@ -88,6 +88,7 @@ class SourceType(StrEnum):
     BEAMERY = "beamery"
     EPLOY = "eploy"
     HIREEZ = "hireez"
+    BRASSRING = "brassring"
 
 
 class RunStatus(StrEnum):

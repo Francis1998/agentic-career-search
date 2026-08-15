@@ -6,6 +6,12 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `BrassringAdapter` (`source_type: brassring`): public IBM Kenexa BrassRing
+  careers boards (`*.brassring.com`). Postings are recognised by
+  `/jobs/{id}`, `/job/{id}`, `/jobdetail/{id}`, `/FgJobDetail/{id}`, and
+  `/careers/{id}` URL shapes; board indexes, apply/login/signin/about steps,
+  and navigation links are ignored. See ADR-139 and
+  `docs/guides/BRASSRING_SOURCE_GUIDE.md`.
 - `HireezAdapter` (`source_type: hireez`): public HireEZ / Hiretual careers
   boards (`*.hireez.com`). Postings are recognised by
   `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, and
