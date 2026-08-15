@@ -87,6 +87,7 @@ class SourceType(StrEnum):
     CORNERSTONE = "cornerstone"
     BEAMERY = "beamery"
     EPLOY = "eploy"
+    HIREEZ = "hireez"
 
 
 class RunStatus(StrEnum):

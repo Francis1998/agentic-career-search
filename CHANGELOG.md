@@ -6,6 +6,12 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `HireezAdapter` (`source_type: hireez`): public HireEZ / Hiretual careers
+  boards (`*.hireez.com`). Postings are recognised by
+  `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, and
+  `/positions/{id}` URL shapes; board indexes, apply/login/signin/about steps,
+  and navigation links are ignored. See ADR-138 and
+  `docs/guides/HIREEZ_SOURCE_GUIDE.md`.
 - `EployAdapter` (`source_type: eploy`): public Eploy careers
   boards (`*.eploy.net`). Postings are recognised by
   `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, and

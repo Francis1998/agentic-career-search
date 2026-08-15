@@ -32,6 +32,7 @@ from autoapply_agent.adapters.freshteam import FreshteamAdapter
 from autoapply_agent.adapters.gem import GemAdapter
 from autoapply_agent.adapters.greenhouse import GreenhouseAdapter
 from autoapply_agent.adapters.hibob import HibobAdapter
+from autoapply_agent.adapters.hireez import HireezAdapter
 from autoapply_agent.adapters.hireology import HireologyAdapter
 from autoapply_agent.adapters.homerun import HomerunAdapter
 from autoapply_agent.adapters.icims import IcimsAdapter
@@ -163,6 +164,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.EIGHTFOLD: EightfoldAdapter(active_settings.http_user_agent),
                 SourceType.EPLOY: EployAdapter(active_settings.http_user_agent),
                 SourceType.JOBSCORE: JobScoreAdapter(active_settings.http_user_agent),
+                SourceType.HIREEZ: HireezAdapter(active_settings.http_user_agent),
                 SourceType.HIREOLOGY: HireologyAdapter(active_settings.http_user_agent),
                 SourceType.DAYFORCE: DayforceAdapter(active_settings.http_user_agent),
                 SourceType.HOMERUN: HomerunAdapter(active_settings.http_user_agent),
