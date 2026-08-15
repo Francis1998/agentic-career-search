@@ -87,6 +87,7 @@ This repository follows the requested standards:
 
 Each `SourceConfig` selects a source adapter by `source_type`:
 
+| `applicantpro` | `ApplicantProAdapter` | Recognises ApplicantPro careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/openings/{id}` URL shapes | ApplicantPro (`*.applicantpro.com`) careers boards |
 | `brassring` | `BrassringAdapter` | Recognises BrassRing careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/jobdetail/{id}`, `/FgJobDetail/{id}`, or `/careers/{id}` URL shapes | IBM Kenexa BrassRing (`*.brassring.com`) careers boards |
 | `source_type` | Adapter | How it parses | Best for |
 |---|---|---|---|

@@ -89,6 +89,7 @@ class SourceType(StrEnum):
     EPLOY = "eploy"
     HIREEZ = "hireez"
     BRASSRING = "brassring"
+    APPLICANTPRO = "applicantpro"
 
 
 class RunStatus(StrEnum):
