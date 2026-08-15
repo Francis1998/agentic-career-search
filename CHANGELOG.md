@@ -6,6 +6,12 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `ApplicantProAdapter` (`source_type: applicantpro`): public ApplicantPro
+  careers boards (`*.applicantpro.com`). Postings are recognised by
+  `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, and
+  `/openings/{id}` URL shapes; board indexes, apply/login/signin/about steps,
+  and navigation links are ignored. See ADR-140 and
+  `docs/guides/APPLICANTPRO_SOURCE_GUIDE.md`.
 - `BrassringAdapter` (`source_type: brassring`): public IBM Kenexa BrassRing
   careers boards (`*.brassring.com`). Postings are recognised by
   `/jobs/{id}`, `/job/{id}`, `/jobdetail/{id}`, `/FgJobDetail/{id}`, and
