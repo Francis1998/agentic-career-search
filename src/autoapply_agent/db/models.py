@@ -99,6 +99,7 @@ class RunStatus(StrEnum):
     FAILED = "failed"
     CANCEL_REQUESTED = "cancel_requested"
     CANCELLED = "cancelled"
+    BRASSRING = "brassring"
 
 
 class SourceConfig(Base):

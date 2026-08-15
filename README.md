@@ -87,6 +87,7 @@ This repository follows the requested standards:
 
 Each `SourceConfig` selects a source adapter by `source_type`:
 
+| `brassring` | `BrassringAdapter` | Recognises BrassRing careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/jobdetail/{id}`, `/FgJobDetail/{id}`, or `/careers/{id}` URL shapes | IBM Kenexa BrassRing (`*.brassring.com`) careers boards |
 | `source_type` | Adapter | How it parses | Best for |
 |---|---|---|---|
 | `greenhouse` | `GreenhouseAdapter` | Scrapes `div.opening` anchors on public Greenhouse boards | Greenhouse-hosted boards |
