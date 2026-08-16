@@ -19,6 +19,7 @@ from autoapply_agent.adapters.brassring import BrassringAdapter
 from autoapply_agent.adapters.breezyhr import BreezyHrAdapter
 from autoapply_agent.adapters.bullhorn import BullhornAdapter
 from autoapply_agent.adapters.careerplug import CareerPlugAdapter
+from autoapply_agent.adapters.catsone import CatsoneAdapter
 from autoapply_agent.adapters.ceipal import CeipalAdapter
 from autoapply_agent.adapters.clearcompany import ClearCompanyAdapter
 from autoapply_agent.adapters.comeet import ComeetAdapter
@@ -144,6 +145,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.BREEZYHR: BreezyHrAdapter(active_settings.http_user_agent),
                 SourceType.BULLHORN: BullhornAdapter(active_settings.http_user_agent),
                 SourceType.CAREERPLUG: CareerPlugAdapter(active_settings.http_user_agent),
+                SourceType.CATSONE: CatsoneAdapter(active_settings.http_user_agent),
                 SourceType.CEIPAL: CeipalAdapter(active_settings.http_user_agent),
                 SourceType.CLEARCOMPANY: ClearCompanyAdapter(active_settings.http_user_agent),
                 SourceType.COMEET: ComeetAdapter(active_settings.http_user_agent),
