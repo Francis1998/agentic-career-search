@@ -90,6 +90,7 @@ class SourceType(StrEnum):
     HIREEZ = "hireez"
     BRASSRING = "brassring"
     APPLICANTPRO = "applicantpro"
+    CATSONE = "catsone"
 
 
 class RunStatus(StrEnum):
