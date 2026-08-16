@@ -8,6 +8,7 @@ from typing import Any
 from fastapi import APIRouter, FastAPI
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from autoapply_agent.adapters.adp import AdpAdapter
 from autoapply_agent.adapters.applicantpro import ApplicantProAdapter
 from autoapply_agent.adapters.applicantstack import ApplicantStackAdapter
 from autoapply_agent.adapters.applied import AppliedAdapter
@@ -147,6 +148,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.BULLHORN: BullhornAdapter(active_settings.http_user_agent),
                 SourceType.CAREERPLUG: CareerPlugAdapter(active_settings.http_user_agent),
                 SourceType.CATSONE: CatsoneAdapter(active_settings.http_user_agent),
+                SourceType.ADP: AdpAdapter(active_settings.http_user_agent),
                 SourceType.PARADOX: ParadoxAdapter(active_settings.http_user_agent),
                 SourceType.CEIPAL: CeipalAdapter(active_settings.http_user_agent),
                 SourceType.CLEARCOMPANY: ClearCompanyAdapter(active_settings.http_user_agent),
