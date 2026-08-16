@@ -88,6 +88,7 @@ This repository follows the requested standards:
 Each `SourceConfig` selects a source adapter by `source_type`:
 
 | `catsone` | `CatsoneAdapter` | Recognises CATS careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/postings/{id}` URL shapes | CATS (`*.catsone.com`) careers boards |
+| `paradox` | `ParadoxAdapter` | Recognises Paradox careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/opportunities/{id}` URL shapes | Paradox Olivia (`*.paradox.ai`) careers boards |
 | `applicantpro` | `ApplicantProAdapter` | Recognises ApplicantPro careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/openings/{id}` URL shapes | ApplicantPro (`*.applicantpro.com`) careers boards |
 | `brassring` | `BrassringAdapter` | Recognises BrassRing careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/jobdetail/{id}`, `/FgJobDetail/{id}`, or `/careers/{id}` URL shapes | IBM Kenexa BrassRing (`*.brassring.com`) careers boards |
 | `source_type` | Adapter | How it parses | Best for |

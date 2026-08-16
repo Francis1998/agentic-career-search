@@ -52,6 +52,7 @@ from autoapply_agent.adapters.loxo import LoxoAdapter
 from autoapply_agent.adapters.manatal import ManatalAdapter
 from autoapply_agent.adapters.oracle_taleo import OracleTaleoAdapter
 from autoapply_agent.adapters.pageup import PageUpAdapter
+from autoapply_agent.adapters.paradox import ParadoxAdapter
 from autoapply_agent.adapters.paylocity import PaylocityAdapter
 from autoapply_agent.adapters.pcrecruiter import PCRecruiterAdapter
 from autoapply_agent.adapters.personio import PersonioAdapter
@@ -146,6 +147,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.BULLHORN: BullhornAdapter(active_settings.http_user_agent),
                 SourceType.CAREERPLUG: CareerPlugAdapter(active_settings.http_user_agent),
                 SourceType.CATSONE: CatsoneAdapter(active_settings.http_user_agent),
+                SourceType.PARADOX: ParadoxAdapter(active_settings.http_user_agent),
                 SourceType.CEIPAL: CeipalAdapter(active_settings.http_user_agent),
                 SourceType.CLEARCOMPANY: ClearCompanyAdapter(active_settings.http_user_agent),
                 SourceType.COMEET: ComeetAdapter(active_settings.http_user_agent),

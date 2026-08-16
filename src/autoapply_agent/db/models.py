@@ -91,6 +91,7 @@ class SourceType(StrEnum):
     BRASSRING = "brassring"
     APPLICANTPRO = "applicantpro"
     CATSONE = "catsone"
+    PARADOX = "paradox"
 
 
 class RunStatus(StrEnum):
