@@ -91,6 +91,7 @@ class SourceType(StrEnum):
     BRASSRING = "brassring"
     APPLICANTPRO = "applicantpro"
     CATSONE = "catsone"
+    ADP = "adp"
     PARADOX = "paradox"
 
 
