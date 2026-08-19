@@ -93,6 +93,7 @@ class SourceType(StrEnum):
     CATSONE = "catsone"
     ADP = "adp"
     PARADOX = "paradox"
+    JIBE = "jibe"
     RADANCY = "radancy"
     SILKROAD = "silkroad"
 

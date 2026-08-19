@@ -41,6 +41,7 @@ from autoapply_agent.adapters.hireology import HireologyAdapter
 from autoapply_agent.adapters.homerun import HomerunAdapter
 from autoapply_agent.adapters.icims import IcimsAdapter
 from autoapply_agent.adapters.jazzhr import JazzHrAdapter
+from autoapply_agent.adapters.jibe import JibeAdapter
 from autoapply_agent.adapters.jobadder import JobAdderAdapter
 from autoapply_agent.adapters.jobdiva import JobDivaAdapter
 from autoapply_agent.adapters.jobscore import JobScoreAdapter
@@ -151,6 +152,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.CAREERPLUG: CareerPlugAdapter(active_settings.http_user_agent),
                 SourceType.CATSONE: CatsoneAdapter(active_settings.http_user_agent),
                 SourceType.ADP: AdpAdapter(active_settings.http_user_agent),
+                SourceType.JIBE: JibeAdapter(active_settings.http_user_agent),
                 SourceType.PARADOX: ParadoxAdapter(active_settings.http_user_agent),
                 SourceType.CEIPAL: CeipalAdapter(active_settings.http_user_agent),
                 SourceType.CLEARCOMPANY: ClearCompanyAdapter(active_settings.http_user_agent),
