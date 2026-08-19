@@ -6,6 +6,12 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `RadancyAdapter` (`source_type: radancy`): public Radancy careers boards
+  (`*.radancy.com`, `*.jobs.net`). Postings are recognised by `/jobs/{id}`,
+  `/job/{id}`, `/search/job/{id}`, `/careers/{id}`, and `/careers/job/{id}`
+  URL shapes; board indexes, apply/login/signin/about steps, and navigation
+  links are ignored. See ADR-145 and `docs/guides/RADANCY_SOURCE_GUIDE.md`.
+
 - `SilkRoadAdapter` (`source_type: silkroad`): public SilkRoad Recruiting boards
   (`*.silkroad.com`). Postings are recognised by `/jobs/{id}`, `/job/{id}`,
   `/posting/{id}`, `/postings/{id}`, and `/opportunity/{id}` URL shapes;

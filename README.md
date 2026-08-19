@@ -89,6 +89,7 @@ Each `SourceConfig` selects a source adapter by `source_type`:
 
 | `catsone` | `CatsoneAdapter` | Recognises CATS careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/postings/{id}` URL shapes | CATS (`*.catsone.com`) careers boards |
 | `adp` | `AdpAdapter` | Recognises ADP Recruiting posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/requisitions/{id}` URL shapes | ADP (`*.adp.com`) recruiting boards |
+| `radancy` | `RadancyAdapter` | Recognises Radancy posting anchors by `/jobs/{id}`, `/job/{id}`, `/search/job/{id}`, `/careers/{id}`, or `/careers/job/{id}` URL shapes | Radancy (`*.radancy.com`, `*.jobs.net`) recruiting boards |
 | `silkroad` | `SilkRoadAdapter` | Recognises SilkRoad posting anchors by `/jobs/{id}`, `/job/{id}`, `/posting/{id}`, `/postings/{id}`, or `/opportunity/{id}` URL shapes | SilkRoad (`*.silkroad.com`) recruiting boards |
 | `paradox` | `ParadoxAdapter` | Recognises Paradox careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/opportunities/{id}` URL shapes | Paradox Olivia (`*.paradox.ai`) careers boards |
 | `applicantpro` | `ApplicantProAdapter` | Recognises ApplicantPro careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/openings/{id}` URL shapes | ApplicantPro (`*.applicantpro.com`) careers boards |
