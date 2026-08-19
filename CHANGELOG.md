@@ -6,6 +6,12 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `JibeAdapter` (`source_type: jibe`): public Jibe careers boards
+  (`*.jibe.com`). Postings are recognised by `/jobs/{id}`, `/job/{id}`,
+  `/position/{id}`, `/positions/{id}`, and `/requisition/{id}` URL shapes;
+  board indexes, apply/login/signin/about steps, and navigation links are
+  ignored. See ADR-146 and `docs/guides/JIBE_SOURCE_GUIDE.md`.
+
 - `RadancyAdapter` (`source_type: radancy`): public Radancy careers boards
   (`*.radancy.com`, `*.jobs.net`). Postings are recognised by `/jobs/{id}`,
   `/job/{id}`, `/search/job/{id}`, `/careers/{id}`, and `/careers/job/{id}`
