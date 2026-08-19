@@ -64,6 +64,7 @@ from autoapply_agent.adapters.recruitcrm import RecruitCrmAdapter
 from autoapply_agent.adapters.recruitee import RecruiteeAdapter
 from autoapply_agent.adapters.recruiterflow import RecruiterflowAdapter
 from autoapply_agent.adapters.rippling import RipplingAdapter
+from autoapply_agent.adapters.silkroad import SilkRoadAdapter
 from autoapply_agent.adapters.smartrecruiters import SmartRecruitersAdapter
 from autoapply_agent.adapters.softgarden import SoftgardenAdapter
 from autoapply_agent.adapters.successfactors import SuccessFactorsAdapter
@@ -192,6 +193,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.RECRUITEE: RecruiteeAdapter(active_settings.http_user_agent),
                 SourceType.RECRUITERFLOW: RecruiterflowAdapter(active_settings.http_user_agent),
                 SourceType.RIPPLING: RipplingAdapter(active_settings.http_user_agent),
+                SourceType.SILKROAD: SilkRoadAdapter(active_settings.http_user_agent),
                 SourceType.SMARTRECRUITERS: SmartRecruitersAdapter(active_settings.http_user_agent),
                 SourceType.SOFTGARDEN: SoftgardenAdapter(active_settings.http_user_agent),
                 SourceType.SUCCESSFACTORS: SuccessFactorsAdapter(active_settings.http_user_agent),
