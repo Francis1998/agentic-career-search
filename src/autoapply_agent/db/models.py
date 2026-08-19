@@ -93,6 +93,7 @@ class SourceType(StrEnum):
     CATSONE = "catsone"
     ADP = "adp"
     PARADOX = "paradox"
+    SILKROAD = "silkroad"
 
 
 class RunStatus(StrEnum):

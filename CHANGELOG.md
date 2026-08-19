@@ -6,6 +6,12 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `SilkRoadAdapter` (`source_type: silkroad`): public SilkRoad Recruiting boards
+  (`*.silkroad.com`). Postings are recognised by `/jobs/{id}`, `/job/{id}`,
+  `/posting/{id}`, `/postings/{id}`, and `/opportunity/{id}` URL shapes;
+  board indexes, apply/login/signin/about steps, and navigation links are
+  ignored. See ADR-144 and `docs/guides/SILKROAD_SOURCE_GUIDE.md`.
+
 - `AdpAdapter` (`source_type: adp`): public ADP Recruiting boards
   (`*.adp.com`). Postings are recognised by `/jobs/{id}`, `/job/{id}`,
   `/careers/{id}`, `/careers/job/{id}`, and `/requisitions/{id}` URL shapes;
