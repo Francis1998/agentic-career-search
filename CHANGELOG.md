@@ -6,6 +6,12 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `YelloAdapter` (`source_type: yello`): public Yello careers boards. Postings
+  are recognised by `/jobs/{id}`, `/job/{id}`, `/position/{id}`,
+  `/positions/{id}`, and `/opening/{id}` URL shapes; board indexes,
+  apply/login/signin/about steps, and navigation links are ignored. See ADR-149
+  and `docs/guides/YELLO_SOURCE_GUIDE.md`.
+
 - `PaycomAdapter` (`source_type: paycom`): public Paycom careers boards.
   Postings are recognised by `/jobs/{id}`, `/job/{id}`, `/posting/{id}`,
   `/postings/{id}`, and `/opportunity/{id}` URL shapes; board indexes,

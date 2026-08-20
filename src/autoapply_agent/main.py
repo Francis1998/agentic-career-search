@@ -80,6 +80,7 @@ from autoapply_agent.adapters.ukg import UkgAdapter
 from autoapply_agent.adapters.vincere import VincereAdapter
 from autoapply_agent.adapters.workable import WorkableAdapter
 from autoapply_agent.adapters.workday import WorkdayAdapter
+from autoapply_agent.adapters.yello import YelloAdapter
 from autoapply_agent.adapters.zoho_recruit import ZohoRecruitAdapter
 from autoapply_agent.api.routes_health import router as health_router
 from autoapply_agent.api.routes_jobs import router as jobs_router
@@ -213,6 +214,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.VINCERE: VincereAdapter(active_settings.http_user_agent),
                 SourceType.WORKABLE: WorkableAdapter(active_settings.http_user_agent),
                 SourceType.WORKDAY: WorkdayAdapter(active_settings.http_user_agent),
+                SourceType.YELLO: YelloAdapter(active_settings.http_user_agent),
                 SourceType.ZOHO_RECRUIT: ZohoRecruitAdapter(active_settings.http_user_agent),
             },
             scoring_service=DeterministicScoringService(),
