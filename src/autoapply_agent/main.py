@@ -38,6 +38,7 @@ from autoapply_agent.adapters.greenhouse import GreenhouseAdapter
 from autoapply_agent.adapters.hibob import HibobAdapter
 from autoapply_agent.adapters.hireez import HireezAdapter
 from autoapply_agent.adapters.hireology import HireologyAdapter
+from autoapply_agent.adapters.hirevue import HireVueAdapter
 from autoapply_agent.adapters.homerun import HomerunAdapter
 from autoapply_agent.adapters.icims import IcimsAdapter
 from autoapply_agent.adapters.jazzhr import JazzHrAdapter
@@ -171,6 +172,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.HIBOB: HibobAdapter(active_settings.http_user_agent),
                 SourceType.HIREEZ: HireezAdapter(active_settings.http_user_agent),
                 SourceType.HIREOLOGY: HireologyAdapter(active_settings.http_user_agent),
+                SourceType.HIREVUE: HireVueAdapter(active_settings.http_user_agent),
                 SourceType.HOMERUN: HomerunAdapter(active_settings.http_user_agent),
                 SourceType.ICIMS: IcimsAdapter(active_settings.http_user_agent),
                 SourceType.JAZZHR: JazzHrAdapter(active_settings.http_user_agent),
