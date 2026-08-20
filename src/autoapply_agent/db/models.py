@@ -98,6 +98,7 @@ class SourceType(StrEnum):
     SILKROAD = "silkroad"
     HIREVUE = "hirevue"
     PAYCOM = "paycom"
+    YELLO = "yello"
 
 
 class RunStatus(StrEnum):
