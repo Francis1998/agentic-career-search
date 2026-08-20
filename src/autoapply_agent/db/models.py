@@ -97,6 +97,7 @@ class SourceType(StrEnum):
     RADANCY = "radancy"
     SILKROAD = "silkroad"
     HIREVUE = "hirevue"
+    PAYCOM = "paycom"
 
 
 class RunStatus(StrEnum):
