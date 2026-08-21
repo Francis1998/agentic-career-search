@@ -6,6 +6,8 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `WellfoundAdapter` (`source_type: wellfound`): public Wellfound careers boards (wellfound.com / angel.co). Postings are recognised by `/jobs/{id}`, `/job/{id}`, `/role/{id}`, `/roles/{id}`, `/startup-jobs/{id}` URL shapes; board indexes, apply/login/signin/about steps, and navigation links are ignored. See ADR-150 and `docs/guides/WELLFOUND_SOURCE_GUIDE.md`.
+
 - `YelloAdapter` (`source_type: yello`): public Yello careers boards. Postings
   are recognised by `/jobs/{id}`, `/job/{id}`, `/position/{id}`,
   `/positions/{id}`, and `/opening/{id}` URL shapes; board indexes,
