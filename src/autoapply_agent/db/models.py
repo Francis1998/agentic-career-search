@@ -100,6 +100,7 @@ class SourceType(StrEnum):
     PAYCOM = "paycom"
     YELLO = "yello"
     WELLFOUND = "wellfound"
+    OTTA = "otta"
 
 
 class RunStatus(StrEnum):
