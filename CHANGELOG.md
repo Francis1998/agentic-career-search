@@ -6,6 +6,8 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `OttaAdapter` (`source_type: otta`): public Otta careers boards (otta.com). Postings are recognised by `/jobs/{id}`, `/job/{id}`, `/roles/{id}`, `/role/{id}`, `/openings/{id}` URL shapes; board indexes, apply/login/signin/about steps, and navigation links are ignored. See ADR-151 and `docs/guides/OTTA_SOURCE_GUIDE.md`.
+
 - `WellfoundAdapter` (`source_type: wellfound`): public Wellfound careers boards (wellfound.com / angel.co). Postings are recognised by `/jobs/{id}`, `/job/{id}`, `/role/{id}`, `/roles/{id}`, `/startup-jobs/{id}` URL shapes; board indexes, apply/login/signin/about steps, and navigation links are ignored. See ADR-150 and `docs/guides/WELLFOUND_SOURCE_GUIDE.md`.
 
 - `YelloAdapter` (`source_type: yello`): public Yello careers boards. Postings
