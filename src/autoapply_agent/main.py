@@ -78,6 +78,7 @@ from autoapply_agent.adapters.trackerrms import TrackerRmsAdapter
 from autoapply_agent.adapters.tribepad import TribepadAdapter
 from autoapply_agent.adapters.ukg import UkgAdapter
 from autoapply_agent.adapters.vincere import VincereAdapter
+from autoapply_agent.adapters.wellfound import WellfoundAdapter
 from autoapply_agent.adapters.workable import WorkableAdapter
 from autoapply_agent.adapters.workday import WorkdayAdapter
 from autoapply_agent.adapters.yello import YelloAdapter
@@ -142,6 +143,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
         worker = InProcessWorker(
             session_factory=session_factory,
             adapters={
+                SourceType.ADP: AdpAdapter(active_settings.http_user_agent),
                 SourceType.APPLICANTPRO: ApplicantProAdapter(active_settings.http_user_agent),
                 SourceType.APPLICANTSTACK: ApplicantStackAdapter(active_settings.http_user_agent),
                 SourceType.APPLIED: AppliedAdapter(active_settings.http_user_agent),
@@ -154,9 +156,6 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.BULLHORN: BullhornAdapter(active_settings.http_user_agent),
                 SourceType.CAREERPLUG: CareerPlugAdapter(active_settings.http_user_agent),
                 SourceType.CATSONE: CatsoneAdapter(active_settings.http_user_agent),
-                SourceType.ADP: AdpAdapter(active_settings.http_user_agent),
-                SourceType.JIBE: JibeAdapter(active_settings.http_user_agent),
-                SourceType.PARADOX: ParadoxAdapter(active_settings.http_user_agent),
                 SourceType.CEIPAL: CeipalAdapter(active_settings.http_user_agent),
                 SourceType.CLEARCOMPANY: ClearCompanyAdapter(active_settings.http_user_agent),
                 SourceType.COMEET: ComeetAdapter(active_settings.http_user_agent),
@@ -178,6 +177,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.HOMERUN: HomerunAdapter(active_settings.http_user_agent),
                 SourceType.ICIMS: IcimsAdapter(active_settings.http_user_agent),
                 SourceType.JAZZHR: JazzHrAdapter(active_settings.http_user_agent),
+                SourceType.JIBE: JibeAdapter(active_settings.http_user_agent),
                 SourceType.JOBADDER: JobAdderAdapter(active_settings.http_user_agent),
                 SourceType.JOBDIVA: JobDivaAdapter(active_settings.http_user_agent),
                 SourceType.JOBSCORE: JobScoreAdapter(active_settings.http_user_agent),
@@ -190,6 +190,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.MANATAL: ManatalAdapter(active_settings.http_user_agent),
                 SourceType.ORACLE_TALEO: OracleTaleoAdapter(active_settings.http_user_agent),
                 SourceType.PAGEUP: PageUpAdapter(active_settings.http_user_agent),
+                SourceType.PARADOX: ParadoxAdapter(active_settings.http_user_agent),
                 SourceType.PAYCOM: PaycomAdapter(active_settings.http_user_agent),
                 SourceType.PAYLOCITY: PaylocityAdapter(active_settings.http_user_agent),
                 SourceType.PCRECRUITER: PCRecruiterAdapter(active_settings.http_user_agent),
@@ -212,6 +213,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.TRIBEPAD: TribepadAdapter(active_settings.http_user_agent),
                 SourceType.UKG: UkgAdapter(active_settings.http_user_agent),
                 SourceType.VINCERE: VincereAdapter(active_settings.http_user_agent),
+                SourceType.WELLFOUND: WellfoundAdapter(active_settings.http_user_agent),
                 SourceType.WORKABLE: WorkableAdapter(active_settings.http_user_agent),
                 SourceType.WORKDAY: WorkdayAdapter(active_settings.http_user_agent),
                 SourceType.YELLO: YelloAdapter(active_settings.http_user_agent),

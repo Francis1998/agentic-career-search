@@ -93,6 +93,7 @@ Each `SourceConfig` selects a source adapter by `source_type`:
 | `hirevue` | `HireVueAdapter` | Recognises HireVue posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/requisition/{id}` URL shapes | HireVue public careers boards |
 | `paycom` | `PaycomAdapter` | Recognises Paycom posting anchors by `/jobs/{id}`, `/job/{id}`, `/posting/{id}`, `/postings/{id}`, or `/opportunity/{id}` URL shapes | Paycom public careers boards |
 | `yello` | `YelloAdapter` | Recognises Yello posting anchors by `/jobs/{id}`, `/job/{id}`, `/position/{id}`, `/positions/{id}`, or `/opening/{id}` URL shapes | Yello public careers boards |
+| `wellfound` | `WellfoundAdapter` | Recognises Wellfound posting anchors by `/jobs/{id}`, `/job/{id}`, `/role/{id}`, `/roles/{id}`, `/startup-jobs/{id}` URL shapes | Wellfound (wellfound.com / angel.co) careers boards |
 | `radancy` | `RadancyAdapter` | Recognises Radancy posting anchors by `/jobs/{id}`, `/job/{id}`, `/search/job/{id}`, `/careers/{id}`, or `/careers/job/{id}` URL shapes | Radancy (`*.radancy.com`, `*.jobs.net`) recruiting boards |
 | `silkroad` | `SilkRoadAdapter` | Recognises SilkRoad posting anchors by `/jobs/{id}`, `/job/{id}`, `/posting/{id}`, `/postings/{id}`, or `/opportunity/{id}` URL shapes | SilkRoad (`*.silkroad.com`) recruiting boards |
 | `paradox` | `ParadoxAdapter` | Recognises Paradox careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/opportunities/{id}` URL shapes | Paradox Olivia (`*.paradox.ai`) careers boards |

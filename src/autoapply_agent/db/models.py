@@ -99,6 +99,7 @@ class SourceType(StrEnum):
     HIREVUE = "hirevue"
     PAYCOM = "paycom"
     YELLO = "yello"
+    WELLFOUND = "wellfound"
 
 
 class RunStatus(StrEnum):
