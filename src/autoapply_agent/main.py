@@ -18,6 +18,7 @@ from autoapply_agent.adapters.bamboohr import BambooHrAdapter
 from autoapply_agent.adapters.beamery import BeameryAdapter
 from autoapply_agent.adapters.brassring import BrassringAdapter
 from autoapply_agent.adapters.breezyhr import BreezyHrAdapter
+from autoapply_agent.adapters.builtin import BuiltinAdapter
 from autoapply_agent.adapters.bullhorn import BullhornAdapter
 from autoapply_agent.adapters.careerplug import CareerPlugAdapter
 from autoapply_agent.adapters.catsone import CatsoneAdapter
@@ -154,6 +155,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.BEAMERY: BeameryAdapter(active_settings.http_user_agent),
                 SourceType.BRASSRING: BrassringAdapter(active_settings.http_user_agent),
                 SourceType.BREEZYHR: BreezyHrAdapter(active_settings.http_user_agent),
+                SourceType.BUILTIN: BuiltinAdapter(active_settings.http_user_agent),
                 SourceType.BULLHORN: BullhornAdapter(active_settings.http_user_agent),
                 SourceType.CAREERPLUG: CareerPlugAdapter(active_settings.http_user_agent),
                 SourceType.CATSONE: CatsoneAdapter(active_settings.http_user_agent),
