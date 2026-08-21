@@ -101,6 +101,7 @@ class SourceType(StrEnum):
     YELLO = "yello"
     WELLFOUND = "wellfound"
     OTTA = "otta"
+    BUILTIN = "builtin"
 
 
 class RunStatus(StrEnum):
