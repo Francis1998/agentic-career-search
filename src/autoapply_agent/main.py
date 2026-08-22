@@ -69,6 +69,7 @@ from autoapply_agent.adapters.radancy import RadancyAdapter
 from autoapply_agent.adapters.recruitcrm import RecruitCrmAdapter
 from autoapply_agent.adapters.recruitee import RecruiteeAdapter
 from autoapply_agent.adapters.recruiterflow import RecruiterflowAdapter
+from autoapply_agent.adapters.remoteok import RemoteokAdapter
 from autoapply_agent.adapters.rippling import RipplingAdapter
 from autoapply_agent.adapters.silkroad import SilkRoadAdapter
 from autoapply_agent.adapters.smartrecruiters import SmartRecruitersAdapter
@@ -206,6 +207,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.RECRUITCRM: RecruitCrmAdapter(active_settings.http_user_agent),
                 SourceType.RECRUITEE: RecruiteeAdapter(active_settings.http_user_agent),
                 SourceType.RECRUITERFLOW: RecruiterflowAdapter(active_settings.http_user_agent),
+                SourceType.REMOTEOK: RemoteokAdapter(active_settings.http_user_agent),
                 SourceType.RIPPLING: RipplingAdapter(active_settings.http_user_agent),
                 SourceType.SILKROAD: SilkRoadAdapter(active_settings.http_user_agent),
                 SourceType.SMARTRECRUITERS: SmartRecruitersAdapter(active_settings.http_user_agent),
