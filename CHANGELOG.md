@@ -6,6 +6,8 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `RemoteokAdapter` (`source_type: remoteok`): public RemoteOK careers boards (remoteok.com). Postings are recognised by `/remote-jobs/{id}`, `/remote-job/{id}`, `/jobs/{id}`, `/job/{id}` URL shapes; board indexes, apply/login/signin/about/index steps, and navigation links are ignored. See ADR-153 and `docs/guides/REMOTEOK_SOURCE_GUIDE.md`.
+
 - `BuiltinAdapter` (`source_type: builtin`): public Built In careers boards (builtin.com / builtinnyc.com / builtinchicago.com). Postings are recognised by `/job/{id}`, `/jobs/{id}`, `/company-jobs/{id}`, `/careers/job/{id}`, `/role/{id}` URL shapes; board indexes, apply/login/signin/about steps, and navigation links are ignored. See ADR-152 and `docs/guides/BUILTIN_SOURCE_GUIDE.md`.
 
 - `OttaAdapter` (`source_type: otta`): public Otta careers boards (otta.com). Postings are recognised by `/jobs/{id}`, `/job/{id}`, `/roles/{id}`, `/role/{id}`, `/openings/{id}` URL shapes; board indexes, apply/login/signin/about steps, and navigation links are ignored. See ADR-151 and `docs/guides/OTTA_SOURCE_GUIDE.md`.

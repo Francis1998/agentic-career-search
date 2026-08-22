@@ -102,6 +102,7 @@ class SourceType(StrEnum):
     WELLFOUND = "wellfound"
     OTTA = "otta"
     BUILTIN = "builtin"
+    REMOTEOK = "remoteok"
 
 
 class RunStatus(StrEnum):
