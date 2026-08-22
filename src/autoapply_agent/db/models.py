@@ -103,6 +103,7 @@ class SourceType(StrEnum):
     OTTA = "otta"
     BUILTIN = "builtin"
     REMOTEOK = "remoteok"
+    WEWORKREMOTELY = "weworkremotely"
 
 
 class RunStatus(StrEnum):
