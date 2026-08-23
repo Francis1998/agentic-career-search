@@ -105,6 +105,7 @@ class SourceType(StrEnum):
     REMOTEOK = "remoteok"
     WEWORKREMOTELY = "weworkremotely"
     WELCOMETOTHEJUNGLE = "welcometothejungle"
+    REMOTIVE = "remotive"
 
 
 class RunStatus(StrEnum):
