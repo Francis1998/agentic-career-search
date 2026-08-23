@@ -37,6 +37,7 @@ from autoapply_agent.adapters.freshteam import FreshteamAdapter
 from autoapply_agent.adapters.gem import GemAdapter
 from autoapply_agent.adapters.greenhouse import GreenhouseAdapter
 from autoapply_agent.adapters.hibob import HibobAdapter
+from autoapply_agent.adapters.himalayas import HimalayasAdapter
 from autoapply_agent.adapters.hireez import HireezAdapter
 from autoapply_agent.adapters.hireology import HireologyAdapter
 from autoapply_agent.adapters.hirevue import HireVueAdapter
@@ -178,6 +179,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.GEM: GemAdapter(active_settings.http_user_agent),
                 SourceType.GREENHOUSE: GreenhouseAdapter(active_settings.http_user_agent),
                 SourceType.HIBOB: HibobAdapter(active_settings.http_user_agent),
+                SourceType.HIMALAYAS: HimalayasAdapter(active_settings.http_user_agent),
                 SourceType.HIREEZ: HireezAdapter(active_settings.http_user_agent),
                 SourceType.HIREOLOGY: HireologyAdapter(active_settings.http_user_agent),
                 SourceType.HIREVUE: HireVueAdapter(active_settings.http_user_agent),
