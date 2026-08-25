@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `JobspressoAdapter` (`source_type: jobspresso`): public Jobspresso careers boards (jobspresso.co). Postings are recognised by /jobs/{id}, /job/{id}, /remote-jobs/{id}, /postings/{id}, /openings/{id} URL shapes; board indexes, apply/login/signin/about/index steps, and navigation links are ignored. See ADR-161 and `docs/guides/JOBSPRESSO_SOURCE_GUIDE.md`.
 - `NodeskAdapter` (`source_type: nodesk`): public NoDesk careers boards (nodesk.co). Postings are recognised by /jobs/{id}, /job/{id}, /remote/{id}, /positions/{id}, /careers/{id} URL shapes; board indexes, apply/login/signin/about/index steps, and navigation links are ignored. See ADR-160 and `docs/guides/NODESK_SOURCE_GUIDE.md`.
 - `JustremoteAdapter` (`source_type: justremote`): public JustRemote careers boards (justremote.co). Postings are recognised by /remote-jobs/{id}, /jobs/{id}, /job/{id}, /listings/{id}, /listing/{id} URL shapes; board indexes, apply/login/signin/about/index steps, and navigation links are ignored. See ADR-159 and `docs/guides/JUSTREMOTE_SOURCE_GUIDE.md`.
 - `WorkingnomadsAdapter` (`source_type: workingnomads`): public Working Nomads careers boards. Postings are recognised by `/jobs/{id}`, `/job/{id}`, `/remote-jobs/{id}`, `/positions/{id}`, `/position/{id}` URL shapes; board indexes, apply/login/signin/about/index steps, and navigation links are ignored. See ADR-158 and `docs/guides/WORKINGNOMADS_SOURCE_GUIDE.md`.
