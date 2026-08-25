@@ -108,6 +108,7 @@ class SourceType(StrEnum):
     REMOTIVE = "remotive"
     HIMALAYAS = "himalayas"
     WORKINGNOMADS = "workingnomads"
+    JUSTREMOTE = "justremote"
 
 
 class RunStatus(StrEnum):
