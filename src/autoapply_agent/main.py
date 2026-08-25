@@ -48,6 +48,7 @@ from autoapply_agent.adapters.jibe import JibeAdapter
 from autoapply_agent.adapters.jobadder import JobAdderAdapter
 from autoapply_agent.adapters.jobdiva import JobDivaAdapter
 from autoapply_agent.adapters.jobscore import JobScoreAdapter
+from autoapply_agent.adapters.jobspresso import JobspressoAdapter
 from autoapply_agent.adapters.jobvite import JobviteAdapter
 from autoapply_agent.adapters.jobylon import JobylonAdapter
 from autoapply_agent.adapters.join import JoinAdapter
@@ -195,6 +196,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.JOBSCORE: JobScoreAdapter(active_settings.http_user_agent),
                 SourceType.JOBVITE: JobviteAdapter(active_settings.http_user_agent),
                 SourceType.JOBYLON: JobylonAdapter(active_settings.http_user_agent),
+                SourceType.JOBSPRESSO: JobspressoAdapter(active_settings.http_user_agent),
                 SourceType.JOIN: JoinAdapter(active_settings.http_user_agent),
                 SourceType.JUSTREMOTE: JustremoteAdapter(active_settings.http_user_agent),
                 SourceType.JSONLD: JsonLdAdapter(active_settings.http_user_agent),

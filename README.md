@@ -104,6 +104,7 @@ Each `SourceConfig` selects a source adapter by `source_type`:
 | `workingnomads` | `WorkingnomadsAdapter` | Recognises Working Nomads posting anchors by `/jobs/{id}`, `/job/{id}`, `/remote-jobs/{id}`, `/positions/{id}`, `/position/{id}` URL shapes | Working Nomads careers boards |
 | `justremote` | `JustremoteAdapter` | Recognises JustRemote posting anchors by /remote-jobs/{id}, /jobs/{id}, /job/{id}, /listings/{id}, /listing/{id} URL shapes | JustRemote (justremote.co) careers boards |
 | `nodesk` | `NodeskAdapter` | Recognises NoDesk posting anchors by /jobs/{id}, /job/{id}, /remote/{id}, /positions/{id}, /careers/{id} URL shapes | NoDesk (nodesk.co) careers boards |
+| `jobspresso` | `JobspressoAdapter` | Recognises Jobspresso posting anchors by /jobs/{id}, /job/{id}, /remote-jobs/{id}, /postings/{id}, /openings/{id} URL shapes | Jobspresso (jobspresso.co) careers boards |
 | `radancy` | `RadancyAdapter` | Recognises Radancy posting anchors by `/jobs/{id}`, `/job/{id}`, `/search/job/{id}`, `/careers/{id}`, or `/careers/job/{id}` URL shapes | Radancy (`*.radancy.com`, `*.jobs.net`) recruiting boards |
 | `silkroad` | `SilkRoadAdapter` | Recognises SilkRoad posting anchors by `/jobs/{id}`, `/job/{id}`, `/posting/{id}`, `/postings/{id}`, or `/opportunity/{id}` URL shapes | SilkRoad (`*.silkroad.com`) recruiting boards |
 | `paradox` | `ParadoxAdapter` | Recognises Paradox careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/opportunities/{id}` URL shapes | Paradox Olivia (`*.paradox.ai`) careers boards |

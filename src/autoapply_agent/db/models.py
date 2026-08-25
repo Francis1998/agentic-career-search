@@ -110,6 +110,7 @@ class SourceType(StrEnum):
     WORKINGNOMADS = "workingnomads"
     JUSTREMOTE = "justremote"
     NODESK = "nodesk"
+    JOBSPRESSO = "jobspresso"
 
 
 class RunStatus(StrEnum):
