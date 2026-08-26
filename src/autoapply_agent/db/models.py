@@ -111,6 +111,7 @@ class SourceType(StrEnum):
     JUSTREMOTE = "justremote"
     NODESK = "nodesk"
     JOBSPRESSO = "jobspresso"
+    DYNAMITEJOBS = "dynamitejobs"
 
 
 class RunStatus(StrEnum):
