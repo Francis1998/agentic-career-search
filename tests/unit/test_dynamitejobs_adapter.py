@@ -154,7 +154,9 @@ def test_dynamitejobs_parser_returns_empty_for_non_positive_max_jobs() -> None:
 
     adapter = DynamitejobsAdapter(user_agent="test-agent")
     assert (
-        adapter._parse_html("https://dynamitejobs.com/remote-jobs", DYNAMITEJOBS_SAMPLE_HTML, max_jobs=0)
+        adapter._parse_html(
+            "https://dynamitejobs.com/remote-jobs", DYNAMITEJOBS_SAMPLE_HTML, max_jobs=0
+        )
         == []
     )
     assert (
