@@ -12,6 +12,7 @@ from autoapply_agent.adapters.adp import AdpAdapter
 from autoapply_agent.adapters.applicantpro import ApplicantProAdapter
 from autoapply_agent.adapters.applicantstack import ApplicantStackAdapter
 from autoapply_agent.adapters.applied import AppliedAdapter
+from autoapply_agent.adapters.arcdev import ArcdevAdapter
 from autoapply_agent.adapters.ashby import AshbyAdapter
 from autoapply_agent.adapters.avature import AvatureAdapter
 from autoapply_agent.adapters.bamboohr import BambooHrAdapter
@@ -160,6 +161,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.APPLICANTPRO: ApplicantProAdapter(active_settings.http_user_agent),
                 SourceType.APPLICANTSTACK: ApplicantStackAdapter(active_settings.http_user_agent),
                 SourceType.APPLIED: AppliedAdapter(active_settings.http_user_agent),
+                SourceType.ARCDEV: ArcdevAdapter(active_settings.http_user_agent),
                 SourceType.ASHBY: AshbyAdapter(active_settings.http_user_agent),
                 SourceType.AVATURE: AvatureAdapter(active_settings.http_user_agent),
                 SourceType.BAMBOOHR: BambooHrAdapter(active_settings.http_user_agent),
