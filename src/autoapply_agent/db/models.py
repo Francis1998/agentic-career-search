@@ -113,6 +113,7 @@ class SourceType(StrEnum):
     JOBSPRESSO = "jobspresso"
     DYNAMITEJOBS = "dynamitejobs"
     REMOTECO = "remoteco"
+    ARCDEV = "arcdev"
 
 
 class RunStatus(StrEnum):
