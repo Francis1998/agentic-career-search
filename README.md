@@ -179,6 +179,7 @@ Each `SourceConfig` selects a source adapter by `source_type`:
 | `eploy` | `EployAdapter` | Recognises Eploy careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/role/{id}` URL shapes | Eploy (`*.eploy.net`) careers boards |
 | `beamery` | `BeameryAdapter` | Recognises Beamery careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/campaign/{id}` URL shapes | Beamery (`*.beamery.com`) careers boards |
 | `hireez` | `HireezAdapter` | Recognises HireEZ careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/positions/{id}` URL shapes | HireEZ / Hiretual (`*.hireez.com`) careers boards |
+| `authenticjobs` | `AuthenticjobsAdapter` | Recognises Authentic Jobs posting anchors by /postings/{id}, /listing/{id}, /opportunities/{id}, /jobs/{id}, /job/{id} URL shapes | Authentic Jobs (authenticjobs.com) careers boards |
 
 Unlike the HTML-scraping adapters, `bamboohr` and `workday` are structured-JSON
 sources: BambooHR and Workday careers pages are client-rendered apps, so those

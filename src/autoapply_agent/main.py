@@ -14,6 +14,7 @@ from autoapply_agent.adapters.applicantstack import ApplicantStackAdapter
 from autoapply_agent.adapters.applied import AppliedAdapter
 from autoapply_agent.adapters.arcdev import ArcdevAdapter
 from autoapply_agent.adapters.ashby import AshbyAdapter
+from autoapply_agent.adapters.authenticjobs import AuthenticjobsAdapter
 from autoapply_agent.adapters.avature import AvatureAdapter
 from autoapply_agent.adapters.bamboohr import BambooHrAdapter
 from autoapply_agent.adapters.beamery import BeameryAdapter
@@ -250,6 +251,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.WORKDAY: WorkdayAdapter(active_settings.http_user_agent),
                 SourceType.YELLO: YelloAdapter(active_settings.http_user_agent),
                 SourceType.ZOHO_RECRUIT: ZohoRecruitAdapter(active_settings.http_user_agent),
+                SourceType.AUTHENTICJOBS: AuthenticjobsAdapter(active_settings.http_user_agent),
             },
             scoring_service=DeterministicScoringService(),
             planning_service=DeterministicPlanningService(),

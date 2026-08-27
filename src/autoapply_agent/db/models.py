@@ -114,6 +114,7 @@ class SourceType(StrEnum):
     DYNAMITEJOBS = "dynamitejobs"
     REMOTECO = "remoteco"
     ARCDEV = "arcdev"
+    AUTHENTICJOBS = "authenticjobs"
     FLEXJOBS = "flexjobs"
 
 
