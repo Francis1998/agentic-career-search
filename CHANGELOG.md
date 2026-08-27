@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `FlexjobsAdapter` (`source_type: flexjobs`): public FlexJobs careers boards (flexjobs.com). Postings are recognised by /search/{id}, /flex-jobs/{id}, /remote-job/{id}, /jobs/{id}, /job/{id} URL shapes; board indexes, apply/login/signin/about/index steps, and navigation links are ignored. See ADR-165 and `docs/guides/FLEXJOBS_SOURCE_GUIDE.md`.
 - `ArcdevAdapter` (`source_type: arcdev`): public Arc.dev careers boards (arc.dev). Postings are recognised by /jobs/{id}, /job/{id}, /roles/{id}, /positions/{id}, /openings/{id} URL shapes; board indexes, apply/login/signin/about/index steps, and navigation links are ignored. See ADR-164 and `docs/guides/ARCDEV_SOURCE_GUIDE.md`.
 - `RemotecoAdapter` (`source_type: remoteco`): public Remote.co careers boards (remote.co). Postings are recognised by /remote-jobs/{id}, /jobs/{id}, /job/{id}, /positions/{id}, /careers/{id} URL shapes; board indexes, apply/login/signin/about/index steps, and navigation links are ignored. See ADR-163 and `docs/guides/REMOTECO_SOURCE_GUIDE.md`.
 - `DynamitejobsAdapter` (`source_type: dynamitejobs`): public Dynamite Jobs careers boards (dynamitejobs.com). Postings are recognised by /jobs/{id}, /job/{id}, /remote-jobs/{id}, /positions/{id}, /listings/{id} URL shapes; board indexes, apply/login/signin/about/index steps, and navigation links are ignored. See ADR-162 and `docs/guides/DYNAMITEJOBS_SOURCE_GUIDE.md`.

@@ -108,6 +108,7 @@ Each `SourceConfig` selects a source adapter by `source_type`:
 | `remoteco` | `RemotecoAdapter` | Recognises Remote.co posting anchors by /remote-jobs/{id}, /jobs/{id}, /job/{id}, /positions/{id}, /careers/{id} URL shapes | Remote.co (remote.co) careers boards |
 | `dynamitejobs` | `DynamitejobsAdapter` | Recognises Dynamite Jobs posting anchors by /jobs/{id}, /job/{id}, /remote-jobs/{id}, /positions/{id}, /listings/{id} URL shapes | Dynamite Jobs (dynamitejobs.com) careers boards |
 | `arcdev` | `ArcdevAdapter` | Recognises Arc.dev posting anchors by /jobs/{id}, /job/{id}, /roles/{id}, /positions/{id}, /openings/{id} URL shapes | Arc.dev (arc.dev) careers boards |
+| `flexjobs` | `FlexjobsAdapter` | Recognises FlexJobs posting anchors by /search/{id}, /flex-jobs/{id}, /remote-job/{id}, /jobs/{id}, /job/{id} URL shapes | FlexJobs (flexjobs.com) careers boards |
 | `radancy` | `RadancyAdapter` | Recognises Radancy posting anchors by `/jobs/{id}`, `/job/{id}`, `/search/job/{id}`, `/careers/{id}`, or `/careers/job/{id}` URL shapes | Radancy (`*.radancy.com`, `*.jobs.net`) recruiting boards |
 | `silkroad` | `SilkRoadAdapter` | Recognises SilkRoad posting anchors by `/jobs/{id}`, `/job/{id}`, `/posting/{id}`, `/postings/{id}`, or `/opportunity/{id}` URL shapes | SilkRoad (`*.silkroad.com`) recruiting boards |
 | `paradox` | `ParadoxAdapter` | Recognises Paradox careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/opportunities/{id}` URL shapes | Paradox Olivia (`*.paradox.ai`) careers boards |
