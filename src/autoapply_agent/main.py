@@ -34,6 +34,7 @@ from autoapply_agent.adapters.dynamitejobs import DynamitejobsAdapter
 from autoapply_agent.adapters.eightfold import EightfoldAdapter
 from autoapply_agent.adapters.eploy import EployAdapter
 from autoapply_agent.adapters.factorial import FactorialAdapter
+from autoapply_agent.adapters.flexjobs import FlexjobsAdapter
 from autoapply_agent.adapters.fountain import FountainAdapter
 from autoapply_agent.adapters.freshteam import FreshteamAdapter
 from autoapply_agent.adapters.gem import GemAdapter
@@ -183,6 +184,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.EIGHTFOLD: EightfoldAdapter(active_settings.http_user_agent),
                 SourceType.EPLOY: EployAdapter(active_settings.http_user_agent),
                 SourceType.FACTORIAL: FactorialAdapter(active_settings.http_user_agent),
+                SourceType.FLEXJOBS: FlexjobsAdapter(active_settings.http_user_agent),
                 SourceType.FOUNTAIN: FountainAdapter(active_settings.http_user_agent),
                 SourceType.FRESHTEAM: FreshteamAdapter(active_settings.http_user_agent),
                 SourceType.GEM: GemAdapter(active_settings.http_user_agent),
