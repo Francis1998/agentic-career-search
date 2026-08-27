@@ -34,6 +34,7 @@ from autoapply_agent.adapters.dover import DoverAdapter
 from autoapply_agent.adapters.dynamitejobs import DynamitejobsAdapter
 from autoapply_agent.adapters.eightfold import EightfoldAdapter
 from autoapply_agent.adapters.eploy import EployAdapter
+from autoapply_agent.adapters.eurotechjobs import EurotechjobsAdapter
 from autoapply_agent.adapters.factorial import FactorialAdapter
 from autoapply_agent.adapters.flexjobs import FlexjobsAdapter
 from autoapply_agent.adapters.fountain import FountainAdapter
@@ -252,6 +253,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.YELLO: YelloAdapter(active_settings.http_user_agent),
                 SourceType.ZOHO_RECRUIT: ZohoRecruitAdapter(active_settings.http_user_agent),
                 SourceType.AUTHENTICJOBS: AuthenticjobsAdapter(active_settings.http_user_agent),
+                SourceType.EUROTECHJOBS: EurotechjobsAdapter(active_settings.http_user_agent),
             },
             scoring_service=DeterministicScoringService(),
             planning_service=DeterministicPlanningService(),

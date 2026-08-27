@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `EurotechjobsAdapter` (`source_type: eurotechjobs`): public EuroTechJobs careers boards (eurotechjobs.com). Postings are recognised by /vacancies/{id}, /offers/{id}, /tech-jobs/{id}, /jobs/{id}, /job/{id} URL shapes; board indexes, apply/login/signin/about/index steps, and navigation links are ignored. See ADR-167 and `docs/guides/EUROTECHJOBS_SOURCE_GUIDE.md`.
 - `AuthenticjobsAdapter` (`source_type: authenticjobs`): public Authentic Jobs careers boards (authenticjobs.com). Postings are recognised by /postings/{id}, /listing/{id}, /opportunities/{id}, /jobs/{id}, /job/{id} URL shapes; board indexes, apply/login/signin/about/index steps, and navigation links are ignored. See ADR-166 and `docs/guides/AUTHENTICJOBS_SOURCE_GUIDE.md`.
 - `FlexjobsAdapter` (`source_type: flexjobs`): public FlexJobs careers boards (flexjobs.com). Postings are recognised by /search/{id}, /flex-jobs/{id}, /remote-job/{id}, /jobs/{id}, /job/{id} URL shapes; board indexes, apply/login/signin/about/index steps, and navigation links are ignored. See ADR-165 and `docs/guides/FLEXJOBS_SOURCE_GUIDE.md`.
 - `ArcdevAdapter` (`source_type: arcdev`): public Arc.dev careers boards (arc.dev). Postings are recognised by /jobs/{id}, /job/{id}, /roles/{id}, /positions/{id}, /openings/{id} URL shapes; board indexes, apply/login/signin/about/index steps, and navigation links are ignored. See ADR-164 and `docs/guides/ARCDEV_SOURCE_GUIDE.md`.

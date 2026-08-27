@@ -116,6 +116,7 @@ class SourceType(StrEnum):
     ARCDEV = "arcdev"
     AUTHENTICJOBS = "authenticjobs"
     FLEXJOBS = "flexjobs"
+    EUROTECHJOBS = "eurotechjobs"
 
 
 class RunStatus(StrEnum):
