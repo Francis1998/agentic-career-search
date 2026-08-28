@@ -119,6 +119,7 @@ class SourceType(StrEnum):
     EUROTECHJOBS = "eurotechjobs"
     JOBGETHER = "jobgether"
     PANGIAN = "pangian"
+    REMOTELEAF = "remoteleaf"
 
 
 class RunStatus(StrEnum):

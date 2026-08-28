@@ -81,6 +81,7 @@ from autoapply_agent.adapters.recruitcrm import RecruitCrmAdapter
 from autoapply_agent.adapters.recruitee import RecruiteeAdapter
 from autoapply_agent.adapters.recruiterflow import RecruiterflowAdapter
 from autoapply_agent.adapters.remoteco import RemotecoAdapter
+from autoapply_agent.adapters.remoteleaf import RemoteleafAdapter
 from autoapply_agent.adapters.remoteok import RemoteokAdapter
 from autoapply_agent.adapters.remotive import RemotiveAdapter
 from autoapply_agent.adapters.rippling import RipplingAdapter
@@ -232,6 +233,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.RECRUITEE: RecruiteeAdapter(active_settings.http_user_agent),
                 SourceType.RECRUITERFLOW: RecruiterflowAdapter(active_settings.http_user_agent),
                 SourceType.REMOTECO: RemotecoAdapter(active_settings.http_user_agent),
+                SourceType.REMOTELEAF: RemoteleafAdapter(active_settings.http_user_agent),
                 SourceType.REMOTEOK: RemoteokAdapter(active_settings.http_user_agent),
                 SourceType.REMOTIVE: RemotiveAdapter(active_settings.http_user_agent),
                 SourceType.RIPPLING: RipplingAdapter(active_settings.http_user_agent),
