@@ -52,6 +52,7 @@ from autoapply_agent.adapters.jazzhr import JazzHrAdapter
 from autoapply_agent.adapters.jibe import JibeAdapter
 from autoapply_agent.adapters.jobadder import JobAdderAdapter
 from autoapply_agent.adapters.jobdiva import JobDivaAdapter
+from autoapply_agent.adapters.jobgether import JobgetherAdapter
 from autoapply_agent.adapters.jobscore import JobScoreAdapter
 from autoapply_agent.adapters.jobspresso import JobspressoAdapter
 from autoapply_agent.adapters.jobvite import JobviteAdapter
@@ -254,6 +255,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.ZOHO_RECRUIT: ZohoRecruitAdapter(active_settings.http_user_agent),
                 SourceType.AUTHENTICJOBS: AuthenticjobsAdapter(active_settings.http_user_agent),
                 SourceType.EUROTECHJOBS: EurotechjobsAdapter(active_settings.http_user_agent),
+                SourceType.JOBGETHER: JobgetherAdapter(active_settings.http_user_agent),
             },
             scoring_service=DeterministicScoringService(),
             planning_service=DeterministicPlanningService(),
