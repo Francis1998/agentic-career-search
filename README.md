@@ -182,6 +182,7 @@ Each `SourceConfig` selects a source adapter by `source_type`:
 | `authenticjobs` | `AuthenticjobsAdapter` | Recognises Authentic Jobs posting anchors by /postings/{id}, /listing/{id}, /opportunities/{id}, /jobs/{id}, /job/{id} URL shapes | Authentic Jobs (authenticjobs.com) careers boards |
 | `eurotechjobs` | `EurotechjobsAdapter` | Recognises EuroTechJobs posting anchors by /vacancies/{id}, /offers/{id}, /tech-jobs/{id}, /jobs/{id}, /job/{id} URL shapes | EuroTechJobs (eurotechjobs.com) careers boards |
 | `jobgether` | `JobgetherAdapter` | Recognises Jobgether posting anchors by /roles/{id}, /openings/{id}, /positions/{id}, /jobs/{id}, /job/{id} URL shapes | Jobgether (jobgether.com) careers boards |
+| `pangian` | `PangianAdapter` | Recognises Pangian posting anchors by /remote-jobs/{id}, /listings/{id}, /positions/{id}, /jobs/{id}, /job/{id} URL shapes | Pangian (pangian.com) careers boards |
 
 Unlike the HTML-scraping adapters, `bamboohr` and `workday` are structured-JSON
 sources: BambooHR and Workday careers pages are client-rendered apps, so those

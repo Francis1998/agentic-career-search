@@ -67,6 +67,7 @@ from autoapply_agent.adapters.nodesk import NodeskAdapter
 from autoapply_agent.adapters.oracle_taleo import OracleTaleoAdapter
 from autoapply_agent.adapters.otta import OttaAdapter
 from autoapply_agent.adapters.pageup import PageUpAdapter
+from autoapply_agent.adapters.pangian import PangianAdapter
 from autoapply_agent.adapters.paradox import ParadoxAdapter
 from autoapply_agent.adapters.paycom import PaycomAdapter
 from autoapply_agent.adapters.paylocity import PaylocityAdapter
@@ -217,6 +218,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.ORACLE_TALEO: OracleTaleoAdapter(active_settings.http_user_agent),
                 SourceType.OTTA: OttaAdapter(active_settings.http_user_agent),
                 SourceType.PAGEUP: PageUpAdapter(active_settings.http_user_agent),
+                SourceType.PANGIAN: PangianAdapter(active_settings.http_user_agent),
                 SourceType.PARADOX: ParadoxAdapter(active_settings.http_user_agent),
                 SourceType.PAYCOM: PaycomAdapter(active_settings.http_user_agent),
                 SourceType.PAYLOCITY: PaylocityAdapter(active_settings.http_user_agent),

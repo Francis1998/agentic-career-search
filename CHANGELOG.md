@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `PangianAdapter` (`source_type: pangian`): public Pangian careers boards (pangian.com). Postings are recognised by /remote-jobs/{id}, /listings/{id}, /positions/{id}, /jobs/{id}, /job/{id} URL shapes; board indexes, apply/login/signin/about/index steps, and navigation links are ignored. See ADR-169 and `docs/guides/PANGIAN_SOURCE_GUIDE.md`.
 - `JobgetherAdapter` (`source_type: jobgether`): public Jobgether careers boards (jobgether.com). Postings are recognised by /roles/{id}, /openings/{id}, /positions/{id}, /jobs/{id}, /job/{id} URL shapes; board indexes, apply/login/signin/about/index steps, and navigation links are ignored. See ADR-168 and `docs/guides/JOBGETHER_SOURCE_GUIDE.md`.
 - `EurotechjobsAdapter` (`source_type: eurotechjobs`): public EuroTechJobs careers boards (eurotechjobs.com). Postings are recognised by /vacancies/{id}, /offers/{id}, /tech-jobs/{id}, /jobs/{id}, /job/{id} URL shapes; board indexes, apply/login/signin/about/index steps, and navigation links are ignored. See ADR-167 and `docs/guides/EUROTECHJOBS_SOURCE_GUIDE.md`.
 - `AuthenticjobsAdapter` (`source_type: authenticjobs`): public Authentic Jobs careers boards (authenticjobs.com). Postings are recognised by /postings/{id}, /listing/{id}, /opportunities/{id}, /jobs/{id}, /job/{id} URL shapes; board indexes, apply/login/signin/about/index steps, and navigation links are ignored. See ADR-166 and `docs/guides/AUTHENTICJOBS_SOURCE_GUIDE.md`.

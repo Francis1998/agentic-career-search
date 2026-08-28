@@ -118,6 +118,7 @@ class SourceType(StrEnum):
     FLEXJOBS = "flexjobs"
     EUROTECHJOBS = "eurotechjobs"
     JOBGETHER = "jobgether"
+    PANGIAN = "pangian"
 
 
 class RunStatus(StrEnum):
