@@ -117,6 +117,7 @@ class SourceType(StrEnum):
     AUTHENTICJOBS = "authenticjobs"
     FLEXJOBS = "flexjobs"
     EUROTECHJOBS = "eurotechjobs"
+    JOBGETHER = "jobgether"
 
 
 class RunStatus(StrEnum):
