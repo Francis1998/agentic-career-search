@@ -38,6 +38,7 @@ from autoapply_agent.adapters.eurotechjobs import EurotechjobsAdapter
 from autoapply_agent.adapters.factorial import FactorialAdapter
 from autoapply_agent.adapters.flexjobs import FlexjobsAdapter
 from autoapply_agent.adapters.fountain import FountainAdapter
+from autoapply_agent.adapters.fourdayweek import FourdayweekAdapter
 from autoapply_agent.adapters.freshteam import FreshteamAdapter
 from autoapply_agent.adapters.gem import GemAdapter
 from autoapply_agent.adapters.greenhouse import GreenhouseAdapter
@@ -234,6 +235,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.RECRUITERFLOW: RecruiterflowAdapter(active_settings.http_user_agent),
                 SourceType.REMOTECO: RemotecoAdapter(active_settings.http_user_agent),
                 SourceType.REMOTELEAF: RemoteleafAdapter(active_settings.http_user_agent),
+                SourceType.FOURDAYWEEK: FourdayweekAdapter(active_settings.http_user_agent),
                 SourceType.REMOTEOK: RemoteokAdapter(active_settings.http_user_agent),
                 SourceType.REMOTIVE: RemotiveAdapter(active_settings.http_user_agent),
                 SourceType.RIPPLING: RipplingAdapter(active_settings.http_user_agent),
