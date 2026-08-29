@@ -184,6 +184,7 @@ Each `SourceConfig` selects a source adapter by `source_type`:
 | `jobgether` | `JobgetherAdapter` | Recognises Jobgether posting anchors by /roles/{id}, /openings/{id}, /positions/{id}, /jobs/{id}, /job/{id} URL shapes | Jobgether (jobgether.com) careers boards |
 | `pangian` | `PangianAdapter` | Recognises Pangian posting anchors by /remote-jobs/{id}, /listings/{id}, /positions/{id}, /jobs/{id}, /job/{id} URL shapes | Pangian (pangian.com) careers boards |
 | `remoteleaf` | `RemoteleafAdapter` | Recognises RemoteLeaf posting anchors by /remote/{id}, /leaf-jobs/{id}, /positions/{id}, /jobs/{id}, /job/{id} URL shapes | RemoteLeaf (remoteleaf.com) careers boards |
+| `fourdayweek` | `FourdayweekAdapter` | Recognises 4 Day Week posting anchors by /four-day/{id}, /listings/{id}, /positions/{id}, /jobs/{id}, /job/{id} URL shapes | 4 Day Week (4dayweek.io) careers boards |
 
 Unlike the HTML-scraping adapters, `bamboohr` and `workday` are structured-JSON
 sources: BambooHR and Workday careers pages are client-rendered apps, so those

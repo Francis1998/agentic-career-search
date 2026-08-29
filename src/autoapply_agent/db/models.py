@@ -120,6 +120,7 @@ class SourceType(StrEnum):
     JOBGETHER = "jobgether"
     PANGIAN = "pangian"
     REMOTELEAF = "remoteleaf"
+    FOURDAYWEEK = "fourdayweek"
 
 
 class RunStatus(StrEnum):
