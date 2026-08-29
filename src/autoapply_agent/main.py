@@ -9,6 +9,7 @@ from fastapi import APIRouter, FastAPI
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from autoapply_agent.adapters.adp import AdpAdapter
+from autoapply_agent.adapters.aijobs import AijobsAdapter
 from autoapply_agent.adapters.applicantpro import ApplicantProAdapter
 from autoapply_agent.adapters.applicantstack import ApplicantStackAdapter
 from autoapply_agent.adapters.applied import AppliedAdapter
@@ -165,6 +166,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
             session_factory=session_factory,
             adapters={
                 SourceType.ADP: AdpAdapter(active_settings.http_user_agent),
+                SourceType.AIJOBS: AijobsAdapter(active_settings.http_user_agent),
                 SourceType.APPLICANTPRO: ApplicantProAdapter(active_settings.http_user_agent),
                 SourceType.APPLICANTSTACK: ApplicantStackAdapter(active_settings.http_user_agent),
                 SourceType.APPLIED: AppliedAdapter(active_settings.http_user_agent),
