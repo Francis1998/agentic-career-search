@@ -78,6 +78,7 @@ from autoapply_agent.adapters.personio import PersonioAdapter
 from autoapply_agent.adapters.phenom import PhenomPeopleAdapter
 from autoapply_agent.adapters.pinpoint import PinpointAdapter
 from autoapply_agent.adapters.polymer import PolymerAdapter
+from autoapply_agent.adapters.powertofly import PowertoflyAdapter
 from autoapply_agent.adapters.radancy import RadancyAdapter
 from autoapply_agent.adapters.recruitcrm import RecruitCrmAdapter
 from autoapply_agent.adapters.recruitee import RecruiteeAdapter
@@ -231,6 +232,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.PHENOM: PhenomPeopleAdapter(active_settings.http_user_agent),
                 SourceType.PINPOINT: PinpointAdapter(active_settings.http_user_agent),
                 SourceType.POLYMER: PolymerAdapter(active_settings.http_user_agent),
+                SourceType.POWERTOFLY: PowertoflyAdapter(active_settings.http_user_agent),
                 SourceType.RADANCY: RadancyAdapter(active_settings.http_user_agent),
                 SourceType.RECRUITCRM: RecruitCrmAdapter(active_settings.http_user_agent),
                 SourceType.RECRUITEE: RecruiteeAdapter(active_settings.http_user_agent),
