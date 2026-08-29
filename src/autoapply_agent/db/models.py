@@ -122,6 +122,7 @@ class SourceType(StrEnum):
     REMOTELEAF = "remoteleaf"
     FOURDAYWEEK = "fourdayweek"
     AIJOBS = "aijobs"
+    POWERTOFLY = "powertofly"
 
 
 class RunStatus(StrEnum):
