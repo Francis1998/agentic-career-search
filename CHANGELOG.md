@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `WorkatastartupAdapter` (`source_type: workatastartup`): public Work at a Startup careers boards (workatastartup.com (YC)). Postings are recognised by /companies/{id}, /startups/{id}, /roles/{id}, /jobs/{id}, /job/{id} URL shapes; board indexes, apply/login/signin/about/index steps, and navigation links are ignored. See ADR-174 and `docs/guides/WORKATASTARTUP_SOURCE_GUIDE.md`.
 - `PowertoflyAdapter` (`source_type: powertofly`): public PowerToFly careers boards (powertofly.com). Postings are recognised by /opportunities/{id}, /women-tech/{id}, /positions/{id}, /jobs/{id}, /job/{id} URL shapes; board indexes, apply/login/signin/about/index steps, and navigation links are ignored. See ADR-173 and `docs/guides/POWERTOFLY_SOURCE_GUIDE.md`.
 - `AijobsAdapter` (`source_type: aijobs`): public AI Jobs careers boards (ai-jobs.net). Postings are recognised by /ai-jobs/{id}, /roles/{id}, /openings/{id}, /jobs/{id}, /job/{id} URL shapes; board indexes, apply/login/signin/about/index steps, and navigation links are ignored. See ADR-172 and `docs/guides/AIJOBS_SOURCE_GUIDE.md`.
 - `FourdayweekAdapter` (`source_type: fourdayweek`): public 4 Day Week careers boards (4dayweek.io). Postings are recognised by /four-day/{id}, /listings/{id}, /positions/{id}, /jobs/{id}, /job/{id} URL shapes; board indexes, apply/login/signin/about/index steps, and navigation links are ignored. See ADR-171 and `docs/guides/FOURDAYWEEK_SOURCE_GUIDE.md`.
