@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `NofluffjobsAdapter` (`source_type: nofluffjobs`): public No Fluff Jobs careers boards (nofluffjobs.com). Postings are recognised by /pl/{id}, /job/{id}, /offers/{id}, /positions/{id}, /jobs/{id} URL shapes; board indexes, apply/login/signin/about/index steps, and navigation links are ignored. See ADR-176 and `docs/guides/NOFLUFFJOBS_SOURCE_GUIDE.md`.
 - `CryptojobsAdapter` (`source_type: cryptojobs`): public Crypto Jobs careers boards (cryptojobslist.com). Postings are recognised by /crypto-jobs/{id}, /web3/{id}, /positions/{id}, /jobs/{id}, /job/{id} URL shapes; board indexes, apply/login/signin/about/index steps, and navigation links are ignored. See ADR-175 and `docs/guides/CRYPTOJOBS_SOURCE_GUIDE.md`.
 - `WorkatastartupAdapter` (`source_type: workatastartup`): public Work at a Startup careers boards (workatastartup.com (YC)). Postings are recognised by /companies/{id}, /startups/{id}, /roles/{id}, /jobs/{id}, /job/{id} URL shapes; board indexes, apply/login/signin/about/index steps, and navigation links are ignored. See ADR-174 and `docs/guides/WORKATASTARTUP_SOURCE_GUIDE.md`.
 - `PowertoflyAdapter` (`source_type: powertofly`): public PowerToFly careers boards (powertofly.com). Postings are recognised by /opportunities/{id}, /women-tech/{id}, /positions/{id}, /jobs/{id}, /job/{id} URL shapes; board indexes, apply/login/signin/about/index steps, and navigation links are ignored. See ADR-173 and `docs/guides/POWERTOFLY_SOURCE_GUIDE.md`.

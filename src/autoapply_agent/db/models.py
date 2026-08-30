@@ -123,6 +123,7 @@ class SourceType(StrEnum):
     FOURDAYWEEK = "fourdayweek"
     AIJOBS = "aijobs"
     POWERTOFLY = "powertofly"
+    NOFLUFFJOBS = "nofluffjobs"
     CRYPTOJOBS = "cryptojobs"
     WORKATASTARTUP = "workatastartup"
 

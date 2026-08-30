@@ -67,6 +67,7 @@ from autoapply_agent.adapters.lever import LeverAdapter
 from autoapply_agent.adapters.loxo import LoxoAdapter
 from autoapply_agent.adapters.manatal import ManatalAdapter
 from autoapply_agent.adapters.nodesk import NodeskAdapter
+from autoapply_agent.adapters.nofluffjobs import NofluffjobsAdapter
 from autoapply_agent.adapters.oracle_taleo import OracleTaleoAdapter
 from autoapply_agent.adapters.otta import OttaAdapter
 from autoapply_agent.adapters.pageup import PageUpAdapter
@@ -235,6 +236,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.PINPOINT: PinpointAdapter(active_settings.http_user_agent),
                 SourceType.POLYMER: PolymerAdapter(active_settings.http_user_agent),
                 SourceType.POWERTOFLY: PowertoflyAdapter(active_settings.http_user_agent),
+                SourceType.NOFLUFFJOBS: NofluffjobsAdapter(active_settings.http_user_agent),
                 SourceType.CRYPTOJOBS: CryptojobsAdapter(active_settings.http_user_agent),
                 SourceType.WORKATASTARTUP: WorkatastartupAdapter(active_settings.http_user_agent),
                 SourceType.RADANCY: RadancyAdapter(active_settings.http_user_agent),

@@ -187,6 +187,7 @@ Each `SourceConfig` selects a source adapter by `source_type`:
 | `fourdayweek` | `FourdayweekAdapter` | Recognises 4 Day Week posting anchors by /four-day/{id}, /listings/{id}, /positions/{id}, /jobs/{id}, /job/{id} URL shapes | 4 Day Week (4dayweek.io) careers boards |
 | `aijobs` | `AijobsAdapter` | Recognises AI Jobs posting anchors by /ai-jobs/{id}, /roles/{id}, /openings/{id}, /jobs/{id}, /job/{id} URL shapes | AI Jobs (ai-jobs.net) careers boards |
 | `powertofly` | `PowertoflyAdapter` | Recognises PowerToFly posting anchors by /opportunities/{id}, /women-tech/{id}, /positions/{id}, /jobs/{id}, /job/{id} URL shapes | PowerToFly (powertofly.com) careers boards |
+| `nofluffjobs` | `NofluffjobsAdapter` | Recognises No Fluff Jobs posting anchors by /pl/{id}, /job/{id}, /offers/{id}, /positions/{id}, /jobs/{id} URL shapes | No Fluff Jobs (nofluffjobs.com) careers boards |
 | `cryptojobs` | `CryptojobsAdapter` | Recognises Crypto Jobs posting anchors by /crypto-jobs/{id}, /web3/{id}, /positions/{id}, /jobs/{id}, /job/{id} URL shapes | Crypto Jobs (cryptojobslist.com) careers boards |
 | `workatastartup` | `WorkatastartupAdapter` | Recognises Work at a Startup posting anchors by /companies/{id}, /startups/{id}, /roles/{id}, /jobs/{id}, /job/{id} URL shapes | Work at a Startup (workatastartup.com (YC)) careers boards |
 
