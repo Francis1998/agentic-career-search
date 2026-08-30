@@ -30,6 +30,7 @@ from autoapply_agent.adapters.clearcompany import ClearCompanyAdapter
 from autoapply_agent.adapters.comeet import ComeetAdapter
 from autoapply_agent.adapters.cornerstone import CornerstoneAdapter
 from autoapply_agent.adapters.crelate import CrelateAdapter
+from autoapply_agent.adapters.cryptojobs import CryptojobsAdapter
 from autoapply_agent.adapters.dayforce import DayforceAdapter
 from autoapply_agent.adapters.dover import DoverAdapter
 from autoapply_agent.adapters.dynamitejobs import DynamitejobsAdapter
@@ -102,6 +103,7 @@ from autoapply_agent.adapters.welcometothejungle import WelcometothejungleAdapte
 from autoapply_agent.adapters.wellfound import WellfoundAdapter
 from autoapply_agent.adapters.weworkremotely import WeworkremotelyAdapter
 from autoapply_agent.adapters.workable import WorkableAdapter
+from autoapply_agent.adapters.workatastartup import WorkatastartupAdapter
 from autoapply_agent.adapters.workday import WorkdayAdapter
 from autoapply_agent.adapters.workingnomads import WorkingnomadsAdapter
 from autoapply_agent.adapters.yello import YelloAdapter
@@ -233,6 +235,8 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.PINPOINT: PinpointAdapter(active_settings.http_user_agent),
                 SourceType.POLYMER: PolymerAdapter(active_settings.http_user_agent),
                 SourceType.POWERTOFLY: PowertoflyAdapter(active_settings.http_user_agent),
+                SourceType.CRYPTOJOBS: CryptojobsAdapter(active_settings.http_user_agent),
+                SourceType.WORKATASTARTUP: WorkatastartupAdapter(active_settings.http_user_agent),
                 SourceType.RADANCY: RadancyAdapter(active_settings.http_user_agent),
                 SourceType.RECRUITCRM: RecruitCrmAdapter(active_settings.http_user_agent),
                 SourceType.RECRUITEE: RecruiteeAdapter(active_settings.http_user_agent),
