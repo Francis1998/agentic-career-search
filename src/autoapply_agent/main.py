@@ -63,6 +63,7 @@ from autoapply_agent.adapters.jobylon import JobylonAdapter
 from autoapply_agent.adapters.join import JoinAdapter
 from autoapply_agent.adapters.jsonld import JsonLdAdapter
 from autoapply_agent.adapters.justremote import JustremoteAdapter
+from autoapply_agent.adapters.levelsfyi import LevelsfyiAdapter
 from autoapply_agent.adapters.lever import LeverAdapter
 from autoapply_agent.adapters.loxo import LoxoAdapter
 from autoapply_agent.adapters.manatal import ManatalAdapter
@@ -239,6 +240,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.NOFLUFFJOBS: NofluffjobsAdapter(active_settings.http_user_agent),
                 SourceType.CRYPTOJOBS: CryptojobsAdapter(active_settings.http_user_agent),
                 SourceType.WORKATASTARTUP: WorkatastartupAdapter(active_settings.http_user_agent),
+                SourceType.LEVELSFYI: LevelsfyiAdapter(active_settings.http_user_agent),
                 SourceType.RADANCY: RadancyAdapter(active_settings.http_user_agent),
                 SourceType.RECRUITCRM: RecruitCrmAdapter(active_settings.http_user_agent),
                 SourceType.RECRUITEE: RecruiteeAdapter(active_settings.http_user_agent),

@@ -190,6 +190,7 @@ Each `SourceConfig` selects a source adapter by `source_type`:
 | `nofluffjobs` | `NofluffjobsAdapter` | Recognises No Fluff Jobs posting anchors by /pl/{id}, /job/{id}, /offers/{id}, /positions/{id}, /jobs/{id} URL shapes | No Fluff Jobs (nofluffjobs.com) careers boards |
 | `cryptojobs` | `CryptojobsAdapter` | Recognises Crypto Jobs posting anchors by /crypto-jobs/{id}, /web3/{id}, /positions/{id}, /jobs/{id}, /job/{id} URL shapes | Crypto Jobs (cryptojobslist.com) careers boards |
 | `workatastartup` | `WorkatastartupAdapter` | Recognises Work at a Startup posting anchors by /companies/{id}, /startups/{id}, /roles/{id}, /jobs/{id}, /job/{id} URL shapes | Work at a Startup (workatastartup.com (YC)) careers boards |
+| `levelsfyi` | `LevelsfyiAdapter` | Recognises Levels.fyi posting anchors by /jobs/{id}, /job/{id}, /roles/{id}, /openings/{id}, /levels/{id} URL shapes | Levels.fyi (levels.fyi) careers boards |
 
 Unlike the HTML-scraping adapters, `bamboohr` and `workday` are structured-JSON
 sources: BambooHR and Workday careers pages are client-rendered apps, so those
