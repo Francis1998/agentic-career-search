@@ -32,6 +32,7 @@ from autoapply_agent.adapters.cornerstone import CornerstoneAdapter
 from autoapply_agent.adapters.crelate import CrelateAdapter
 from autoapply_agent.adapters.cryptojobs import CryptojobsAdapter
 from autoapply_agent.adapters.dayforce import DayforceAdapter
+from autoapply_agent.adapters.dice import DiceAdapter
 from autoapply_agent.adapters.dover import DoverAdapter
 from autoapply_agent.adapters.dynamitejobs import DynamitejobsAdapter
 from autoapply_agent.adapters.eightfold import EightfoldAdapter
@@ -243,6 +244,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.WORKATASTARTUP: WorkatastartupAdapter(active_settings.http_user_agent),
                 SourceType.LEVELSFYI: LevelsfyiAdapter(active_settings.http_user_agent),
                 SourceType.WORKINTHEOPEN: WorkintheopenAdapter(active_settings.http_user_agent),
+                SourceType.DICE: DiceAdapter(active_settings.http_user_agent),
                 SourceType.RADANCY: RadancyAdapter(active_settings.http_user_agent),
                 SourceType.RECRUITCRM: RecruitCrmAdapter(active_settings.http_user_agent),
                 SourceType.RECRUITEE: RecruiteeAdapter(active_settings.http_user_agent),

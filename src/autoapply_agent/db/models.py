@@ -128,6 +128,7 @@ class SourceType(StrEnum):
     WORKATASTARTUP = "workatastartup"
     LEVELSFYI = "levelsfyi"
     WORKINTHEOPEN = "workintheopen"
+    DICE = "dice"
 
 
 class RunStatus(StrEnum):
