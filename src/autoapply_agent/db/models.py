@@ -127,6 +127,7 @@ class SourceType(StrEnum):
     CRYPTOJOBS = "cryptojobs"
     WORKATASTARTUP = "workatastartup"
     LEVELSFYI = "levelsfyi"
+    WORKINTHEOPEN = "workintheopen"
 
 
 class RunStatus(StrEnum):
