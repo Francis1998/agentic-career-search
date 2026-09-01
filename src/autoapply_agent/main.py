@@ -94,6 +94,7 @@ from autoapply_agent.adapters.remoteok import RemoteokAdapter
 from autoapply_agent.adapters.remotive import RemotiveAdapter
 from autoapply_agent.adapters.rippling import RipplingAdapter
 from autoapply_agent.adapters.silkroad import SilkRoadAdapter
+from autoapply_agent.adapters.simplyhired import SimplyhiredAdapter
 from autoapply_agent.adapters.smartrecruiters import SmartRecruitersAdapter
 from autoapply_agent.adapters.softgarden import SoftgardenAdapter
 from autoapply_agent.adapters.successfactors import SuccessFactorsAdapter
@@ -247,6 +248,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.WORKINTHEOPEN: WorkintheopenAdapter(active_settings.http_user_agent),
                 SourceType.DICE: DiceAdapter(active_settings.http_user_agent),
                 SourceType.PYTHONJOBS: PythonjobsAdapter(active_settings.http_user_agent),
+                SourceType.SIMPLYHIRED: SimplyhiredAdapter(active_settings.http_user_agent),
                 SourceType.RADANCY: RadancyAdapter(active_settings.http_user_agent),
                 SourceType.RECRUITCRM: RecruitCrmAdapter(active_settings.http_user_agent),
                 SourceType.RECRUITEE: RecruiteeAdapter(active_settings.http_user_agent),
