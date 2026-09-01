@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `JoobleAdapter` (`source_type: jooble`): public Jooble careers boards (jooble.org). Postings are recognised by /jobs/{id}, /job/{id}, /vacancy/{id}, /vacancies/{id}, /listings/{id} URL shapes; board indexes, apply/login/signin/about/index steps, and navigation links are ignored. See ADR-182 and `docs/guides/JOOBLE_SOURCE_GUIDE.md`.
 - `SimplyhiredAdapter` (`source_type: simplyhired`): public SimplyHired careers boards (simplyhired.com). Postings are recognised by /job/{id}, /jobs/{id}, /listings/{id}, /positions/{id}, /openings/{id} URL shapes; board indexes, apply/login/signin/about/index steps, and navigation links are ignored. See ADR-181 and `docs/guides/SIMPLYHIRED_SOURCE_GUIDE.md`.
 - `PythonjobsAdapter` (`source_type: pythonjobs`): public Python Jobs careers boards (python.org/jobs). Postings are recognised by /python-jobs/{id}, /listings/{id}, /positions/{id}, /jobs/{id}, /job/{id} URL shapes; board indexes, apply/login/signin/about/index steps, and navigation links are ignored. See ADR-180 and `docs/guides/PYTHONJOBS_SOURCE_GUIDE.md`.
 - `DiceAdapter` (`source_type: dice`): public Dice careers boards. Postings are recognised by /positions/{id}, /jobs/{id}, /job/{id}, /listings/{id}, /tech-jobs/{id} URL shapes; board indexes, apply/login/signin/about/index steps, and navigation links are ignored. See ADR-177 and `docs/guides/DICE_SOURCE_GUIDE.md`.

@@ -62,6 +62,7 @@ from autoapply_agent.adapters.jobspresso import JobspressoAdapter
 from autoapply_agent.adapters.jobvite import JobviteAdapter
 from autoapply_agent.adapters.jobylon import JobylonAdapter
 from autoapply_agent.adapters.join import JoinAdapter
+from autoapply_agent.adapters.jooble import JoobleAdapter
 from autoapply_agent.adapters.jsonld import JsonLdAdapter
 from autoapply_agent.adapters.justremote import JustremoteAdapter
 from autoapply_agent.adapters.levelsfyi import LevelsfyiAdapter
@@ -248,6 +249,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.WORKINTHEOPEN: WorkintheopenAdapter(active_settings.http_user_agent),
                 SourceType.DICE: DiceAdapter(active_settings.http_user_agent),
                 SourceType.PYTHONJOBS: PythonjobsAdapter(active_settings.http_user_agent),
+                SourceType.JOOBLE: JoobleAdapter(active_settings.http_user_agent),
                 SourceType.SIMPLYHIRED: SimplyhiredAdapter(active_settings.http_user_agent),
                 SourceType.RADANCY: RadancyAdapter(active_settings.http_user_agent),
                 SourceType.RECRUITCRM: RecruitCrmAdapter(active_settings.http_user_agent),
