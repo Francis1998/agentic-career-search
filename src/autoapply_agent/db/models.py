@@ -129,6 +129,7 @@ class SourceType(StrEnum):
     LEVELSFYI = "levelsfyi"
     WORKINTHEOPEN = "workintheopen"
     DICE = "dice"
+    PYTHONJOBS = "pythonjobs"
 
 
 class RunStatus(StrEnum):
