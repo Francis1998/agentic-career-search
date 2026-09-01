@@ -131,6 +131,7 @@ class SourceType(StrEnum):
     DICE = "dice"
     PYTHONJOBS = "pythonjobs"
     SIMPLYHIRED = "simplyhired"
+    JOOBLE = "jooble"
 
 
 class RunStatus(StrEnum):
