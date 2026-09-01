@@ -130,6 +130,7 @@ class SourceType(StrEnum):
     WORKINTHEOPEN = "workintheopen"
     DICE = "dice"
     PYTHONJOBS = "pythonjobs"
+    SIMPLYHIRED = "simplyhired"
 
 
 class RunStatus(StrEnum):
