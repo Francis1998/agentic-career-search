@@ -192,6 +192,7 @@ Each `SourceConfig` selects a source adapter by `source_type`:
 | `workatastartup` | `WorkatastartupAdapter` | Recognises Work at a Startup posting anchors by /companies/{id}, /startups/{id}, /roles/{id}, /jobs/{id}, /job/{id} URL shapes | Work at a Startup (workatastartup.com (YC)) careers boards |
 | `levelsfyi` | `LevelsfyiAdapter` | Recognises Levels.fyi posting anchors by /jobs/{id}, /job/{id}, /roles/{id}, /openings/{id}, /levels/{id} URL shapes | Levels.fyi (levels.fyi) careers boards |
 | `dice` | `DiceAdapter` | Recognises Dice posting anchors by /positions/{id}, /jobs/{id}, /job/{id}, /listings/{id}, /tech-jobs/{id} URL shapes | Dice (dice.com) tech careers boards |
+| `pythonjobs` | `PythonjobsAdapter` | Recognises Python Jobs posting anchors by /python-jobs/{id}, /listings/{id}, /positions/{id}, /jobs/{id}, /job/{id} URL shapes | Python Jobs (python.org/jobs) careers boards |
 | `workintheopen` | `WorkintheopenAdapter` | Recognises Work in the Open posting anchors by /jobs/{id}, /job/{id}, /roles/{id}, /openings/{id}, /positions/{id} URL shapes | Work in the Open careers boards |
 
 Unlike the HTML-scraping adapters, `bamboohr` and `workday` are structured-JSON

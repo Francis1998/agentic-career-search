@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `PythonjobsAdapter` (`source_type: pythonjobs`): public Python Jobs careers boards (python.org/jobs). Postings are recognised by /python-jobs/{id}, /listings/{id}, /positions/{id}, /jobs/{id}, /job/{id} URL shapes; board indexes, apply/login/signin/about/index steps, and navigation links are ignored. See ADR-180 and `docs/guides/PYTHONJOBS_SOURCE_GUIDE.md`.
 - `DiceAdapter` (`source_type: dice`): public Dice careers boards. Postings are recognised by /positions/{id}, /jobs/{id}, /job/{id}, /listings/{id}, /tech-jobs/{id} URL shapes; board indexes, apply/login/signin/about/index steps, and navigation links are ignored. See ADR-177 and `docs/guides/DICE_SOURCE_GUIDE.md`.
 - `WorkintheopenAdapter` (`source_type: workintheopen`): public Work in the Open careers boards. Postings are recognised by /jobs/{id}, /job/{id}, /roles/{id}, /openings/{id}, /positions/{id} URL shapes; board indexes, apply/login/signin/about/index steps, and navigation links are ignored. See ADR-179 and `docs/guides/WORKINTHEOPEN_SOURCE_GUIDE.md`.
 - `LevelsfyiAdapter` (`source_type: levelsfyi`): public Levels.fyi careers boards (levels.fyi). Postings are recognised by /jobs/{id}, /job/{id}, /roles/{id}, /openings/{id}, /levels/{id} URL shapes; board indexes, apply/login/signin/about/index steps, and navigation links are ignored. See ADR-178 and `docs/guides/LEVELSFYI_SOURCE_GUIDE.md`.
