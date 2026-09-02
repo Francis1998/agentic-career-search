@@ -102,6 +102,7 @@ from autoapply_agent.adapters.softgarden import SoftgardenAdapter
 from autoapply_agent.adapters.successfactors import SuccessFactorsAdapter
 from autoapply_agent.adapters.talentlyft import TalentLyftAdapter
 from autoapply_agent.adapters.teamtailor import TeamtailorAdapter
+from autoapply_agent.adapters.themuse import ThemuseAdapter
 from autoapply_agent.adapters.trackerrms import TrackerRmsAdapter
 from autoapply_agent.adapters.tribepad import TribepadAdapter
 from autoapply_agent.adapters.ukg import UkgAdapter
@@ -255,6 +256,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.SIMPLYHIRED: SimplyhiredAdapter(active_settings.http_user_agent),
                 SourceType.ZIPRECRUITER: ZiprecruiterAdapter(active_settings.http_user_agent),
                 SourceType.REED: ReedAdapter(active_settings.http_user_agent),
+                SourceType.THEMUSE: ThemuseAdapter(active_settings.http_user_agent),
                 SourceType.RADANCY: RadancyAdapter(active_settings.http_user_agent),
                 SourceType.RECRUITCRM: RecruitCrmAdapter(active_settings.http_user_agent),
                 SourceType.RECRUITEE: RecruiteeAdapter(active_settings.http_user_agent),

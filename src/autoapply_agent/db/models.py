@@ -134,6 +134,7 @@ class SourceType(StrEnum):
     JOOBLE = "jooble"
     ZIPRECRUITER = "ziprecruiter"
     REED = "reed"
+    THEMUSE = "themuse"
 
 
 class RunStatus(StrEnum):
