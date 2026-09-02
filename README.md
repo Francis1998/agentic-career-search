@@ -195,6 +195,7 @@ Each `SourceConfig` selects a source adapter by `source_type`:
 | `pythonjobs` | `PythonjobsAdapter` | Recognises Python Jobs posting anchors by /python-jobs/{id}, /listings/{id}, /positions/{id}, /jobs/{id}, /job/{id} URL shapes | Python Jobs (python.org/jobs) careers boards |
 | `jooble` | `JoobleAdapter` | Recognises Jooble posting anchors by /jobs/{id}, /job/{id}, /vacancy/{id}, /vacancies/{id}, /listings/{id} URL shapes | Jooble (jooble.org) careers boards |
 | `simplyhired` | `SimplyhiredAdapter` | Recognises SimplyHired posting anchors by /job/{id}, /jobs/{id}, /listings/{id}, /positions/{id}, /openings/{id} URL shapes | SimplyHired (simplyhired.com) careers boards |
+| `ziprecruiter` | `ZiprecruiterAdapter` | Recognises ZipRecruiter posting anchors by /jobs/{id}, /job/{id}, /listings/{id}, /openings/{id}, /positions/{id} URL shapes | ZipRecruiter (www.ziprecruiter.com) careers boards |
 | `workintheopen` | `WorkintheopenAdapter` | Recognises Work in the Open posting anchors by /jobs/{id}, /job/{id}, /roles/{id}, /openings/{id}, /positions/{id} URL shapes | Work in the Open careers boards |
 
 Unlike the HTML-scraping adapters, `bamboohr` and `workday` are structured-JSON

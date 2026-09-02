@@ -132,6 +132,7 @@ class SourceType(StrEnum):
     PYTHONJOBS = "pythonjobs"
     SIMPLYHIRED = "simplyhired"
     JOOBLE = "jooble"
+    ZIPRECRUITER = "ziprecruiter"
 
 
 class RunStatus(StrEnum):
