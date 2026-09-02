@@ -114,6 +114,7 @@ from autoapply_agent.adapters.workday import WorkdayAdapter
 from autoapply_agent.adapters.workingnomads import WorkingnomadsAdapter
 from autoapply_agent.adapters.workintheopen import WorkintheopenAdapter
 from autoapply_agent.adapters.yello import YelloAdapter
+from autoapply_agent.adapters.ziprecruiter import ZiprecruiterAdapter
 from autoapply_agent.adapters.zoho_recruit import ZohoRecruitAdapter
 from autoapply_agent.api.routes_health import router as health_router
 from autoapply_agent.api.routes_jobs import router as jobs_router
@@ -251,6 +252,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.PYTHONJOBS: PythonjobsAdapter(active_settings.http_user_agent),
                 SourceType.JOOBLE: JoobleAdapter(active_settings.http_user_agent),
                 SourceType.SIMPLYHIRED: SimplyhiredAdapter(active_settings.http_user_agent),
+                SourceType.ZIPRECRUITER: ZiprecruiterAdapter(active_settings.http_user_agent),
                 SourceType.RADANCY: RadancyAdapter(active_settings.http_user_agent),
                 SourceType.RECRUITCRM: RecruitCrmAdapter(active_settings.http_user_agent),
                 SourceType.RECRUITEE: RecruiteeAdapter(active_settings.http_user_agent),
