@@ -133,6 +133,7 @@ class SourceType(StrEnum):
     SIMPLYHIRED = "simplyhired"
     JOOBLE = "jooble"
     ZIPRECRUITER = "ziprecruiter"
+    REED = "reed"
 
 
 class RunStatus(StrEnum):

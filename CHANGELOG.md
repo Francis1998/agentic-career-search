@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `ReedAdapter` (`source_type: reed`): public Reed careers boards (www.reed.co.uk). Postings are recognised by /jobs/{id}, /job/{id}, /details/{id}, /vacancies/{id}, /listings/{id} URL shapes; board indexes, apply/login/signin/about/index steps, and navigation links are ignored. See ADR-184 and `docs/guides/REED_SOURCE_GUIDE.md`.
 - `ZiprecruiterAdapter` (`source_type: ziprecruiter`): public ZipRecruiter careers boards (www.ziprecruiter.com). Postings are recognised by /jobs/{id}, /job/{id}, /listings/{id}, /openings/{id}, /positions/{id} URL shapes; board indexes, apply/login/signin/about/index steps, and navigation links are ignored. See ADR-183 and `docs/guides/ZIPRECRUITER_SOURCE_GUIDE.md`.
 - `JoobleAdapter` (`source_type: jooble`): public Jooble careers boards (jooble.org). Postings are recognised by /jobs/{id}, /job/{id}, /vacancy/{id}, /vacancies/{id}, /listings/{id} URL shapes; board indexes, apply/login/signin/about/index steps, and navigation links are ignored. See ADR-182 and `docs/guides/JOOBLE_SOURCE_GUIDE.md`.
 - `SimplyhiredAdapter` (`source_type: simplyhired`): public SimplyHired careers boards (simplyhired.com). Postings are recognised by /job/{id}, /jobs/{id}, /listings/{id}, /positions/{id}, /openings/{id} URL shapes; board indexes, apply/login/signin/about/index steps, and navigation links are ignored. See ADR-181 and `docs/guides/SIMPLYHIRED_SOURCE_GUIDE.md`.
