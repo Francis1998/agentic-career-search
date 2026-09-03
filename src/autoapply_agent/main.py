@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from autoapply_agent.adapters.adp import AdpAdapter
 from autoapply_agent.adapters.aijobs import AijobsAdapter
+from autoapply_agent.adapters.angellist import AngellistAdapter
 from autoapply_agent.adapters.applicantpro import ApplicantProAdapter
 from autoapply_agent.adapters.applicantstack import ApplicantStackAdapter
 from autoapply_agent.adapters.applied import AppliedAdapter
@@ -259,6 +260,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.REED: ReedAdapter(active_settings.http_user_agent),
                 SourceType.THEMUSE: ThemuseAdapter(active_settings.http_user_agent),
                 SourceType.GLASSDOOR: GlassdoorAdapter(active_settings.http_user_agent),
+                SourceType.ANGELLIST: AngellistAdapter(active_settings.http_user_agent),
                 SourceType.RADANCY: RadancyAdapter(active_settings.http_user_agent),
                 SourceType.RECRUITCRM: RecruitCrmAdapter(active_settings.http_user_agent),
                 SourceType.RECRUITEE: RecruiteeAdapter(active_settings.http_user_agent),
