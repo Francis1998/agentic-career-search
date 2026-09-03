@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `AngellistAdapter` (`source_type: angellist`): public AngelList careers boards (angel.co). Postings are recognised by /jobs/{id}, /startups/{id}, /startup-jobs/{id}, /roles/{id}, /positions/{id} URL shapes; board indexes, apply/login/signin/about/index steps, and navigation links are ignored. See ADR-187 and `docs/guides/ANGELLIST_SOURCE_GUIDE.md`.
 - `GlassdoorAdapter` (`source_type: glassdoor`): public Glassdoor careers boards (www.glassdoor.com). Postings are recognised by /reviews/{id}, /jobs/{id}, /job-listing/{id}, /positions/{id}, /openings/{id} URL shapes; board indexes, apply/login/signin/about/index steps, and navigation links are ignored. See ADR-186 and `docs/guides/GLASSDOOR_SOURCE_GUIDE.md`.
 - `ThemuseAdapter` (`source_type: themuse`): public The Muse careers boards (www.themuse.com). Postings are recognised by /jobs/{id}, /job/{id}, /positions/{id}, /openings/{id}, /roles/{id} URL shapes; board indexes, apply/login/signin/about/index steps, and navigation links are ignored. See ADR-185 and `docs/guides/THEMUSE_SOURCE_GUIDE.md`.
 - `ReedAdapter` (`source_type: reed`): public Reed careers boards (www.reed.co.uk). Postings are recognised by /jobs/{id}, /job/{id}, /details/{id}, /vacancies/{id}, /listings/{id} URL shapes; board indexes, apply/login/signin/about/index steps, and navigation links are ignored. See ADR-184 and `docs/guides/REED_SOURCE_GUIDE.md`.

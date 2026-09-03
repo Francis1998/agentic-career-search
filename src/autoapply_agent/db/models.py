@@ -136,6 +136,7 @@ class SourceType(StrEnum):
     REED = "reed"
     THEMUSE = "themuse"
     GLASSDOOR = "glassdoor"
+    ANGELLIST = "angellist"
 
 
 class RunStatus(StrEnum):
