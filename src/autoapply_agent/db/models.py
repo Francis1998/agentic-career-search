@@ -135,6 +135,7 @@ class SourceType(StrEnum):
     ZIPRECRUITER = "ziprecruiter"
     REED = "reed"
     THEMUSE = "themuse"
+    GLASSDOOR = "glassdoor"
 
 
 class RunStatus(StrEnum):
