@@ -200,6 +200,7 @@ Each `SourceConfig` selects a source adapter by `source_type`:
 | `themuse` | `ThemuseAdapter` | Recognises TheMuse posting anchors by /jobs/{id}, /job/{id}, /positions/{id}, /openings/{id}, /roles/{id} URL shapes | TheMuse (www.themuse.com) careers boards |
 | `glassdoor` | `GlassdoorAdapter` | Recognises Glassdoor posting anchors by /reviews/{id}, /jobs/{id}, /job-listing/{id}, /positions/{id}, /openings/{id} URL shapes | Glassdoor (www.glassdoor.com) careers boards |
 | `angellist` | `AngellistAdapter` | Recognises AngelList posting anchors by /jobs/{id}, /startups/{id}, /startup-jobs/{id}, /roles/{id}, /positions/{id} URL shapes | AngelList (angel.co) careers boards |
+| `indeed` | `IndeedAdapter` | Recognises Indeed posting anchors by /viewjob/{id}, /jobs/{id}, /job/{id}, /rc/clk/{id}, /m/jobs/{id} URL shapes | Indeed (www.indeed.com) careers boards |
 | `workintheopen` | `WorkintheopenAdapter` | Recognises Work in the Open posting anchors by /jobs/{id}, /job/{id}, /roles/{id}, /openings/{id}, /positions/{id} URL shapes | Work in the Open careers boards |
 
 Unlike the HTML-scraping adapters, `bamboohr` and `workday` are structured-JSON
