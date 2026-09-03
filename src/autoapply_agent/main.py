@@ -54,6 +54,7 @@ from autoapply_agent.adapters.hireology import HireologyAdapter
 from autoapply_agent.adapters.hirevue import HireVueAdapter
 from autoapply_agent.adapters.homerun import HomerunAdapter
 from autoapply_agent.adapters.icims import IcimsAdapter
+from autoapply_agent.adapters.indeed import IndeedAdapter
 from autoapply_agent.adapters.jazzhr import JazzHrAdapter
 from autoapply_agent.adapters.jibe import JibeAdapter
 from autoapply_agent.adapters.jobadder import JobAdderAdapter
@@ -261,6 +262,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.THEMUSE: ThemuseAdapter(active_settings.http_user_agent),
                 SourceType.GLASSDOOR: GlassdoorAdapter(active_settings.http_user_agent),
                 SourceType.ANGELLIST: AngellistAdapter(active_settings.http_user_agent),
+                SourceType.INDEED: IndeedAdapter(active_settings.http_user_agent),
                 SourceType.RADANCY: RadancyAdapter(active_settings.http_user_agent),
                 SourceType.RECRUITCRM: RecruitCrmAdapter(active_settings.http_user_agent),
                 SourceType.RECRUITEE: RecruiteeAdapter(active_settings.http_user_agent),
