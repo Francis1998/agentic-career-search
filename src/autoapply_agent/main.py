@@ -24,6 +24,7 @@ from autoapply_agent.adapters.brassring import BrassringAdapter
 from autoapply_agent.adapters.breezyhr import BreezyHrAdapter
 from autoapply_agent.adapters.builtin import BuiltinAdapter
 from autoapply_agent.adapters.bullhorn import BullhornAdapter
+from autoapply_agent.adapters.careerbuilder import CareerbuilderAdapter
 from autoapply_agent.adapters.careerplug import CareerPlugAdapter
 from autoapply_agent.adapters.catsone import CatsoneAdapter
 from autoapply_agent.adapters.ceipal import CeipalAdapter
@@ -265,6 +266,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.ANGELLIST: AngellistAdapter(active_settings.http_user_agent),
                 SourceType.INDEED: IndeedAdapter(active_settings.http_user_agent),
                 SourceType.MONSTER: MonsterAdapter(active_settings.http_user_agent),
+                SourceType.CAREERBUILDER: CareerbuilderAdapter(active_settings.http_user_agent),
                 SourceType.RADANCY: RadancyAdapter(active_settings.http_user_agent),
                 SourceType.RECRUITCRM: RecruitCrmAdapter(active_settings.http_user_agent),
                 SourceType.RECRUITEE: RecruiteeAdapter(active_settings.http_user_agent),

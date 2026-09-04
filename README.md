@@ -201,6 +201,7 @@ Each `SourceConfig` selects a source adapter by `source_type`:
 | `glassdoor` | `GlassdoorAdapter` | Recognises Glassdoor posting anchors by /reviews/{id}, /jobs/{id}, /job-listing/{id}, /positions/{id}, /openings/{id} URL shapes | Glassdoor (www.glassdoor.com) careers boards |
 | `angellist` | `AngellistAdapter` | Recognises AngelList posting anchors by /jobs/{id}, /startups/{id}, /startup-jobs/{id}, /roles/{id}, /positions/{id} URL shapes | AngelList (angel.co) careers boards |
 | `indeed` | `IndeedAdapter` | Recognises Indeed posting anchors by /viewjob/{id}, /jobs/{id}, /job/{id}, /rc/clk/{id}, /m/jobs/{id} URL shapes | Indeed (www.indeed.com) careers boards |
+| `careerbuilder` | `CareerbuilderAdapter` | Recognises CareerBuilder posting anchors by /job/{id}, /jobs/{id}, /jobseeker/jobs/{id}, /share/job/{id}, /career-jobs/{id} URL shapes | CareerBuilder (www.careerbuilder.com) careers boards |
 | `monster` | `MonsterAdapter` | Recognises Monster posting anchors by /jobs/job/{id}, /job-openings/{id}, /jobs/{id}, /career/{id}, /m/job/{id} URL shapes | Monster (www.monster.com) careers boards |
 | `workintheopen` | `WorkintheopenAdapter` | Recognises Work in the Open posting anchors by /jobs/{id}, /job/{id}, /roles/{id}, /openings/{id}, /positions/{id} URL shapes | Work in the Open careers boards |
 

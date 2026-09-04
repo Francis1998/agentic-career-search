@@ -139,6 +139,7 @@ class SourceType(StrEnum):
     ANGELLIST = "angellist"
     INDEED = "indeed"
     MONSTER = "monster"
+    CAREERBUILDER = "careerbuilder"
 
 
 class RunStatus(StrEnum):
