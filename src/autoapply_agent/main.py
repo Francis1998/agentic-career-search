@@ -48,6 +48,7 @@ from autoapply_agent.adapters.freshteam import FreshteamAdapter
 from autoapply_agent.adapters.gem import GemAdapter
 from autoapply_agent.adapters.glassdoor import GlassdoorAdapter
 from autoapply_agent.adapters.greenhouse import GreenhouseAdapter
+from autoapply_agent.adapters.handshake import HandshakeAdapter
 from autoapply_agent.adapters.hibob import HibobAdapter
 from autoapply_agent.adapters.himalayas import HimalayasAdapter
 from autoapply_agent.adapters.hireez import HireezAdapter
@@ -267,6 +268,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.INDEED: IndeedAdapter(active_settings.http_user_agent),
                 SourceType.MONSTER: MonsterAdapter(active_settings.http_user_agent),
                 SourceType.CAREERBUILDER: CareerbuilderAdapter(active_settings.http_user_agent),
+                SourceType.HANDSHAKE: HandshakeAdapter(active_settings.http_user_agent),
                 SourceType.RADANCY: RadancyAdapter(active_settings.http_user_agent),
                 SourceType.RECRUITCRM: RecruitCrmAdapter(active_settings.http_user_agent),
                 SourceType.RECRUITEE: RecruiteeAdapter(active_settings.http_user_agent),
