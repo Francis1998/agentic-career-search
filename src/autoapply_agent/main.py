@@ -72,6 +72,7 @@ from autoapply_agent.adapters.levelsfyi import LevelsfyiAdapter
 from autoapply_agent.adapters.lever import LeverAdapter
 from autoapply_agent.adapters.loxo import LoxoAdapter
 from autoapply_agent.adapters.manatal import ManatalAdapter
+from autoapply_agent.adapters.monster import MonsterAdapter
 from autoapply_agent.adapters.nodesk import NodeskAdapter
 from autoapply_agent.adapters.nofluffjobs import NofluffjobsAdapter
 from autoapply_agent.adapters.oracle_taleo import OracleTaleoAdapter
@@ -263,6 +264,7 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
                 SourceType.GLASSDOOR: GlassdoorAdapter(active_settings.http_user_agent),
                 SourceType.ANGELLIST: AngellistAdapter(active_settings.http_user_agent),
                 SourceType.INDEED: IndeedAdapter(active_settings.http_user_agent),
+                SourceType.MONSTER: MonsterAdapter(active_settings.http_user_agent),
                 SourceType.RADANCY: RadancyAdapter(active_settings.http_user_agent),
                 SourceType.RECRUITCRM: RecruitCrmAdapter(active_settings.http_user_agent),
                 SourceType.RECRUITEE: RecruiteeAdapter(active_settings.http_user_agent),
