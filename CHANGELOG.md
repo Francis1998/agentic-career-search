@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `CareerbuilderAdapter` (`source_type: careerbuilder`): public CareerBuilder careers boards (www.careerbuilder.com). Postings are recognised by /job/{id}, /jobs/{id}, /jobseeker/jobs/{id}, /share/job/{id}, /career-jobs/{id} URL shapes; board indexes, apply/login/signin/about/index steps, and navigation links are ignored. See ADR-190 and `docs/guides/CAREERBUILDER_SOURCE_GUIDE.md`.
 - `MonsterAdapter` (`source_type: monster`): public Monster careers boards (www.monster.com). Postings are recognised by /jobs/job/{id}, /job-openings/{id}, /jobs/{id}, /career/{id}, /m/job/{id} URL shapes; board indexes, apply/login/signin/about/index steps, and navigation links are ignored. See ADR-189 and `docs/guides/MONSTER_SOURCE_GUIDE.md`.
 - `IndeedAdapter` (`source_type: indeed`): public Indeed careers boards (www.indeed.com). Postings are recognised by /viewjob/{id}, /jobs/{id}, /job/{id}, /rc/clk/{id}, /m/jobs/{id} URL shapes; board indexes, apply/login/signin/about/index steps, and navigation links are ignored. See ADR-188 and `docs/guides/INDEED_SOURCE_GUIDE.md`.
 - `AngellistAdapter` (`source_type: angellist`): public AngelList careers boards (angel.co). Postings are recognised by /jobs/{id}, /startups/{id}, /startup-jobs/{id}, /roles/{id}, /positions/{id} URL shapes; board indexes, apply/login/signin/about/index steps, and navigation links are ignored. See ADR-187 and `docs/guides/ANGELLIST_SOURCE_GUIDE.md`.
