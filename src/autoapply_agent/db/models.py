@@ -138,6 +138,7 @@ class SourceType(StrEnum):
     GLASSDOOR = "glassdoor"
     ANGELLIST = "angellist"
     INDEED = "indeed"
+    MONSTER = "monster"
 
 
 class RunStatus(StrEnum):
