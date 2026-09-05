@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `TotaljobsAdapter` (`source_type: totaljobs`): public Totaljobs careers boards (www.totaljobs.com). Postings are recognised by /job/{id}, /jobs/{id}, /job-vacancy/{id}, /details/{id}, /uk/job/{id} URL shapes; board indexes, apply/login/signin/about/index steps, and navigation links are ignored. See ADR-194 and `docs/guides/TOTALJOBS_SOURCE_GUIDE.md`.
 - `NaukriAdapter` (`source_type: naukri`): public Naukri careers boards (www.naukri.com). Postings are recognised by /job-listings/{id}, /jobdetail/{id}, /jobs/{id}, /job-description/{id}, /recruiters/job/{id} URL shapes; board indexes, apply/login/signin/about/index steps, and navigation links are ignored. See ADR-193 and `docs/guides/NAUKRI_SOURCE_GUIDE.md`.
 - `SeekAdapter` (`source_type: seek`): public Seek careers boards (www.seek.com.au). Postings are recognised by /job/{id}, /jobs/{id}, /listed-job/{id}, /jobsearch/{id}, /au/job/{id} URL shapes; board indexes, apply/login/signin/about/index steps, and navigation links are ignored. See ADR-192 and `docs/guides/SEEK_SOURCE_GUIDE.md`.
 - `HandshakeAdapter` (`source_type: handshake`): public Handshake careers boards (joinhandshake.com). Postings are recognised by /jobs/{id}, /job-search/{id}, /postings/{id}, /edu/jobs/{id}, /internship/{id} URL shapes; board indexes, apply/login/signin/about/index steps, and navigation links are ignored. See ADR-191 and `docs/guides/HANDSHAKE_SOURCE_GUIDE.md`.

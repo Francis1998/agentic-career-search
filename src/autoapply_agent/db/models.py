@@ -143,6 +143,7 @@ class SourceType(StrEnum):
     HANDSHAKE = "handshake"
     SEEK = "seek"
     NAUKRI = "naukri"
+    TOTALJOBS = "totaljobs"
 
 
 class RunStatus(StrEnum):
