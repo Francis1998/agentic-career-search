@@ -141,6 +141,7 @@ class SourceType(StrEnum):
     MONSTER = "monster"
     CAREERBUILDER = "careerbuilder"
     HANDSHAKE = "handshake"
+    SEEK = "seek"
 
 
 class RunStatus(StrEnum):
