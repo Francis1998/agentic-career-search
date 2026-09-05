@@ -142,6 +142,7 @@ class SourceType(StrEnum):
     CAREERBUILDER = "careerbuilder"
     HANDSHAKE = "handshake"
     SEEK = "seek"
+    NAUKRI = "naukri"
 
 
 class RunStatus(StrEnum):

@@ -204,6 +204,7 @@ Each `SourceConfig` selects a source adapter by `source_type`:
 | `careerbuilder` | `CareerbuilderAdapter` | Recognises CareerBuilder posting anchors by /job/{id}, /jobs/{id}, /jobseeker/jobs/{id}, /share/job/{id}, /career-jobs/{id} URL shapes | CareerBuilder (www.careerbuilder.com) careers boards |
 | `handshake` | `HandshakeAdapter` | Recognises Handshake posting anchors by /jobs/{id}, /job-search/{id}, /postings/{id}, /edu/jobs/{id}, /internship/{id} URL shapes | Handshake (joinhandshake.com) careers boards |
 | `seek` | `SeekAdapter` | Recognises Seek posting anchors by /job/{id}, /jobs/{id}, /listed-job/{id}, /jobsearch/{id}, /au/job/{id} URL shapes | Seek (www.seek.com.au) careers boards |
+| `naukri` | `NaukriAdapter` | Recognises Naukri posting anchors by /job-listings/{id}, /jobdetail/{id}, /jobs/{id}, /job-description/{id}, /recruiters/job/{id} URL shapes | Naukri (www.naukri.com) careers boards |
 | `monster` | `MonsterAdapter` | Recognises Monster posting anchors by /jobs/job/{id}, /job-openings/{id}, /jobs/{id}, /career/{id}, /m/job/{id} URL shapes | Monster (www.monster.com) careers boards |
 | `workintheopen` | `WorkintheopenAdapter` | Recognises Work in the Open posting anchors by /jobs/{id}, /job/{id}, /roles/{id}, /openings/{id}, /positions/{id} URL shapes | Work in the Open careers boards |
 
