@@ -16,6 +16,8 @@ AI-agent backend for autonomous job discovery, explainable decisions, and produc
 
 ![Phenom People Source Adapter](assets/demo/phenom-source.gif)
 
+![Priority Alert Webhook](assets/demo/priority-alert-webhook.gif)
+
 ## Why this exists
 
 Most job-search automation demos fail in real usage because they:
@@ -29,7 +31,8 @@ This project solves those issues with explicit agent engineering primitives:
 - state-machine run lifecycle and durable event log,
 - tool/adapters abstraction for external integrations,
 - safety controls (timeouts, bounded scope, cancellation),
-- optional LLM enrichment via multiple providers.
+- optional LLM enrichment via multiple providers,
+- optional fail-soft priority webhook alerts for high-tier decisions (see `docs/guides/PRIORITY_ALERT_WEBHOOK_GUIDE.md`).
 
 ## Real use cases (problem -> solution)
 

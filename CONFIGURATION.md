@@ -24,6 +24,9 @@ Configuration is environment-variable driven via `pydantic-settings`.
 | `OPENAI_API_KEY` | _empty_ | GPT / OpenAI-compatible API key |
 | `OPENAI_MODEL` | `gpt-5.5` | GPT model name |
 | `OPENAI_BASE_URL` | `https://api.openai.com/v1` | OpenAI-compatible base URL |
+| `PRIORITY_ALERT_WEBHOOK_ENABLED` | `false` | POST alerts when `priority_tier` is `high` |
+| `PRIORITY_ALERT_WEBHOOK_URL` | _empty_ | Slack/Discord/custom webhook URL |
+| `PRIORITY_ALERT_WEBHOOK_TIMEOUT_SECONDS` | `5.0` | Webhook HTTP timeout (fail-soft) |
 
 ## Recommended Profiles
 
