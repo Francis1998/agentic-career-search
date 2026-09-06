@@ -43,5 +43,18 @@ class Settings(BaseSettings):
     openai_model: str = Field(default="gpt-5.5", alias="OPENAI_MODEL")
     openai_base_url: str = Field(default="https://api.openai.com/v1", alias="OPENAI_BASE_URL")
 
+    priority_alert_webhook_enabled: bool = Field(
+        default=False,
+        alias="PRIORITY_ALERT_WEBHOOK_ENABLED",
+    )
+    priority_alert_webhook_url: str | None = Field(
+        default=None,
+        alias="PRIORITY_ALERT_WEBHOOK_URL",
+    )
+    priority_alert_webhook_timeout_seconds: float = Field(
+        default=5.0,
+        alias="PRIORITY_ALERT_WEBHOOK_TIMEOUT_SECONDS",
+    )
+
 
 settings = Settings()
