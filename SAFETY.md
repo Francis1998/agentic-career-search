@@ -26,4 +26,4 @@
 - Keep request rates conservative to avoid degrading target systems.
 - Treat agent decisions as assistive triage, not automatic truth.
 - Manually review high-priority postings before downstream actions.
-- Optional priority webhooks are fail-soft notifications only (no auto-apply).
+- Application drafts are HITL-only templates — never auto-submitted.
