@@ -26,4 +26,4 @@
 - Keep request rates conservative to avoid degrading target systems.
 - Treat agent decisions as assistive triage, not automatic truth.
 - Manually review high-priority postings before downstream actions.
-- Application drafts are HITL-only templates — never auto-submitted.
+- Skills-profile fit scores are assistive triage signals, not auto-apply triggers.

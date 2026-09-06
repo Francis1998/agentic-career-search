@@ -16,7 +16,7 @@ AI-agent backend for autonomous job discovery, explainable decisions, and produc
 
 ![Phenom People Source Adapter](assets/demo/phenom-source.gif)
 
-![Application Draft HITL](assets/demo/application-draft-hitl.gif)
+![Skills Profile Fit](assets/demo/skills-profile-fit.gif)
 
 ## Why this exists
 
@@ -32,7 +32,7 @@ This project solves those issues with explicit agent engineering primitives:
 - tool/adapters abstraction for external integrations,
 - safety controls (timeouts, bounded scope, cancellation),
 - optional LLM enrichment via multiple providers,
-- HITL application drafts (resume bullets + cover notes) with no auto-submit — see `docs/guides/APPLICATION_DRAFT_SERVICE_GUIDE.md`.
+- skills-profile fit scoring (`fit_score` 0–1 + matched/missing) — see `docs/guides/SKILLS_PROFILE_FIT_GUIDE.md`.
 
 ## Real use cases (problem -> solution)
 
