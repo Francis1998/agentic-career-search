@@ -24,6 +24,8 @@ AI-agent backend for autonomous job discovery, explainable decisions, and produc
 
 ![Salary Band Estimator](assets/demo/salary-band-estimator.gif)
 
+![Interview Prep Brief](assets/demo/interview-prep-brief.gif)
+
 ## Why this exists
 
 Most job-search automation demos fail in real usage because they:
@@ -42,6 +44,7 @@ This project solves those issues with explicit agent engineering primitives:
 - assistive USD salary-band estimates from title/location heuristics — see `docs/guides/SALARY_BAND_ESTIMATOR_GUIDE.md`,
 - HITL application drafts (resume bullets + cover notes) with no auto-submit — see `docs/guides/APPLICATION_DRAFT_SERVICE_GUIDE.md`,
 - CRM-lite application stage tracker (`saved→applied→interview→offer`) — see `docs/guides/APPLICATION_STAGE_TRACKER_GUIDE.md`,
+- interview-prep briefs (likely questions + STAR prompts + focus gaps) — see `docs/guides/INTERVIEW_PREP_BRIEF_GUIDE.md`,
 
 ## Real use cases (problem -> solution)
 
@@ -53,6 +56,7 @@ This project solves those issues with explicit agent engineering primitives:
 | Model/API outages break the entire flow | System appears unreliable | Graceful fallback preserves deterministic baseline output when LLM enrichment is unavailable |
 | Scraped jobs pile up without a pipeline CRM | Candidates lose track of where each role stands | `ApplicationStageTracker` enforces an auditable saved→offer stage machine |
 | Postings omit pay and scrapers leave empty salary fields | Candidates cannot triage roles by compensation | `SalaryBandEstimator` produces an auditable USD band from title/location heuristics |
+| Candidates discover roles but arrive unprepared for interviews | Weak signal conversion after outreach | `InterviewPrepBriefService` builds likely questions, STAR prompts, and focus gaps for human review |
 | Repo quality degrades over time | Contributors lose confidence | CI checks + daily automation loop maintain quality and push incremental improvements |
 
 ## LLM API integration (consumes model outputs)
