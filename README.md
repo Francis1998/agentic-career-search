@@ -22,6 +22,8 @@ AI-agent backend for autonomous job discovery, explainable decisions, and produc
 
 ![Application Stage Tracker](assets/demo/application-stage-tracker.gif)
 
+![Salary Band Estimator](assets/demo/salary-band-estimator.gif)
+
 ## Why this exists
 
 Most job-search automation demos fail in real usage because they:
@@ -37,6 +39,7 @@ This project solves those issues with explicit agent engineering primitives:
 - safety controls (timeouts, bounded scope, cancellation),
 - optional LLM enrichment via multiple providers,
 - skills-profile fit scoring (`fit_score` 0–1 + matched/missing) — see `docs/guides/SKILLS_PROFILE_FIT_GUIDE.md`,
+- assistive USD salary-band estimates from title/location heuristics — see `docs/guides/SALARY_BAND_ESTIMATOR_GUIDE.md`,
 - HITL application drafts (resume bullets + cover notes) with no auto-submit — see `docs/guides/APPLICATION_DRAFT_SERVICE_GUIDE.md`,
 - CRM-lite application stage tracker (`saved→applied→interview→offer`) — see `docs/guides/APPLICATION_STAGE_TRACKER_GUIDE.md`,
 
@@ -49,6 +52,7 @@ This project solves those issues with explicit agent engineering primitives:
 | Vendor lock-in around one model provider | High migration cost and brittle integrations | Configurable LLM enrichment supports GPT-5.5, Claude Sonnet 4.6, Gemini 3.x, and Kimi K2-style APIs |
 | Model/API outages break the entire flow | System appears unreliable | Graceful fallback preserves deterministic baseline output when LLM enrichment is unavailable |
 | Scraped jobs pile up without a pipeline CRM | Candidates lose track of where each role stands | `ApplicationStageTracker` enforces an auditable saved→offer stage machine |
+| Postings omit pay and scrapers leave empty salary fields | Candidates cannot triage roles by compensation | `SalaryBandEstimator` produces an auditable USD band from title/location heuristics |
 | Repo quality degrades over time | Contributors lose confidence | CI checks + daily automation loop maintain quality and push incremental improvements |
 
 ## LLM API integration (consumes model outputs)

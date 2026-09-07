@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `SalaryBandEstimator` (`services/salary_band.py`): deterministic USD low/mid/high band from seniority + location/remote heuristics (non-authoritative). Optional later narrative polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/SALARY_BAND_ESTIMATOR_GUIDE.md`.
 - `ApplicationStageTracker` (`services/application_stages.py`): in-memory CRM-lite pipeline (`saved→applied→interview→offer→accepted|rejected`) with explicit allowed transitions. Never auto-submits. Optional later note polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/APPLICATION_STAGE_TRACKER_GUIDE.md`.
 - `SkillsProfileFitScorer` (`services/skills_fit.py`): pure-function skills fit scorer returning `fit_score` in [0.0, 1.0] plus matched/missing skills (case-insensitive; no DB). Optional later LLM skill extraction via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/SKILLS_PROFILE_FIT_GUIDE.md`.
 - `ApplicationDraftService` (`services/application_drafts.py`): deterministic HITL draft generator for resume bullets + cover-note templates from job title/company/query. Never auto-submits (SAFETY-aligned). Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/APPLICATION_DRAFT_SERVICE_GUIDE.md`.
