@@ -27,4 +27,5 @@
 - Treat agent decisions as assistive triage, not automatic truth.
 - Manually review high-priority postings before downstream actions.
 - Skills-profile fit scores are assistive triage signals, not auto-apply triggers.
+- Salary-band estimates are assistive triage signals, not offers, market truth, or legal advice.
 - Application stage tracking is local pipeline state only; it never submits applications or contacts employers.
