@@ -25,7 +25,7 @@ result = score_skills_fit(
     ["Python", "Kubernetes", "SQL"],
     "Senior Python engineer with SQL and cloud experience",
 )
-print(result.fit_score)       # e.g. 0.6667
+print(result.fit_score)  # e.g. 0.6667
 print(result.matched_skills)  # ["Python", "SQL"]
 print(result.missing_skills)  # ["Kubernetes"]
 
