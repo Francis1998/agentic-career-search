@@ -30,6 +30,8 @@ AI-agent backend for autonomous job discovery, explainable decisions, and produc
 
 ![ATS Keyword Coverage](assets/demo/ats-keyword-coverage.gif)
 
+![Company Research Brief](assets/demo/company-research-brief.gif)
+
 ## Why this exists
 
 Most job-search automation demos fail in real usage because they:
@@ -51,6 +53,7 @@ This project solves those issues with explicit agent engineering primitives:
 - interview-prep briefs (likely questions + STAR prompts + focus gaps) — see `docs/guides/INTERVIEW_PREP_BRIEF_GUIDE.md`,
 - cross-source fuzzy dedup (title+company beyond URL) — see `docs/guides/CROSS_SOURCE_JOB_DEDUP_GUIDE.md`,
 - ATS keyword coverage (resume text ↔ JD keywords) — see `docs/guides/ATS_KEYWORD_COVERAGE_GUIDE.md`,
+- company research briefs (talking points + JD signals, HITL) — see `docs/guides/COMPANY_RESEARCH_BRIEF_GUIDE.md`,
 
 ## Real use cases (problem -> solution)
 
@@ -65,6 +68,7 @@ This project solves those issues with explicit agent engineering primitives:
 | Candidates discover roles but arrive unprepared for interviews | Weak signal conversion after outreach | `InterviewPrepBriefService` builds likely questions, STAR prompts, and focus gaps for human review |
 | Same role appears on Indeed + LinkedIn with different URLs | Duplicate noise in triage and CRM | `CrossSourceJobDeduper` clusters fuzzy title+company near-duplicates after URL pass |
 | Resume free text is not scored against JD keywords | ATS rejection risk is opaque | `AtsKeywordCoverageScorer` reports coverage + present/missing JD keywords |
+| Candidates research companies ad hoc before outreach | Inconsistent talking points and invented facts | `CompanyResearchBriefService` builds offline HITL briefs from JD signals |
 | Repo quality degrades over time | Contributors lose confidence | CI checks + daily automation loop maintain quality and push incremental improvements |
 
 ## LLM API integration (consumes model outputs)
