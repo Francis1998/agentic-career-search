@@ -26,6 +26,8 @@ AI-agent backend for autonomous job discovery, explainable decisions, and produc
 
 ![Interview Prep Brief](assets/demo/interview-prep-brief.gif)
 
+![Cross-Source Job Dedup](assets/demo/cross-source-job-dedup.gif)
+
 ## Why this exists
 
 Most job-search automation demos fail in real usage because they:
@@ -45,6 +47,7 @@ This project solves those issues with explicit agent engineering primitives:
 - HITL application drafts (resume bullets + cover notes) with no auto-submit — see `docs/guides/APPLICATION_DRAFT_SERVICE_GUIDE.md`,
 - CRM-lite application stage tracker (`saved→applied→interview→offer`) — see `docs/guides/APPLICATION_STAGE_TRACKER_GUIDE.md`,
 - interview-prep briefs (likely questions + STAR prompts + focus gaps) — see `docs/guides/INTERVIEW_PREP_BRIEF_GUIDE.md`,
+- cross-source fuzzy dedup (title+company beyond URL) — see `docs/guides/CROSS_SOURCE_JOB_DEDUP_GUIDE.md`,
 
 ## Real use cases (problem -> solution)
 
@@ -57,6 +60,7 @@ This project solves those issues with explicit agent engineering primitives:
 | Scraped jobs pile up without a pipeline CRM | Candidates lose track of where each role stands | `ApplicationStageTracker` enforces an auditable saved→offer stage machine |
 | Postings omit pay and scrapers leave empty salary fields | Candidates cannot triage roles by compensation | `SalaryBandEstimator` produces an auditable USD band from title/location heuristics |
 | Candidates discover roles but arrive unprepared for interviews | Weak signal conversion after outreach | `InterviewPrepBriefService` builds likely questions, STAR prompts, and focus gaps for human review |
+| Same role appears on Indeed + LinkedIn with different URLs | Duplicate noise in triage and CRM | `CrossSourceJobDeduper` clusters fuzzy title+company near-duplicates after URL pass |
 | Repo quality degrades over time | Contributors lose confidence | CI checks + daily automation loop maintain quality and push incremental improvements |
 
 ## LLM API integration (consumes model outputs)
