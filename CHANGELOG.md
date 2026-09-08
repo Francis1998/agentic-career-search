@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `CompanyResearchBriefService` (`services/company_research.py`): deterministic offline HITL company briefs (talking points, JD signals, open questions). Never auto-outreach. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/COMPANY_RESEARCH_BRIEF_GUIDE.md`.
 - `AtsKeywordCoverageScorer` (`services/ats_keyword_coverage.py`): ATS-style resume↔JD keyword coverage (distinct from skills-list fit). Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/ATS_KEYWORD_COVERAGE_GUIDE.md`.
 - `CrossSourceJobDeduper` (`services/cross_source_dedup.py`): fuzzy title+company clustering after exact-URL pass for cross-board near-duplicates (stdlib ``difflib``). Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/CROSS_SOURCE_JOB_DEDUP_GUIDE.md`.
 - `InterviewPrepBriefService` (`services/interview_prep.py`): deterministic HITL interview-prep briefs with likely questions, STAR prompts, and focus gaps from job title/company/description. Never contacts recruiters. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/INTERVIEW_PREP_BRIEF_GUIDE.md`.
