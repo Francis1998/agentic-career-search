@@ -28,6 +28,8 @@ AI-agent backend for autonomous job discovery, explainable decisions, and produc
 
 ![Cross-Source Job Dedup](assets/demo/cross-source-job-dedup.gif)
 
+![ATS Keyword Coverage](assets/demo/ats-keyword-coverage.gif)
+
 ## Why this exists
 
 Most job-search automation demos fail in real usage because they:
@@ -48,6 +50,7 @@ This project solves those issues with explicit agent engineering primitives:
 - CRM-lite application stage tracker (`saved→applied→interview→offer`) — see `docs/guides/APPLICATION_STAGE_TRACKER_GUIDE.md`,
 - interview-prep briefs (likely questions + STAR prompts + focus gaps) — see `docs/guides/INTERVIEW_PREP_BRIEF_GUIDE.md`,
 - cross-source fuzzy dedup (title+company beyond URL) — see `docs/guides/CROSS_SOURCE_JOB_DEDUP_GUIDE.md`,
+- ATS keyword coverage (resume text ↔ JD keywords) — see `docs/guides/ATS_KEYWORD_COVERAGE_GUIDE.md`,
 
 ## Real use cases (problem -> solution)
 
@@ -61,6 +64,7 @@ This project solves those issues with explicit agent engineering primitives:
 | Postings omit pay and scrapers leave empty salary fields | Candidates cannot triage roles by compensation | `SalaryBandEstimator` produces an auditable USD band from title/location heuristics |
 | Candidates discover roles but arrive unprepared for interviews | Weak signal conversion after outreach | `InterviewPrepBriefService` builds likely questions, STAR prompts, and focus gaps for human review |
 | Same role appears on Indeed + LinkedIn with different URLs | Duplicate noise in triage and CRM | `CrossSourceJobDeduper` clusters fuzzy title+company near-duplicates after URL pass |
+| Resume free text is not scored against JD keywords | ATS rejection risk is opaque | `AtsKeywordCoverageScorer` reports coverage + present/missing JD keywords |
 | Repo quality degrades over time | Contributors lose confidence | CI checks + daily automation loop maintain quality and push incremental improvements |
 
 ## LLM API integration (consumes model outputs)
