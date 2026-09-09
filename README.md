@@ -32,6 +32,8 @@ AI-agent backend for autonomous job discovery, explainable decisions, and produc
 
 ![Company Research Brief](assets/demo/company-research-brief.gif)
 
+![Recruiter Outreach Draft](assets/demo/recruiter-outreach-draft.gif)
+
 ## Why this exists
 
 Most job-search automation demos fail in real usage because they:
@@ -54,6 +56,7 @@ This project solves those issues with explicit agent engineering primitives:
 - cross-source fuzzy dedup (title+company beyond URL) — see `docs/guides/CROSS_SOURCE_JOB_DEDUP_GUIDE.md`,
 - ATS keyword coverage (resume text ↔ JD keywords) — see `docs/guides/ATS_KEYWORD_COVERAGE_GUIDE.md`,
 - company research briefs (talking points + JD signals, HITL) — see `docs/guides/COMPANY_RESEARCH_BRIEF_GUIDE.md`,
+- HITL recruiter outreach drafts (email + LinkedIn DM, never auto-send) — see `docs/guides/RECRUITER_OUTREACH_DRAFT_GUIDE.md`,
 
 ## Real use cases (problem -> solution)
 
@@ -69,6 +72,7 @@ This project solves those issues with explicit agent engineering primitives:
 | Same role appears on Indeed + LinkedIn with different URLs | Duplicate noise in triage and CRM | `CrossSourceJobDeduper` clusters fuzzy title+company near-duplicates after URL pass |
 | Resume free text is not scored against JD keywords | ATS rejection risk is opaque | `AtsKeywordCoverageScorer` reports coverage + present/missing JD keywords |
 | Candidates research companies ad hoc before outreach | Inconsistent talking points and invented facts | `CompanyResearchBriefService` builds offline HITL briefs from JD signals |
+| Outreach templates and Easy Apply auto-send without review | Accidental spam and irreversible messages | `RecruiterOutreachDraftService` builds email/LinkedIn drafts that always require human review |
 | Repo quality degrades over time | Contributors lose confidence | CI checks + daily automation loop maintain quality and push incremental improvements |
 
 ## LLM API integration (consumes model outputs)
