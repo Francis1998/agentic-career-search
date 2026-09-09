@@ -98,6 +98,4 @@ def test_blank_company_raises() -> None:
     """Blank company on an offer raises ValueError."""
 
     with pytest.raises(ValueError, match="company"):
-        OfferCompareMatrix().compare(
-            [{"company": "  ", "base": 100, "bonus": 0, "equity": 0}]
-        )
+        OfferCompareMatrix().compare([{"company": "  ", "base": 100, "bonus": 0, "equity": 0}])
