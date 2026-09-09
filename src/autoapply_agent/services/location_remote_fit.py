@@ -97,8 +97,7 @@ class LocationRemoteFitScorer:
             return LocationRemoteFitResult(
                 fit_score=0.0,
                 reasons=[
-                    "Blank inputs: no candidate locations, posting location, "
-                    "or remote policy."
+                    "Blank inputs: no candidate locations, posting location, or remote policy."
                 ],
             )
 
