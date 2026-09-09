@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `OfferCompareMatrix` (`services/offer_compare.py`): offline multi-offer side-by-side ranking by cash+equity heuristic (never auto-accepts). Optional later narrative polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/OFFER_COMPARE_MATRIX_GUIDE.md`.
 - `RecruiterOutreachDraftService` (`services/recruiter_outreach.py`): HITL email + LinkedIn DM outreach drafts (never auto-send; no network). Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/RECRUITER_OUTREACH_DRAFT_GUIDE.md`.
 - `CompanyResearchBriefService` (`services/company_research.py`): deterministic offline HITL company briefs (talking points, JD signals, open questions). Never auto-outreach. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/COMPANY_RESEARCH_BRIEF_GUIDE.md`.
 - `AtsKeywordCoverageScorer` (`services/ats_keyword_coverage.py`): ATS-style resume↔JD keyword coverage (distinct from skills-list fit). Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/ATS_KEYWORD_COVERAGE_GUIDE.md`.
