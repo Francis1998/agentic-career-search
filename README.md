@@ -38,6 +38,8 @@ AI-agent backend for autonomous job discovery, explainable decisions, and produc
 
 ![Negotiation Talking Points](assets/demo/negotiation-talking-points.gif)
 
+![Interview Feedback Synth](assets/demo/interview-feedback-synth.gif)
+
 ## Why this exists
 
 Most job-search automation demos fail in real usage because they:
@@ -63,6 +65,7 @@ This project solves those issues with explicit agent engineering primitives:
 - HITL recruiter outreach drafts (email + LinkedIn DM, never auto-send) — see `docs/guides/RECRUITER_OUTREACH_DRAFT_GUIDE.md`,
 - HITL referral intro drafts (warm email + LinkedIn, never auto-send) — see `docs/guides/REFERRAL_INTRO_DRAFT_GUIDE.md`,
 - negotiation talking points (total-comp counters, HITL) — see `docs/guides/NEGOTIATION_TALKING_POINTS_GUIDE.md`,
+- post-interview debrief briefs (strengths + gaps + follow-ups, HITL) — see `docs/guides/INTERVIEW_FEEDBACK_SYNTH_GUIDE.md`,
 
 ## Real use cases (problem -> solution)
 
@@ -84,6 +87,7 @@ This project solves those issues with explicit agent engineering primitives:
 | Outreach templates and Easy Apply auto-send without review | Accidental spam and irreversible messages | `RecruiterOutreachDraftService` builds email/LinkedIn drafts that always require human review |
 | Warm intros are ad-hoc or auto-sent via InMail templates | Burned connectors and irreversible messages | `ReferralIntroDraftService` builds email/LinkedIn intro drafts that always require human review |
 | Counter-offers are improvised from Levels.fyi / Blind threads | Inconsistent anchors and accidental over-ask | `NegotiationTalkingPointsService` builds HITL talking points from current vs target total-comp |
+| Interview notes stay unstructured after loops | Weak conversion and lost signal | `InterviewFeedbackSynthesizer` builds HITL debriefs with strengths/gaps/follow-ups |
 | Repo quality degrades over time | Contributors lose confidence | CI checks + daily automation loop maintain quality and push incremental improvements |
 
 ## LLM API integration (consumes model outputs)
