@@ -22,11 +22,13 @@ cross-source cluster primitive. This module closes that gap for agentic triage.
 from dataclasses import dataclass
 from autoapply_agent.services.cross_source_dedup import CrossSourceJobDeduper
 
+
 @dataclass(frozen=True)
 class Job:
     title: str
     company: str | None
     url: str
+
 
 jobs = [
     Job("Senior SWE", "Acme Inc", "https://indeed.com/a"),
@@ -35,9 +37,9 @@ jobs = [
 ]
 deduper = CrossSourceJobDeduper(threshold=0.85)
 result = deduper.dedupe(jobs)
-print(result.kept_indices)   # (0, 2)
+print(result.kept_indices)  # (0, 2)
 print(result.dropped_count)  # 1
-kept = deduper.keep(jobs)    # canonical Job objects
+kept = deduper.keep(jobs)  # canonical Job objects
 ```
 
 ## Distinct from URL-only worker dedup
