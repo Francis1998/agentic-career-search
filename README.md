@@ -34,6 +34,8 @@ AI-agent backend for autonomous job discovery, explainable decisions, and produc
 
 ![Recruiter Outreach Draft](assets/demo/recruiter-outreach-draft.gif)
 
+![Referral Intro Draft](assets/demo/referral-intro-draft.gif)
+
 ## Why this exists
 
 Most job-search automation demos fail in real usage because they:
@@ -57,6 +59,7 @@ This project solves those issues with explicit agent engineering primitives:
 - ATS keyword coverage (resume text ↔ JD keywords) — see `docs/guides/ATS_KEYWORD_COVERAGE_GUIDE.md`,
 - company research briefs (talking points + JD signals, HITL) — see `docs/guides/COMPANY_RESEARCH_BRIEF_GUIDE.md`,
 - HITL recruiter outreach drafts (email + LinkedIn DM, never auto-send) — see `docs/guides/RECRUITER_OUTREACH_DRAFT_GUIDE.md`,
+- HITL referral intro drafts (warm email + LinkedIn, never auto-send) — see `docs/guides/REFERRAL_INTRO_DRAFT_GUIDE.md`,
 
 ## Real use cases (problem -> solution)
 
@@ -76,6 +79,7 @@ This project solves those issues with explicit agent engineering primitives:
 | RemoteOK-style location prefs are board-UI-only | Hard to reuse geo/remote filters in agent triage | `LocationRemoteFitScorer` scores candidate prefs vs posting location/policy |
 ![Offer Compare Matrix](assets/demo/offer-compare-matrix.gif)
 | Outreach templates and Easy Apply auto-send without review | Accidental spam and irreversible messages | `RecruiterOutreachDraftService` builds email/LinkedIn drafts that always require human review |
+| Warm intros are ad-hoc or auto-sent via InMail templates | Burned connectors and irreversible messages | `ReferralIntroDraftService` builds email/LinkedIn intro drafts that always require human review |
 | Repo quality degrades over time | Contributors lose confidence | CI checks + daily automation loop maintain quality and push incremental improvements |
 
 ## LLM API integration (consumes model outputs)

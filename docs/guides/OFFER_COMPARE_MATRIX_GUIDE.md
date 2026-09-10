@@ -23,10 +23,22 @@ from autoapply_agent.services.offer_compare import OfferCompareMatrix
 
 result = OfferCompareMatrix().compare(
     [
-        {"company": "Acme", "base": 150_000, "bonus": 10_000, "equity": 20_000,
-         "remote": "hybrid", "notes": "good team"},
-        {"company": "Globex", "base": 140_000, "bonus": 5_000, "equity": 80_000,
-         "remote": "remote", "notes": ""},
+        {
+            "company": "Acme",
+            "base": 150_000,
+            "bonus": 10_000,
+            "equity": 20_000,
+            "remote": "hybrid",
+            "notes": "good team",
+        },
+        {
+            "company": "Globex",
+            "base": 140_000,
+            "bonus": 5_000,
+            "equity": 80_000,
+            "remote": "remote",
+            "notes": "",
+        },
     ]
 )
 assert result.auto_accept is False
