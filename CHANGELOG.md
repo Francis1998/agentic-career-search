@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `OfferDeadlineTracker` (`services/offer_deadline.py`): offline offer deadline countdown + HITL reminders (never auto-declines). Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/OFFER_DEADLINE_TRACKER_GUIDE.md`.
 - `InterviewFeedbackSynthesizer` (`services/interview_feedback.py`): offline post-interview notes → HITL debrief (strengths/gaps/follow-ups; never contacts recruiters). Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/INTERVIEW_FEEDBACK_SYNTH_GUIDE.md`.
 - `NegotiationTalkingPointsService` (`services/negotiation_talking.py`): offline total-comp counter-offer talking points (never auto-sends). Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/NEGOTIATION_TALKING_POINTS_GUIDE.md`.
 - `ReferralIntroDraftService` (`services/referral_intro.py`): HITL warm-intro email + LinkedIn drafts (never auto-send; no network). Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/REFERRAL_INTRO_DRAFT_GUIDE.md`.
