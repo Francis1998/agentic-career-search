@@ -42,6 +42,8 @@ AI-agent backend for autonomous job discovery, explainable decisions, and produc
 
 ![Offer Deadline Tracker](assets/demo/offer-deadline-tracker.gif)
 
+![Portfolio Project Matcher](assets/demo/portfolio-project-matcher.gif)
+
 ## Why this exists
 
 Most job-search automation demos fail in real usage because they:
@@ -69,6 +71,7 @@ This project solves those issues with explicit agent engineering primitives:
 - negotiation talking points (total-comp counters, HITL) — see `docs/guides/NEGOTIATION_TALKING_POINTS_GUIDE.md`,
 - post-interview debrief briefs (strengths + gaps + follow-ups, HITL) — see `docs/guides/INTERVIEW_FEEDBACK_SYNTH_GUIDE.md`,
 - offer deadline countdowns + HITL reminders (never auto-decline) — see `docs/guides/OFFER_DEADLINE_TRACKER_GUIDE.md`,
+- portfolio bullet ↔ JD theme matching (HITL token overlap) — see `docs/guides/PORTFOLIO_PROJECT_MATCHER_GUIDE.md`,
 
 ## Real use cases (problem -> solution)
 
@@ -92,6 +95,7 @@ This project solves those issues with explicit agent engineering primitives:
 | Counter-offers are improvised from Levels.fyi / Blind threads | Inconsistent anchors and accidental over-ask | `NegotiationTalkingPointsService` builds HITL talking points from current vs target total-comp |
 | Interview notes stay unstructured after loops | Weak conversion and lost signal | `InterviewFeedbackSynthesizer` builds HITL debriefs with strengths/gaps/follow-ups |
 | Offer deadlines are tracked only in Teal/Huntr without local countdown | Missed responses or accidental auto-decline risk | `OfferDeadlineTracker` computes offline urgency + HITL reminders and never auto-declines |
+| Portfolio bullets are hand-aligned to JD themes in Teal/Jobscan UIs | Hard to reuse theme mapping in agentic triage | `PortfolioProjectMatcher` scores offline bullet↔theme token overlap for HITL review |
 | Repo quality degrades over time | Contributors lose confidence | CI checks + daily automation loop maintain quality and push incremental improvements |
 
 ## LLM API integration (consumes model outputs)
