@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `InterviewScheduleConflictGuard` (`services/interview_schedule_conflict.py`): offline interview slot overlap advisory (HITL; never writes calendars). Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/INTERVIEW_SCHEDULE_CONFLICT_GUARD_GUIDE.md`.
 - `PortfolioProjectMatcher` (`services/portfolio_matcher.py`): offline portfolio bullet ↔ JD theme token-overlap matching (HITL; distinct from ATS keyword coverage / skills fit). Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/PORTFOLIO_PROJECT_MATCHER_GUIDE.md`.
 - `OfferDeadlineTracker` (`services/offer_deadline.py`): offline offer deadline countdown + HITL reminders (never auto-declines). Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/OFFER_DEADLINE_TRACKER_GUIDE.md`.
 - `InterviewFeedbackSynthesizer` (`services/interview_feedback.py`): offline post-interview notes → HITL debrief (strengths/gaps/follow-ups; never contacts recruiters). Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/INTERVIEW_FEEDBACK_SYNTH_GUIDE.md`.
