@@ -40,6 +40,8 @@ AI-agent backend for autonomous job discovery, explainable decisions, and produc
 
 ![Interview Feedback Synth](assets/demo/interview-feedback-synth.gif)
 
+![Offer Deadline Tracker](assets/demo/offer-deadline-tracker.gif)
+
 ## Why this exists
 
 Most job-search automation demos fail in real usage because they:
@@ -66,6 +68,7 @@ This project solves those issues with explicit agent engineering primitives:
 - HITL referral intro drafts (warm email + LinkedIn, never auto-send) — see `docs/guides/REFERRAL_INTRO_DRAFT_GUIDE.md`,
 - negotiation talking points (total-comp counters, HITL) — see `docs/guides/NEGOTIATION_TALKING_POINTS_GUIDE.md`,
 - post-interview debrief briefs (strengths + gaps + follow-ups, HITL) — see `docs/guides/INTERVIEW_FEEDBACK_SYNTH_GUIDE.md`,
+- offer deadline countdowns + HITL reminders (never auto-decline) — see `docs/guides/OFFER_DEADLINE_TRACKER_GUIDE.md`,
 
 ## Real use cases (problem -> solution)
 
@@ -88,6 +91,7 @@ This project solves those issues with explicit agent engineering primitives:
 | Warm intros are ad-hoc or auto-sent via InMail templates | Burned connectors and irreversible messages | `ReferralIntroDraftService` builds email/LinkedIn intro drafts that always require human review |
 | Counter-offers are improvised from Levels.fyi / Blind threads | Inconsistent anchors and accidental over-ask | `NegotiationTalkingPointsService` builds HITL talking points from current vs target total-comp |
 | Interview notes stay unstructured after loops | Weak conversion and lost signal | `InterviewFeedbackSynthesizer` builds HITL debriefs with strengths/gaps/follow-ups |
+| Offer deadlines are tracked only in Teal/Huntr without local countdown | Missed responses or accidental auto-decline risk | `OfferDeadlineTracker` computes offline urgency + HITL reminders and never auto-declines |
 | Repo quality degrades over time | Contributors lose confidence | CI checks + daily automation loop maintain quality and push incremental improvements |
 
 ## LLM API integration (consumes model outputs)
