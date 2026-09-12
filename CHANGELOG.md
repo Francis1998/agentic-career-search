@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `WeeklyApplicationPaceAdvisor` (`services/weekly_pace.py`): offline weekly application pace bands + HITL guidance (never auto-submits). Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/WEEKLY_APPLICATION_PACE_ADVISOR_GUIDE.md`.
 - `ApplicationGhostingDetector` (`services/application_ghosting.py`): offline stalled-application urgency + HITL follow-up suggestions (never auto-nudges). Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/APPLICATION_GHOSTING_DETECTOR_GUIDE.md`.
 - `ThankYouNoteOutlinePlanner` (`services/thank_you_outline.py`): offline post-interview thank-you email/LinkedIn outlines (HITL; never auto-sends). Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/THANK_YOU_NOTE_OUTLINE_PLANNER_GUIDE.md`.
 - `InterviewScheduleConflictGuard` (`services/interview_schedule_conflict.py`): offline interview slot overlap advisory (HITL; never writes calendars). Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/INTERVIEW_SCHEDULE_CONFLICT_GUARD_GUIDE.md`.

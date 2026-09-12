@@ -50,6 +50,8 @@ AI-agent backend for autonomous job discovery, explainable decisions, and produc
 
 ![Application Ghosting Detector](assets/demo/application-ghosting-detector.gif)
 
+![Weekly Application Pace Advisor](assets/demo/weekly-application-pace-advisor.gif)
+
 ## Why this exists
 
 Most job-search automation demos fail in real usage because they:
@@ -106,6 +108,7 @@ This project solves those issues with explicit agent engineering primitives:
 | Teal/Huntr calendar sync auto-writes interview events | Accidental double-booking without local HITL review | `InterviewScheduleConflictGuard` detects offline overlaps and never mutates calendars |
 | Teal/Careerflow thank-you templates encourage one-click sends | Accidental recruiter spam after interviews | `ThankYouNoteOutlinePlanner` builds offline email/LinkedIn outlines and never auto-sends |
 | Teal/Huntr show quiet apps only inside proprietary CRM UIs | Follow-ups are ad-hoc or accidentally auto-sent | `ApplicationGhostingDetector` computes offline stall urgency + HITL suggestions and never auto-nudges |
+| Teal Insights / Huntr analytics keep apply-volume coaching in closed UIs | Burnout from spray-and-pray without local pace bands | `WeeklyApplicationPaceAdvisor` compares planned vs target apps offline and never auto-submits |
 | Repo quality degrades over time | Contributors lose confidence | CI checks + daily automation loop maintain quality and push incremental improvements |
 
 ## LLM API integration (consumes model outputs)
