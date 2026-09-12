@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `ThankYouNoteOutlinePlanner` (`services/thank_you_outline.py`): offline post-interview thank-you email/LinkedIn outlines (HITL; never auto-sends). Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/THANK_YOU_NOTE_OUTLINE_PLANNER_GUIDE.md`.
 - `InterviewScheduleConflictGuard` (`services/interview_schedule_conflict.py`): offline interview slot overlap advisory (HITL; never writes calendars). Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/INTERVIEW_SCHEDULE_CONFLICT_GUARD_GUIDE.md`.
 - `PortfolioProjectMatcher` (`services/portfolio_matcher.py`): offline portfolio bullet ↔ JD theme token-overlap matching (HITL; distinct from ATS keyword coverage / skills fit). Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/PORTFOLIO_PROJECT_MATCHER_GUIDE.md`.
 - `OfferDeadlineTracker` (`services/offer_deadline.py`): offline offer deadline countdown + HITL reminders (never auto-declines). Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/OFFER_DEADLINE_TRACKER_GUIDE.md`.

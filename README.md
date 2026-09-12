@@ -46,6 +46,8 @@ AI-agent backend for autonomous job discovery, explainable decisions, and produc
 
 ![Interview Schedule Conflict Guard](assets/demo/interview-schedule-conflict-guard.gif)
 
+![Thank-You Note Outline Planner](assets/demo/thank-you-note-outline-planner.gif)
+
 ## Why this exists
 
 Most job-search automation demos fail in real usage because they:
@@ -100,6 +102,7 @@ This project solves those issues with explicit agent engineering primitives:
 | Offer deadlines are tracked only in Teal/Huntr without local countdown | Missed responses or accidental auto-decline risk | `OfferDeadlineTracker` computes offline urgency + HITL reminders and never auto-declines |
 | Portfolio bullets are hand-aligned to JD themes in Teal/Jobscan UIs | Hard to reuse theme mapping in agentic triage | `PortfolioProjectMatcher` scores offline bullet↔theme token overlap for HITL review |
 | Teal/Huntr calendar sync auto-writes interview events | Accidental double-booking without local HITL review | `InterviewScheduleConflictGuard` detects offline overlaps and never mutates calendars |
+| Teal/Careerflow thank-you templates encourage one-click sends | Accidental recruiter spam after interviews | `ThankYouNoteOutlinePlanner` builds offline email/LinkedIn outlines and never auto-sends |
 | Repo quality degrades over time | Contributors lose confidence | CI checks + daily automation loop maintain quality and push incremental improvements |
 
 ## LLM API integration (consumes model outputs)
