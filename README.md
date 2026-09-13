@@ -109,6 +109,7 @@ This project solves those issues with explicit agent engineering primitives:
 | Teal/Careerflow thank-you templates encourage one-click sends | Accidental recruiter spam after interviews | `ThankYouNoteOutlinePlanner` builds offline email/LinkedIn outlines and never auto-sends |
 | Teal/Huntr show quiet apps only inside proprietary CRM UIs | Follow-ups are ad-hoc or accidentally auto-sent | `ApplicationGhostingDetector` computes offline stall urgency + HITL suggestions and never auto-nudges |
 | Teal Insights / Huntr analytics keep apply-volume coaching in closed UIs | Burnout from spray-and-pray without local pace bands | `WeeklyApplicationPaceAdvisor` compares planned vs target apps offline and never auto-submits |
+| Teal/Simplify keep skill learning plans inside closed dashboards | Fit scores alone do not produce a practice path | `SkillGapLearningPathPlanner` emits ordered HITL milestones from have vs required skills and never enrolls |
 | Teal/Huntr/Simplify hide posting age inside proprietary boards | Candidates waste time on stale evergreen listings | `JobPostingFreshnessScorer` bands age_days offline (fresh/aging/stale/expired) and never auto-applies |
 | Repo quality degrades over time | Contributors lose confidence | CI checks + daily automation loop maintain quality and push incremental improvements |
 
