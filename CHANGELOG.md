@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `SkillGapLearningPathPlanner` (`services/skill_gap_learning.py`): offline ordered learning milestones for missing skills (HITL; never enrolls courses). Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/SKILL_GAP_LEARNING_PATH_PLANNER_GUIDE.md`.
 - `JobPostingFreshnessScorer` (`services/job_freshness.py`): offline job posting freshness bands from age_days (HITL; never auto-applies). Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/JOB_POSTING_FRESHNESS_SCORER_GUIDE.md`.
 - `WeeklyApplicationPaceAdvisor` (`services/weekly_pace.py`): offline weekly application pace bands + HITL guidance (never auto-submits). Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/WEEKLY_APPLICATION_PACE_ADVISOR_GUIDE.md`.
 - `ApplicationGhostingDetector` (`services/application_ghosting.py`): offline stalled-application urgency + HITL follow-up suggestions (never auto-nudges). Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/APPLICATION_GHOSTING_DETECTOR_GUIDE.md`.
