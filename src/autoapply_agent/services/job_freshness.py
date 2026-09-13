@@ -117,8 +117,7 @@ def _guidance_for(
     if company:
         label = f"{label} @ {company}"
     lines = [
-        f"{label}: age_days={age_days}, band={band}, "
-        f"freshness_score={freshness_score:.3f}.",
+        f"{label}: age_days={age_days}, band={band}, freshness_score={freshness_score:.3f}.",
         "requires_human_review=True; auto_apply=False — never auto-applies.",
     ]
     if band == "fresh":
