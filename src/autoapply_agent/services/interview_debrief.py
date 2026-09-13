@@ -138,8 +138,7 @@ def _guidance_for(
     lines = [
         f"{role} @ {company}: offline debrief checklist ready for human review.",
         "requires_human_review=True; auto_submit=False — never auto-sends notes.",
-        f"Captured {len(strengths)} strengths, {len(gaps)} gaps, "
-        f"{len(follow_ups)} follow-ups.",
+        f"Captured {len(strengths)} strengths, {len(gaps)} gaps, {len(follow_ups)} follow-ups.",
     ]
     if not strengths and not gaps and not follow_ups:
         lines.append("Add at least one strength, gap, or follow-up before filing.")
