@@ -59,9 +59,7 @@ class SkillGapLearningPathPlanner:
 
         cleaned_have = _clean_skills(have_skills)
         have_norm = {_normalize(skill) for skill in cleaned_have}
-        missing = [
-            skill for skill in cleaned_required if _normalize(skill) not in have_norm
-        ]
+        missing = [skill for skill in cleaned_required if _normalize(skill) not in have_norm]
         cleaned_role = (role or "").strip()
         milestones = _milestones_for(missing)
         guidance = _guidance_for(
@@ -112,15 +110,12 @@ def _guidance_for(
 ) -> list[str]:
     label = role or "target role"
     lines = [
-        f"{label}: have={len(have)}, required={len(required)}, "
-        f"missing={len(missing)}.",
+        f"{label}: have={len(have)}, required={len(required)}, missing={len(missing)}.",
         "requires_human_review=True; auto_enroll=False — never enrolls courses.",
     ]
     if not missing:
         lines.append("No gaps vs required skills — maintain practice cadence.")
     else:
-        lines.append(
-            f"Work milestones in order; start with '{missing[0]}' before later gaps."
-        )
+        lines.append(f"Work milestones in order; start with '{missing[0]}' before later gaps.")
         lines.append("Use SkillsProfileFitScorer for fit scoring; this planner only paths gaps.")
     return lines
