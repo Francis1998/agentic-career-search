@@ -52,6 +52,8 @@ AI-agent backend for autonomous job discovery, explainable decisions, and produc
 
 ![Weekly Application Pace Advisor](assets/demo/weekly-application-pace-advisor.gif)
 
+![JD Culture Signal Extractor](assets/demo/jd-culture-signal-extractor.gif)
+
 ![Application Follow-Up Cadence](assets/demo/application-followup-cadence.gif)
 
 ## Why this exists
@@ -112,6 +114,7 @@ This project solves those issues with explicit agent engineering primitives:
 | Teal/Careerflow thank-you templates encourage one-click sends | Accidental recruiter spam after interviews | `ThankYouNoteOutlinePlanner` builds offline email/LinkedIn outlines and never auto-sends |
 | Teal/Huntr show quiet apps only inside proprietary CRM UIs | Follow-ups are ad-hoc or accidentally auto-sent | `ApplicationGhostingDetector` computes offline stall urgency + HITL suggestions and never auto-nudges |
 | Teal Insights / Huntr analytics keep apply-volume coaching in closed UIs | Burnout from spray-and-pray without local pace bands | `WeeklyApplicationPaceAdvisor` compares planned vs target apps offline and never auto-submits |
+| Teal/LinkedIn bury JD culture cues inside proprietary insight panels | Candidates miss pace/on-call/collab signals before applying | `JdCultureSignalExtractor` extracts offline culture cues for HITL review and never auto-applies |
 | Teal/Huntr bury post-apply follow-up calendars in closed CRMs | Candidates either spam or go silent without a local cadence | `ApplicationFollowUpCadencePlanner` emits offline day+channel HITL steps and never auto-nudges |
 | Teal/Huntr bury post-interview reflection checklists in closed UIs | Lost signal and ad-hoc follow-ups after loops | `InterviewDebriefChecklist` builds offline what-went-well/gaps/follow-up checklists and never auto-sends |
 | Teal/Simplify keep skill learning plans inside closed dashboards | Fit scores alone do not produce a practice path | `SkillGapLearningPathPlanner` emits ordered HITL milestones from have vs required skills and never enrolls |

@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `JdCultureSignalExtractor` (`services/jd_culture_signals.py`): offline HITL culture-signal extraction from JD text (pace/collaboration/oncall cues; never auto-applies). Gap vs Teal/LinkedIn JD insights locked in closed UIs. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/JD_CULTURE_SIGNAL_EXTRACTOR_GUIDE.md`.
 - `ApplicationFollowUpCadencePlanner` (`services/followup_cadence.py`): offline HITL follow-up day schedule after apply (never auto-nudges). Gap vs Teal/Huntr CRM follow-up reminders locked in closed UIs. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/APPLICATION_FOLLOWUP_CADENCE_GUIDE.md`.
 - `InterviewDebriefChecklist` (`services/interview_debrief.py`): offline post-interview HITL debrief checklist (what went well / gaps / follow-ups; never auto-sends). Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/INTERVIEW_DEBRIEF_CHECKLIST_GUIDE.md`.
 - `SkillGapLearningPathPlanner` (`services/skill_gap_learning.py`): offline ordered learning milestones for missing skills (HITL; never enrolls courses). Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/SKILL_GAP_LEARNING_PATH_PLANNER_GUIDE.md`.
