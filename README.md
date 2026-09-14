@@ -52,6 +52,7 @@ AI-agent backend for autonomous job discovery, explainable decisions, and produc
 
 ![Weekly Application Pace Advisor](assets/demo/weekly-application-pace-advisor.gif)
 
+![Rejection Pattern Analyzer](assets/demo/rejection-pattern-analyzer.gif)
 ![JD Culture Signal Extractor](assets/demo/jd-culture-signal-extractor.gif)
 
 ![Application Follow-Up Cadence](assets/demo/application-followup-cadence.gif)
@@ -85,6 +86,7 @@ This project solves those issues with explicit agent engineering primitives:
 - offer deadline countdowns + HITL reminders (never auto-decline) — see `docs/guides/OFFER_DEADLINE_TRACKER_GUIDE.md`,
 - portfolio bullet ↔ JD theme matching (HITL token overlap) — see `docs/guides/PORTFOLIO_PROJECT_MATCHER_GUIDE.md`,
 - interview schedule conflict advisory (local overlap detection; never writes calendars) — see `docs/guides/INTERVIEW_SCHEDULE_CONFLICT_GUARD_GUIDE.md`,
+- HITL rejection-pattern themes from offline notes (never auto-rewrites resumes) — see `docs/guides/REJECTION_PATTERN_ANALYZER_GUIDE.md`,
 - HITL post-apply follow-up cadence (day offsets + channels; never auto-nudge) — see `docs/guides/APPLICATION_FOLLOWUP_CADENCE_GUIDE.md`,
 
 ## Real use cases (problem -> solution)
@@ -114,6 +116,7 @@ This project solves those issues with explicit agent engineering primitives:
 | Teal/Careerflow thank-you templates encourage one-click sends | Accidental recruiter spam after interviews | `ThankYouNoteOutlinePlanner` builds offline email/LinkedIn outlines and never auto-sends |
 | Teal/Huntr show quiet apps only inside proprietary CRM UIs | Follow-ups are ad-hoc or accidentally auto-sent | `ApplicationGhostingDetector` computes offline stall urgency + HITL suggestions and never auto-nudges |
 | Teal Insights / Huntr analytics keep apply-volume coaching in closed UIs | Burnout from spray-and-pray without local pace bands | `WeeklyApplicationPaceAdvisor` compares planned vs target apps offline and never auto-submits |
+| Teal Insights / Huntr keep rejection analytics in closed dashboards | Candidates repeat the same miss without a local theme map | `RejectionPatternAnalyzer` clusters offline rejection reasons into HITL themes and never auto-rewrites resumes |
 | Teal/LinkedIn bury JD culture cues inside proprietary insight panels | Candidates miss pace/on-call/collab signals before applying | `JdCultureSignalExtractor` extracts offline culture cues for HITL review and never auto-applies |
 | Teal/Huntr bury post-apply follow-up calendars in closed CRMs | Candidates either spam or go silent without a local cadence | `ApplicationFollowUpCadencePlanner` emits offline day+channel HITL steps and never auto-nudges |
 | Teal/Huntr bury post-interview reflection checklists in closed UIs | Lost signal and ad-hoc follow-ups after loops | `InterviewDebriefChecklist` builds offline what-went-well/gaps/follow-up checklists and never auto-sends |
