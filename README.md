@@ -122,6 +122,8 @@ This project solves those issues with explicit agent engineering primitives:
 ![Visa Sponsorship Signal Extractor](assets/demo/visa-sponsorship-signal-extractor.gif)
 | Teal Insights / Jobscan / Resume Worded lock bullet-impact scoring in closed UIs | Candidates keep weak adjective-only bullets without a local metric map | `ResumeBulletImpactScorer` scores offline %/$/scale cues for HITL edits and never auto-rewrites |
 ![Resume Bullet Impact Scorer](assets/demo/resume-bullet-impact-scorer.gif)
+| Teal/Huntr/Superhuman keep recruiter-reply intent labels in proprietary inboxes | Candidates misread scheduling vs rejection tone without a local classifier | `RecruiterReplyIntentClassifier` classifies offline reply intents for HITL responses and never auto-sends |
+![Recruiter Reply Intent Classifier](assets/demo/recruiter-reply-intent-classifier.gif)
 | Teal/Huntr bury post-apply follow-up calendars in closed CRMs | Candidates either spam or go silent without a local cadence | `ApplicationFollowUpCadencePlanner` emits offline day+channel HITL steps and never auto-nudges |
 | Teal/Huntr bury post-interview reflection checklists in closed UIs | Lost signal and ad-hoc follow-ups after loops | `InterviewDebriefChecklist` builds offline what-went-well/gaps/follow-up checklists and never auto-sends |
 | Teal/Simplify keep skill learning plans inside closed dashboards | Fit scores alone do not produce a practice path | `SkillGapLearningPathPlanner` emits ordered HITL milestones from have vs required skills and never enrolls |
