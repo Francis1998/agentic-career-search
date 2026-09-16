@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `CoverLetterToneAligner` (`services/cover_letter_tone.py`): offline HITL cover-letter tone alignment vs JD culture/pace cues (never auto-sends). Gap vs Teal/Rezi/Kickresume tone matchers. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/COVER_LETTER_TONE_ALIGNER_GUIDE.md`.
 - `RecruiterReplyIntentClassifier` (`services/reply_intent.py`): offline HITL recruiter-reply intent classification (interested/scheduling/rejection/nurture; never auto-sends). Gap vs Teal/Huntr/Superhuman inbox labels. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/RECRUITER_REPLY_INTENT_CLASSIFIER_GUIDE.md`.
 - `ResumeBulletImpactScorer` (`services/bullet_impact.py`): offline HITL quantified-impact scoring for resume bullets (never auto-rewrites). Gap vs Teal Insights / Jobscan / Resume Worded locked in closed UIs. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/RESUME_BULLET_IMPACT_SCORER_GUIDE.md`.
 - `VisaSponsorshipSignalExtractor` (`services/visa_sponsorship.py`): offline HITL visa/work-auth cue extraction from JD text (sponsors/citizenship-only/no-sponsor/transfer; never auto-applies). Gap vs Simplify/Teal/LinkedIn sponsorship filters locked behind login walls. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/VISA_SPONSORSHIP_SIGNAL_EXTRACTOR_GUIDE.md`.
