@@ -127,6 +127,8 @@ This project solves those issues with explicit agent engineering primitives:
 ![Cover Letter Tone Aligner](assets/demo/cover-letter-tone-aligner.gif)
 | Careerflow/Taplio/LinkedIn Premium lock headline graders in closed UIs | Candidates publish keyword-weak headlines without a local coverage map | `LinkedInHeadlineKeywordScorer` scores offline headline↔role keywords for HITL edits and never auto-posts |
 ![LinkedIn Headline Keyword Scorer](assets/demo/linkedin-headline-keyword-scorer.gif)
+| Interviewing.io/Exponent/Teal lock phone-screen agendas in closed UIs | Candidates improvise screens without a local minute map | `PhoneScreenAgendaPlanner` builds offline JD-driven agendas for HITL rehearsal and never auto-books |
+![Phone Screen Agenda Planner](assets/demo/phone-screen-agenda-planner.gif)
 ![Recruiter Reply Intent Classifier](assets/demo/recruiter-reply-intent-classifier.gif)
 | Teal/Huntr bury post-apply follow-up calendars in closed CRMs | Candidates either spam or go silent without a local cadence | `ApplicationFollowUpCadencePlanner` emits offline day+channel HITL steps and never auto-nudges |
 | Teal/Huntr bury post-interview reflection checklists in closed UIs | Lost signal and ad-hoc follow-ups after loops | `InterviewDebriefChecklist` builds offline what-went-well/gaps/follow-up checklists and never auto-sends |
