@@ -131,6 +131,8 @@ This project solves those issues with explicit agent engineering primitives:
 ![Phone Screen Agenda Planner](assets/demo/phone-screen-agenda-planner.gif)
 | Interviewing.io/Exponent/Teal lock behavioral STAR banks in closed UIs | Candidates improvise stories without a local competency map | `StarBehavioralStoryMatcher` matches offline STAR banks to JD cues for HITL rehearsal and never auto-sends |
 ![StarBehavioralStoryMatcher](assets/demo/star-behavioral-story-matcher.gif)
+| Teal/Huntr/Simplify lock packet checklists in closed CRMs | Candidates submit incomplete packets without a local gate | `ApplicationPacketCompletenessGate` checks offline resume/cover/portfolio readiness for HITL submit and never auto-submits |
+![ApplicationPacketCompletenessGate](assets/demo/application-packet-completeness-gate.gif)
 ![Recruiter Reply Intent Classifier](assets/demo/recruiter-reply-intent-classifier.gif)
 | Teal/Huntr bury post-apply follow-up calendars in closed CRMs | Candidates either spam or go silent without a local cadence | `ApplicationFollowUpCadencePlanner` emits offline day+channel HITL steps and never auto-nudges |
 | Teal/Huntr bury post-interview reflection checklists in closed UIs | Lost signal and ad-hoc follow-ups after loops | `InterviewDebriefChecklist` builds offline what-went-well/gaps/follow-up checklists and never auto-sends |
