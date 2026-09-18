@@ -133,6 +133,8 @@ This project solves those issues with explicit agent engineering primitives:
 ![StarBehavioralStoryMatcher](assets/demo/star-behavioral-story-matcher.gif)
 | Teal/Huntr/Simplify lock packet checklists in closed CRMs | Candidates submit incomplete packets without a local gate | `ApplicationPacketCompletenessGate` checks offline resume/cover/portfolio readiness for HITL submit and never auto-submits |
 ![ApplicationPacketCompletenessGate](assets/demo/application-packet-completeness-gate.gif)
+| Teal/Simplify/Huntr bury ghost-job detectors behind proprietary boards | Candidates waste cycles on evergreen/vague listings | `GhostJobSignalFlagger` flags offline evergreen/repost/vague-comp cues for HITL review and never auto-applies |
+![GhostJobSignalFlagger](assets/demo/ghost-job-signal-flagger.gif)
 ![Recruiter Reply Intent Classifier](assets/demo/recruiter-reply-intent-classifier.gif)
 | Teal/Huntr bury post-apply follow-up calendars in closed CRMs | Candidates either spam or go silent without a local cadence | `ApplicationFollowUpCadencePlanner` emits offline day+channel HITL steps and never auto-nudges |
 | Teal/Huntr bury post-interview reflection checklists in closed UIs | Lost signal and ad-hoc follow-ups after loops | `InterviewDebriefChecklist` builds offline what-went-well/gaps/follow-up checklists and never auto-sends |
