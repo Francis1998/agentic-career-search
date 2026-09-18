@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `ApplicationPacketCompletenessGate` (`services/packet_completeness.py`): offline HITL resume/cover/portfolio completeness gate (never auto-submits). Gap vs Teal/Huntr/Simplify packet checklists. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/APPLICATION_PACKET_COMPLETENESS_GATE_GUIDE.md`.
 - `StarBehavioralStoryMatcher` (`services/star_story.py`): offline HITL STAR story↔JD competency matcher (never auto-sends). Gap vs Interviewing.io/Exponent/Teal behavioral banks. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/STAR_BEHAVIORAL_STORY_MATCHER_GUIDE.md`.
 - `PhoneScreenAgendaPlanner` (`services/phone_screen_agenda.py`): offline HITL phone-screen agenda from JD cues (never auto-books). Gap vs Interviewing.io/Exponent/Teal prep UIs. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/PHONE_SCREEN_AGENDA_PLANNER_GUIDE.md`.
 - `LinkedInHeadlineKeywordScorer` (`services/linkedin_headline.py`): offline HITL LinkedIn headline keyword coverage vs target role keywords (never auto-posts). Gap vs Careerflow/Taplio/LinkedIn Premium graders. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/LINKEDIN_HEADLINE_KEYWORD_SCORER_GUIDE.md`.
