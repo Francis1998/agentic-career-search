@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `InterviewRoundProgressTracker` (`services/interview_rounds.py`): offline HITL multi-round interview progress with allowed transitions (never auto-advances). Gap vs Huntr/Teal/Jobtracker round boards. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/INTERVIEW_ROUND_PROGRESS_TRACKER_GUIDE.md`.
 - `RemoteTimezoneOverlapAdvisor` (`services/timezone_overlap.py`): offline HITL weekday timezone-overlap bands vs team core hours (never auto-applies). Gap vs RemoteOK/FlexJobs/WWR timezone filters. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/REMOTE_TIMEZONE_OVERLAP_ADVISOR_GUIDE.md`.
 - `GhostJobSignalFlagger` (`services/ghost_job.py`): offline HITL ghost/evergreen JD risk cues (never auto-applies). Gap vs Teal/Simplify/Huntr ghost detectors. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/GHOST_JOB_SIGNAL_FLAGGER_GUIDE.md`.
 - `ApplicationPacketCompletenessGate` (`services/packet_completeness.py`): offline HITL resume/cover/portfolio completeness gate (never auto-submits). Gap vs Teal/Huntr/Simplify packet checklists. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/APPLICATION_PACKET_COMPLETENESS_GATE_GUIDE.md`.
