@@ -133,6 +133,8 @@ This project solves those issues with explicit agent engineering primitives:
 ![StarBehavioralStoryMatcher](assets/demo/star-behavioral-story-matcher.gif)
 | Teal/Huntr/Simplify lock packet checklists in closed CRMs | Candidates submit incomplete packets without a local gate | `ApplicationPacketCompletenessGate` checks offline resume/cover/portfolio readiness for HITL submit and never auto-submits |
 ![ApplicationPacketCompletenessGate](assets/demo/application-packet-completeness-gate.gif)
+| RemoteOK/FlexJobs/WWR bury timezone filters behind proprietary boards | Candidates misjudge remote sync fit across offsets | `RemoteTimezoneOverlapAdvisor` bands offline weekday overlap hours for HITL review and never auto-applies |
+![RemoteTimezoneOverlapAdvisor](assets/demo/remote-timezone-overlap-advisor.gif)
 | Teal/Simplify/Huntr bury ghost-job detectors behind proprietary boards | Candidates waste cycles on evergreen/vague listings | `GhostJobSignalFlagger` flags offline evergreen/repost/vague-comp cues for HITL review and never auto-applies |
 ![GhostJobSignalFlagger](assets/demo/ghost-job-signal-flagger.gif)
 ![Recruiter Reply Intent Classifier](assets/demo/recruiter-reply-intent-classifier.gif)
