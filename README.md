@@ -135,6 +135,8 @@ This project solves those issues with explicit agent engineering primitives:
 ![ApplicationPacketCompletenessGate](assets/demo/application-packet-completeness-gate.gif)
 | RemoteOK/FlexJobs/WWR bury timezone filters behind proprietary boards | Candidates misjudge remote sync fit across offsets | `RemoteTimezoneOverlapAdvisor` bands offline weekday overlap hours for HITL review and never auto-applies |
 ![RemoteTimezoneOverlapAdvisor](assets/demo/remote-timezone-overlap-advisor.gif)
+| Huntr/Teal/Jobtracker lock multi-round interview boards in closed CRMs | Candidates lose track of phone→HM→onsite→offer without a local state machine | `InterviewRoundProgressTracker` tracks offline allowed round transitions for HITL review and never auto-advances |
+![InterviewRoundProgressTracker](assets/demo/interview-round-progress-tracker.gif)
 | Teal/Simplify/Huntr bury ghost-job detectors behind proprietary boards | Candidates waste cycles on evergreen/vague listings | `GhostJobSignalFlagger` flags offline evergreen/repost/vague-comp cues for HITL review and never auto-applies |
 ![GhostJobSignalFlagger](assets/demo/ghost-job-signal-flagger.gif)
 ![Recruiter Reply Intent Classifier](assets/demo/recruiter-reply-intent-classifier.gif)
