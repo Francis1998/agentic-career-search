@@ -30,5 +30,6 @@
 - Salary-band estimates are assistive triage signals, not offers, market truth, or legal advice.
 - Application stage tracking is local pipeline state only; it never submits applications or contacts employers.
 - Interview-prep briefs are assistive coaching content, not recruiter outreach or scheduling automation.
+- Equity vesting/cliff math is assistive triage only — never auto-accepts offers or writes broker orders.
 - Interview-round progress tracking is local pipeline state only; it never advances candidates or contacts employers.
 - Remote timezone-overlap bands are assistive triage signals, not auto-apply or calendar-write triggers.
