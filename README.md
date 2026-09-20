@@ -141,6 +141,8 @@ This project solves those issues with explicit agent engineering primitives:
 ![EquityVestingCliffAdvisor](assets/demo/equity-vesting-cliff-advisor.gif)
 | Levels.fyi/Candor/Blind bury signing-bonus clawback math in closed UIs | Candidates misjudge repayment risk if they leave early | `SigningBonusClawbackAdvisor` bands offline remaining clawback liability for HITL review and never auto-accepts |
 ![SigningBonusClawbackAdvisor](assets/demo/signing-bonus-clawback-advisor.gif)
+| Huntr/Teal/Levels.fyi bury relocation stipend math in closed UIs | Candidates accept underfunded moves without a local coverage band | `RelocationPackageGapAdvisor` bands offline stipend vs move-cost coverage for HITL review and never auto-accepts |
+![RelocationPackageGapAdvisor](assets/demo/relocation-package-gap-advisor.gif)
 | Teal/Simplify/Huntr bury ghost-job detectors behind proprietary boards | Candidates waste cycles on evergreen/vague listings | `GhostJobSignalFlagger` flags offline evergreen/repost/vague-comp cues for HITL review and never auto-applies |
 ![GhostJobSignalFlagger](assets/demo/ghost-job-signal-flagger.gif)
 ![Recruiter Reply Intent Classifier](assets/demo/recruiter-reply-intent-classifier.gif)
