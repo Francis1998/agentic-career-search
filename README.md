@@ -139,6 +139,8 @@ This project solves those issues with explicit agent engineering primitives:
 ![InterviewRoundProgressTracker](assets/demo/interview-round-progress-tracker.gif)
 | Levels.fyi/Candor/Carta lock vesting calculators in closed UIs | Candidates misread cliff/unvested risk without a local schedule | `EquityVestingCliffAdvisor` bands offline cliff + linear vest progress for HITL review and never auto-accepts |
 ![EquityVestingCliffAdvisor](assets/demo/equity-vesting-cliff-advisor.gif)
+| Levels.fyi/Candor/Blind bury signing-bonus clawback math in closed UIs | Candidates misjudge repayment risk if they leave early | `SigningBonusClawbackAdvisor` bands offline remaining clawback liability for HITL review and never auto-accepts |
+![SigningBonusClawbackAdvisor](assets/demo/signing-bonus-clawback-advisor.gif)
 | Teal/Simplify/Huntr bury ghost-job detectors behind proprietary boards | Candidates waste cycles on evergreen/vague listings | `GhostJobSignalFlagger` flags offline evergreen/repost/vague-comp cues for HITL review and never auto-applies |
 ![GhostJobSignalFlagger](assets/demo/ghost-job-signal-flagger.gif)
 ![Recruiter Reply Intent Classifier](assets/demo/recruiter-reply-intent-classifier.gif)
