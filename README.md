@@ -139,6 +139,8 @@ This project solves those issues with explicit agent engineering primitives:
 ![InterviewRoundProgressTracker](assets/demo/interview-round-progress-tracker.gif)
 | Levels.fyi/Candor/Carta lock vesting calculators in closed UIs | Candidates misread cliff/unvested risk without a local schedule | `EquityVestingCliffAdvisor` bands offline cliff + linear vest progress for HITL review and never auto-accepts |
 ![EquityVestingCliffAdvisor](assets/demo/equity-vesting-cliff-advisor.gif)
+| Levels.fyi/Blind/Candor bury severance week math in closed UIs | Candidates accept under-tenure packages without a local coverage band | `SeverancePackageGapAdvisor` bands offline offered vs expected weeks for HITL review and never auto-accepts |
+![SeverancePackageGapAdvisor](assets/demo/severance-package-gap-advisor.gif)
 | Levels.fyi/Candor/Blind bury signing-bonus clawback math in closed UIs | Candidates misjudge repayment risk if they leave early | `SigningBonusClawbackAdvisor` bands offline remaining clawback liability for HITL review and never auto-accepts |
 ![SigningBonusClawbackAdvisor](assets/demo/signing-bonus-clawback-advisor.gif)
 | Huntr/Teal/Levels.fyi bury relocation stipend math in closed UIs | Candidates accept underfunded moves without a local coverage band | `RelocationPackageGapAdvisor` bands offline stipend vs move-cost coverage for HITL review and never auto-accepts |
