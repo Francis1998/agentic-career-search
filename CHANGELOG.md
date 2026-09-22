@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `RsuRefreshCadenceAdvisor` (`services/rsu_refresh_cadence.py`): offline HITL RSU refresh cadence bands from years since last grant (never auto-accepts). Gap vs Levels.fyi/Carta/Candor refresh planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/RSU_REFRESH_CADENCE_ADVISOR_GUIDE.md`.
 - `NoticePeriodConflictFlagger` (`services/notice_period_conflict.py`): offline HITL notice weeks vs preferred-start conflict bands (never auto-accepts). Gap vs Huntr/Teal/Greenhouse start-date planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/NOTICE_PERIOD_CONFLICT_FLAGGER_GUIDE.md`.
 - `SeverancePackageGapAdvisor` (`services/severance_package_gap.py`): offline HITL severance weeks vs tenure-scaled expectation bands (never auto-accepts). Gap vs Levels.fyi/Blind/Candor severance calculators. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/SEVERANCE_PACKAGE_GAP_ADVISOR_GUIDE.md`.
 - `SigningBonusClawbackAdvisor` (`services/signing_bonus_clawback.py`): offline HITL signing-bonus clawback liability bands (never auto-accepts). Gap vs Levels.fyi/Candor/Blind clawback calculators. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/SIGNING_BONUS_CLAWBACK_ADVISOR_GUIDE.md`.

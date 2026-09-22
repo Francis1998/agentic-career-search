@@ -139,6 +139,8 @@ This project solves those issues with explicit agent engineering primitives:
 ![InterviewRoundProgressTracker](assets/demo/interview-round-progress-tracker.gif)
 | Levels.fyi/Candor/Carta lock vesting calculators in closed UIs | Candidates misread cliff/unvested risk without a local schedule | `EquityVestingCliffAdvisor` bands offline cliff + linear vest progress for HITL review and never auto-accepts |
 ![EquityVestingCliffAdvisor](assets/demo/equity-vesting-cliff-advisor.gif)
+| Levels.fyi/Carta/Candor bury RSU refresh planners in closed UIs | Employees miss overdue refresh conversations without a local cadence band | `RsuRefreshCadenceAdvisor` bands offline years-since-refresh for HITL review and never auto-accepts |
+![RsuRefreshCadenceAdvisor](assets/demo/rsu-refresh-cadence-advisor.gif)
 | Huntr/Teal/Greenhouse bury notice vs start-date planners in closed UIs | Candidates accept starts that collide with contractual notice | `NoticePeriodConflictFlagger` bands offline notice vs preferred-start slack for HITL review and never auto-accepts |
 ![NoticePeriodConflictFlagger](assets/demo/notice-period-conflict-flagger.gif)
 | Levels.fyi/Blind/Candor bury severance week math in closed UIs | Candidates accept under-tenure packages without a local coverage band | `SeverancePackageGapAdvisor` bands offline offered vs expected weeks for HITL review and never auto-accepts |
