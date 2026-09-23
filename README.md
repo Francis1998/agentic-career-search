@@ -143,6 +143,8 @@ This project solves those issues with explicit agent engineering primitives:
 ![ParentalLeaveGapAdvisor](assets/demo/parental-leave-gap-advisor.gif)
 | Levels.fyi/Carta/Candor bury ESPP discount contribution math in closed UIs | Employees under-contribute without a local discount-value band | `EsppDiscountValueAdvisor` bands offline look-through discount value for HITL review and never auto-enrolls |
 ![EsppDiscountValueAdvisor](assets/demo/espp-discount-value-advisor.gif)
+| Huntr/Teal/Levels.fyi bury counter-offer leverage scoring in closed UIs | Candidates under-negotiate without a local leverage band | `CounterOfferLeverageAdvisor` bands offline competing-offer leverage for HITL review and never auto-sends |
+![CounterOfferLeverageAdvisor](assets/demo/counter-offer-leverage-advisor.gif)
 | Levels.fyi/Carta/Candor bury RSU refresh planners in closed UIs | Employees miss overdue refresh conversations without a local cadence band | `RsuRefreshCadenceAdvisor` bands offline years-since-refresh for HITL review and never auto-accepts |
 ![RsuRefreshCadenceAdvisor](assets/demo/rsu-refresh-cadence-advisor.gif)
 | Huntr/Teal/Greenhouse bury notice vs start-date planners in closed UIs | Candidates accept starts that collide with contractual notice | `NoticePeriodConflictFlagger` bands offline notice vs preferred-start slack for HITL review and never auto-accepts |
