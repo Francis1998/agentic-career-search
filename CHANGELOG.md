@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `EsppDiscountValueAdvisor` (`services/espp_discount_value.py`): offline HITL ESPP discount contribution value bands (never auto-enrolls). Gap vs Levels.fyi/Carta/Candor ESPP calculators. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/ESPP_DISCOUNT_VALUE_ADVISOR_GUIDE.md`.
 - `ParentalLeaveGapAdvisor` (`services/parental_leave_gap.py`): offline HITL parental-leave weeks vs market coverage bands (never auto-accepts). Gap vs Levels.fyi/Blind/Candor leave planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/PARENTAL_LEAVE_GAP_ADVISOR_GUIDE.md`.
 - `RsuRefreshCadenceAdvisor` (`services/rsu_refresh_cadence.py`): offline HITL RSU refresh cadence bands from years since last grant (never auto-accepts). Gap vs Levels.fyi/Carta/Candor refresh planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/RSU_REFRESH_CADENCE_ADVISOR_GUIDE.md`.
 - `NoticePeriodConflictFlagger` (`services/notice_period_conflict.py`): offline HITL notice weeks vs preferred-start conflict bands (never auto-accepts). Gap vs Huntr/Teal/Greenhouse start-date planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/NOTICE_PERIOD_CONFLICT_FLAGGER_GUIDE.md`.
