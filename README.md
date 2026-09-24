@@ -139,6 +139,8 @@ This project solves those issues with explicit agent engineering primitives:
 ![InterviewRoundProgressTracker](assets/demo/interview-round-progress-tracker.gif)
 | Levels.fyi/Candor/Carta lock vesting calculators in closed UIs | Candidates misread cliff/unvested risk without a local schedule | `EquityVestingCliffAdvisor` bands offline cliff + linear vest progress for HITL review and never auto-accepts |
 ![EquityVestingCliffAdvisor](assets/demo/equity-vesting-cliff-advisor.gif)
+| Blind/Levels.fyi/RemoteOK bury commute vs stipend math in closed UIs | Candidates accept office terms without a local commute-cost band | `CommuteCostTradeoffAdvisor` bands offline commute vs stipend tradeoffs for HITL review and never auto-accepts |
+![CommuteCostTradeoffAdvisor](assets/demo/commute-cost-tradeoff-advisor.gif)
 | Rippling/Gusto/Candor bury PTO cash-out calculators in closed UIs | Employees misjudge payout vs use-it without a local cash-out band | `PtoCashOutValueAdvisor` bands offline unused-PTO cash-out value for HITL review and never auto-cashes |
 ![PtoCashOutValueAdvisor](assets/demo/pto-cash-out-value-advisor.gif)
 | Levels.fyi/Fidelity/Candor bury 401(k) match calculators in closed UIs | Employees under-contribute without a local match-gap band | `FourOhOneKMatchGapAdvisor` bands offline employer vs market match dollars for HITL review and never auto-enrolls |
