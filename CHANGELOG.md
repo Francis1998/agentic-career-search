@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `PtoCashOutValueAdvisor` (`services/pto_cash_out_value.py`): offline HITL unused-PTO cash-out value bands (never auto-cashes). Gap vs Rippling/Gusto/Candor PTO payout calculators. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/PTO_CASH_OUT_VALUE_ADVISOR_GUIDE.md`.
 - `FourOhOneKMatchGapAdvisor` (`services/four01k_match_gap.py`): offline HITL 401(k) employer-match gap bands from offered vs market match % (never auto-enrolls). Gap vs Levels.fyi/Fidelity/Candor match calculators. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/FOUR01K_MATCH_GAP_ADVISOR_GUIDE.md`.
 - `CounterOfferLeverageAdvisor` (`services/counter_offer_leverage.py`): offline HITL counter-offer leverage bands from competing offer delta (never auto-sends). Gap vs Huntr/Teal/Levels.fyi negotiation tools. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/COUNTER_OFFER_LEVERAGE_ADVISOR_GUIDE.md`.
 - `EsppDiscountValueAdvisor` (`services/espp_discount_value.py`): offline HITL ESPP discount contribution value bands (never auto-enrolls). Gap vs Levels.fyi/Carta/Candor ESPP calculators. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/ESPP_DISCOUNT_VALUE_ADVISOR_GUIDE.md`.
