@@ -139,6 +139,8 @@ This project solves those issues with explicit agent engineering primitives:
 ![InterviewRoundProgressTracker](assets/demo/interview-round-progress-tracker.gif)
 | Levels.fyi/Candor/Carta lock vesting calculators in closed UIs | Candidates misread cliff/unvested risk without a local schedule | `EquityVestingCliffAdvisor` bands offline cliff + linear vest progress for HITL review and never auto-accepts |
 ![EquityVestingCliffAdvisor](assets/demo/equity-vesting-cliff-advisor.gif)
+| Levels.fyi/Fidelity/Candor bury 401(k) match calculators in closed UIs | Employees under-contribute without a local match-gap band | `FourOhOneKMatchGapAdvisor` bands offline employer vs market match dollars for HITL review and never auto-enrolls |
+![FourOhOneKMatchGapAdvisor](assets/demo/four01k-match-gap-advisor.gif)
 | Levels.fyi/Blind/Candor bury parental-leave week math in closed UIs | Candidates accept thin leave without a local coverage band | `ParentalLeaveGapAdvisor` bands offline offered vs market leave weeks for HITL review and never auto-accepts |
 ![ParentalLeaveGapAdvisor](assets/demo/parental-leave-gap-advisor.gif)
 | Levels.fyi/Carta/Candor bury ESPP discount contribution math in closed UIs | Employees under-contribute without a local discount-value band | `EsppDiscountValueAdvisor` bands offline look-through discount value for HITL review and never auto-enrolls |
