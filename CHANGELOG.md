@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `HomeOfficeStipendGapAdvisor` (`services/home_office_stipend_gap.py`): offline HITL home-office stipend vs setup-cost coverage bands (never auto-accepts). Gap vs Rippling/Levels.fyi/Candor stipend calculators. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/HOME_OFFICE_STIPEND_GAP_ADVISOR_GUIDE.md`.
 - `CommuteCostTradeoffAdvisor` (`services/commute_cost_tradeoff.py`): offline HITL commute vs remote-stipend tradeoff bands (never auto-accepts). Gap vs Blind/Levels.fyi/RemoteOK commute math. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/COMMUTE_COST_TRADEOFF_ADVISOR_GUIDE.md`.
 - `PtoCashOutValueAdvisor` (`services/pto_cash_out_value.py`): offline HITL unused-PTO cash-out value bands (never auto-cashes). Gap vs Rippling/Gusto/Candor PTO payout calculators. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/PTO_CASH_OUT_VALUE_ADVISOR_GUIDE.md`.
 - `FourOhOneKMatchGapAdvisor` (`services/four01k_match_gap.py`): offline HITL 401(k) employer-match gap bands from offered vs market match % (never auto-enrolls). Gap vs Levels.fyi/Fidelity/Candor match calculators. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/FOUR01K_MATCH_GAP_ADVISOR_GUIDE.md`.
