@@ -139,6 +139,8 @@ This project solves those issues with explicit agent engineering primitives:
 ![InterviewRoundProgressTracker](assets/demo/interview-round-progress-tracker.gif)
 | Levels.fyi/Candor/Carta lock vesting calculators in closed UIs | Candidates misread cliff/unvested risk without a local schedule | `EquityVestingCliffAdvisor` bands offline cliff + linear vest progress for HITL review and never auto-accepts |
 ![EquityVestingCliffAdvisor](assets/demo/equity-vesting-cliff-advisor.gif)
+| Levels.fyi/Blind/Candor bury on-call pay math in closed UIs | Engineers accept thin rotations without a local value band | `OnCallStipendGapAdvisor` bands offline stipend vs on-call load for HITL review and never auto-accepts |
+![OnCallStipendGapAdvisor](assets/demo/oncall-stipend-gap-advisor.gif)
 | Levels.fyi/Candor/Blind bury target-bonus math in closed UIs | Candidates under-negotiate bonus without a local gap band | `PerformanceBonusTargetGapAdvisor` bands offline offered vs market target % for HITL review and never auto-accepts |
 ![PerformanceBonusTargetGapAdvisor](assets/demo/performance-bonus-target-gap-advisor.gif)
 | Rippling/Levels.fyi/Candor bury home-office stipend math in closed UIs | Candidates underfund desks without a local coverage band | `HomeOfficeStipendGapAdvisor` bands offline stipend vs setup cost for HITL review and never auto-accepts |
