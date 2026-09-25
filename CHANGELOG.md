@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `PerformanceBonusTargetGapAdvisor` (`services/performance_bonus_target_gap.py`): offline HITL offered vs market performance-bonus target % bands (never auto-accepts). Gap vs Levels.fyi/Candor/Blind bonus calculators. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/PERFORMANCE_BONUS_TARGET_GAP_ADVISOR_GUIDE.md`.
 - `HomeOfficeStipendGapAdvisor` (`services/home_office_stipend_gap.py`): offline HITL home-office stipend vs setup-cost coverage bands (never auto-accepts). Gap vs Rippling/Levels.fyi/Candor stipend calculators. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/HOME_OFFICE_STIPEND_GAP_ADVISOR_GUIDE.md`.
 - `CommuteCostTradeoffAdvisor` (`services/commute_cost_tradeoff.py`): offline HITL commute vs remote-stipend tradeoff bands (never auto-accepts). Gap vs Blind/Levels.fyi/RemoteOK commute math. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/COMMUTE_COST_TRADEOFF_ADVISOR_GUIDE.md`.
 - `PtoCashOutValueAdvisor` (`services/pto_cash_out_value.py`): offline HITL unused-PTO cash-out value bands (never auto-cashes). Gap vs Rippling/Gusto/Candor PTO payout calculators. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/PTO_CASH_OUT_VALUE_ADVISOR_GUIDE.md`.
