@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `HsaContributionGapAdvisor` (`services/hsa_contribution_gap.py`): offline HITL HSA YTD vs IRS-limit remaining-room bands (never auto-enrolls). Gap vs Fidelity/HealthEquity/Levels.fyi HSA planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/HSA_CONTRIBUTION_GAP_ADVISOR_GUIDE.md`.
 - `OnCallStipendGapAdvisor` (`services/oncall_stipend_gap.py`): offline HITL on-call stipend vs load value bands (never auto-accepts). Gap vs Levels.fyi/Blind/Candor on-call calculators. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/ONCALL_STIPEND_GAP_ADVISOR_GUIDE.md`.
 - `PerformanceBonusTargetGapAdvisor` (`services/performance_bonus_target_gap.py`): offline HITL offered vs market performance-bonus target % bands (never auto-accepts). Gap vs Levels.fyi/Candor/Blind bonus calculators. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/PERFORMANCE_BONUS_TARGET_GAP_ADVISOR_GUIDE.md`.
 - `HomeOfficeStipendGapAdvisor` (`services/home_office_stipend_gap.py`): offline HITL home-office stipend vs setup-cost coverage bands (never auto-accepts). Gap vs Rippling/Levels.fyi/Candor stipend calculators. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/HOME_OFFICE_STIPEND_GAP_ADVISOR_GUIDE.md`.
