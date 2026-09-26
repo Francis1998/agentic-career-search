@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `SabbaticalEligibilityAdvisor` (`services/sabbatical_eligibility.py`): offline HITL sabbatical tenure/weeks eligibility bands (never auto-approves). Gap vs Levels.fyi/Blind/Candor sabbatical planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/SABBATICAL_ELIGIBILITY_ADVISOR_GUIDE.md`.
 - `IsoAmtExposureAdvisor` (`services/iso_amt_exposure.py`): offline HITL ISO bargain-element AMT exposure bands (never auto-exercises). Gap vs Carta/Pulley/Levels.fyi AMT calculators. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/ISO_AMT_EXPOSURE_ADVISOR_GUIDE.md`.
 - `HsaContributionGapAdvisor` (`services/hsa_contribution_gap.py`): offline HITL HSA YTD vs IRS-limit remaining-room bands (never auto-enrolls). Gap vs Fidelity/HealthEquity/Levels.fyi HSA planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/HSA_CONTRIBUTION_GAP_ADVISOR_GUIDE.md`.
 - `OnCallStipendGapAdvisor` (`services/oncall_stipend_gap.py`): offline HITL on-call stipend vs load value bands (never auto-accepts). Gap vs Levels.fyi/Blind/Candor on-call calculators. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/ONCALL_STIPEND_GAP_ADVISOR_GUIDE.md`.
