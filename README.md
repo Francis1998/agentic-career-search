@@ -145,6 +145,8 @@ This project solves those issues with explicit agent engineering primitives:
 ![PerformanceBonusTargetGapAdvisor](assets/demo/performance-bonus-target-gap-advisor.gif)
 | Rippling/Levels.fyi/Candor bury home-office stipend math in closed UIs | Candidates underfund desks without a local coverage band | `HomeOfficeStipendGapAdvisor` bands offline stipend vs setup cost for HITL review and never auto-accepts |
 ![HomeOfficeStipendGapAdvisor](assets/demo/home-office-stipend-gap-advisor.gif)
+| Fidelity/HealthEquity/Levels.fyi bury HSA contribution room in closed UIs | Employees leave IRS room unused without a local gap band | `HsaContributionGapAdvisor` bands offline YTD vs IRS limit for HITL review and never auto-enrolls |
+![HsaContributionGapAdvisor](assets/demo/hsa-contribution-gap-advisor.gif)
 | Blind/Levels.fyi/RemoteOK bury commute vs stipend math in closed UIs | Candidates accept office terms without a local commute-cost band | `CommuteCostTradeoffAdvisor` bands offline commute vs stipend tradeoffs for HITL review and never auto-accepts |
 ![CommuteCostTradeoffAdvisor](assets/demo/commute-cost-tradeoff-advisor.gif)
 | Rippling/Gusto/Candor bury PTO cash-out calculators in closed UIs | Employees misjudge payout vs use-it without a local cash-out band | `PtoCashOutValueAdvisor` bands offline unused-PTO cash-out value for HITL review and never auto-cashes |
