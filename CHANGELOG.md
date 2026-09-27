@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `NqdcDeferralCliffAdvisor` (`services/nqdc_deferral_cliff.py`): offline HITL NQDC deferral cliff timing/tax-delta bands (never auto-elects). Gap vs Fidelity/Carta/Levels.fyi deferred-comp planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/NQDC_DEFERRAL_CLIFF_ADVISOR_GUIDE.md`.
 - `CobraContinuationGapAdvisor` (`services/cobra_continuation_gap.py`): offline HITL COBRA premium runway vs bridge-month coverage bands (never auto-enrolls). Gap vs Fidelity/HealthEquity/Levels.fyi COBRA planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/COBRA_CONTINUATION_GAP_ADVISOR_GUIDE.md`.
 - `SabbaticalEligibilityAdvisor` (`services/sabbatical_eligibility.py`): offline HITL sabbatical tenure/weeks eligibility bands (never auto-approves). Gap vs Levels.fyi/Blind/Candor sabbatical planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/SABBATICAL_ELIGIBILITY_ADVISOR_GUIDE.md`.
 - `IsoAmtExposureAdvisor` (`services/iso_amt_exposure.py`): offline HITL ISO bargain-element AMT exposure bands (never auto-exercises). Gap vs Carta/Pulley/Levels.fyi AMT calculators. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/ISO_AMT_EXPOSURE_ADVISOR_GUIDE.md`.
