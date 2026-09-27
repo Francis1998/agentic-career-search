@@ -151,6 +151,8 @@ This project solves those issues with explicit agent engineering primitives:
 ![IsoAmtExposureAdvisor](assets/demo/iso-amt-exposure-advisor.gif)
 | Fidelity/HealthEquity/Levels.fyi bury COBRA premium runway math in closed UIs | Workers underfund continuation months without a local bridge band | `CobraContinuationGapAdvisor` bands offline premium×months vs bridge for HITL review and never auto-enrolls |
 ![CobraContinuationGapAdvisor](assets/demo/cobra-continuation-gap-advisor.gif)
+| Fidelity/Carta/Levels.fyi bury NQDC deferral cliff math in closed UIs | Employees surprise-distributions without a local cliff band | `NqdcDeferralCliffAdvisor` bands offline years-to-cliff vs deferral for HITL review and never auto-elects |
+![NqdcDeferralCliffAdvisor](assets/demo/nqdc-deferral-cliff-advisor.gif)
 | Levels.fyi/Blind/Candor bury sabbatical tenure math in closed UIs | Employees miss leave windows without a local eligibility band | `SabbaticalEligibilityAdvisor` bands offline tenure vs policy for HITL review and never auto-approves |
 ![SabbaticalEligibilityAdvisor](assets/demo/sabbatical-eligibility-advisor.gif)
 | Blind/Levels.fyi/RemoteOK bury commute vs stipend math in closed UIs | Candidates accept office terms without a local commute-cost band | `CommuteCostTradeoffAdvisor` bands offline commute vs stipend tradeoffs for HITL review and never auto-accepts |
