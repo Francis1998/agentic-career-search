@@ -157,6 +157,8 @@ This project solves those issues with explicit agent engineering primitives:
 ![BereavementLeaveGapAdvisor](assets/demo/bereavement-leave-gap-advisor.gif)
 | Student Loan Hero/Rippling/Levels.fyi bury employer SLPRP math in closed UIs | Workers underfund loan payments without a local contribution band | `StudentLoanRepaymentGapAdvisor` bands offline payment vs employer contribution for HITL review and never auto-enrolls |
 ![StudentLoanRepaymentGapAdvisor](assets/demo/student-loan-repayment-gap-advisor.gif)
+| Levels.fyi/Blind/Carrot/Progyny bury fertility benefit math in closed UIs | Employees under-claim fertility coverage without a local cap band | `FertilityBenefitGapAdvisor` bands offline treatment cost vs employer cap for HITL review and never auto-claims |
+![FertilityBenefitGapAdvisor](assets/demo/fertility-benefit-gap-advisor.gif)
 | Levels.fyi/Blind/Candor bury tuition reimbursement math in closed UIs | Employees under-claim learning budgets without a local coverage band | `TuitionReimbursementGapAdvisor` bands offline tuition vs employer cap for HITL review and never auto-claims |
 ![TuitionReimbursementGapAdvisor](assets/demo/tuition-reimbursement-gap-advisor.gif)
 | Levels.fyi/Blind/Candor bury sabbatical tenure math in closed UIs | Employees miss leave windows without a local eligibility band | `SabbaticalEligibilityAdvisor` bands offline tenure vs policy for HITL review and never auto-approves |
