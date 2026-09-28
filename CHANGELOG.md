@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `FertilityBenefitGapAdvisor` (`services/fertility_benefit_gap.py`): offline HITL fertility treatment cost vs employer benefit-cap coverage bands (never auto-claims). Gap vs Levels.fyi/Blind/Carrot/Progyny fertility planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/FERTILITY_BENEFIT_GAP_ADVISOR_GUIDE.md`.
 - `StudentLoanRepaymentGapAdvisor` (`services/student_loan_repayment_gap.py`): offline HITL monthly payment vs employer SLPRP contribution coverage bands (never auto-enrolls). Gap vs Student Loan Hero/Rippling/Levels.fyi SLPRP planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/STUDENT_LOAN_REPAYMENT_GAP_ADVISOR_GUIDE.md`.
 - `BereavementLeaveGapAdvisor` (`services/bereavement_leave_gap.py`): offline HITL offered vs needed bereavement-day coverage bands (never auto-approves). Gap vs Lattice/Workday/Levels.fyi bereavement planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/BEREAVEMENT_LEAVE_GAP_ADVISOR_GUIDE.md`.
 - `TuitionReimbursementGapAdvisor` (`services/tuition_reimbursement_gap.py`): offline HITL tuition cost vs employer reimbursement-cap coverage bands (never auto-claims). Gap vs Levels.fyi/Blind/Candor tuition planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/TUITION_REIMBURSEMENT_GAP_ADVISOR_GUIDE.md`.
