@@ -153,6 +153,8 @@ This project solves those issues with explicit agent engineering primitives:
 ![CobraContinuationGapAdvisor](assets/demo/cobra-continuation-gap-advisor.gif)
 | Fidelity/Carta/Levels.fyi bury NQDC deferral cliff math in closed UIs | Employees surprise-distributions without a local cliff band | `NqdcDeferralCliffAdvisor` bands offline years-to-cliff vs deferral for HITL review and never auto-elects |
 ![NqdcDeferralCliffAdvisor](assets/demo/nqdc-deferral-cliff-advisor.gif)
+| Lattice/Workday/Levels.fyi bury bereavement leave math in closed UIs | Workers under-provision grief days without a local coverage band | `BereavementLeaveGapAdvisor` bands offline offered vs needed days for HITL review and never auto-approves |
+![BereavementLeaveGapAdvisor](assets/demo/bereavement-leave-gap-advisor.gif)
 | Levels.fyi/Blind/Candor bury tuition reimbursement math in closed UIs | Employees under-claim learning budgets without a local coverage band | `TuitionReimbursementGapAdvisor` bands offline tuition vs employer cap for HITL review and never auto-claims |
 ![TuitionReimbursementGapAdvisor](assets/demo/tuition-reimbursement-gap-advisor.gif)
 | Levels.fyi/Blind/Candor bury sabbatical tenure math in closed UIs | Employees miss leave windows without a local eligibility band | `SabbaticalEligibilityAdvisor` bands offline tenure vs policy for HITL review and never auto-approves |
