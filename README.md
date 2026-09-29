@@ -161,6 +161,8 @@ This project solves those issues with explicit agent engineering primitives:
 ![PetInsuranceGapAdvisor](assets/demo/pet-insurance-gap-advisor.gif)
 | Ladder/Wellhub/Levels.fyi/Blind bury wellness stipend math in closed UIs | Employees under-use wellness budgets without a local coverage band | `WellnessStipendGapAdvisor` bands offline wellness spend vs employer stipend for HITL review and never auto-claims |
 ![WellnessStipendGapAdvisor](assets/demo/wellness-stipend-gap-advisor.gif)
+| WageWorks/Fidelity/Levels.fyi bury Dependent Care FSA math in closed UIs | Caregivers underfund daycare without a local FSA room band | `DependentCareFsaGapAdvisor` bands offline daycare cost vs DCFSA limit for HITL review and never auto-enrolls |
+![DependentCareFsaGapAdvisor](assets/demo/dependent-care-fsa-gap-advisor.gif)
 | Levels.fyi/Blind/Carrot/Progyny bury fertility benefit math in closed UIs | Employees under-claim fertility coverage without a local cap band | `FertilityBenefitGapAdvisor` bands offline treatment cost vs employer cap for HITL review and never auto-claims |
 ![FertilityBenefitGapAdvisor](assets/demo/fertility-benefit-gap-advisor.gif)
 | Levels.fyi/Blind/Candor bury tuition reimbursement math in closed UIs | Employees under-claim learning budgets without a local coverage band | `TuitionReimbursementGapAdvisor` bands offline tuition vs employer cap for HITL review and never auto-claims |
