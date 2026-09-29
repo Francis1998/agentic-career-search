@@ -159,6 +159,8 @@ This project solves those issues with explicit agent engineering primitives:
 ![StudentLoanRepaymentGapAdvisor](assets/demo/student-loan-repayment-gap-advisor.gif)
 | Figo/Trupanion/Levels.fyi/Blind bury pet insurance stipend math in closed UIs | Employees under-claim pet coverage without a local stipend band | `PetInsuranceGapAdvisor` bands offline vet cost vs employer pet stipend for HITL review and never auto-claims |
 ![PetInsuranceGapAdvisor](assets/demo/pet-insurance-gap-advisor.gif)
+| Ladder/Wellhub/Levels.fyi/Blind bury wellness stipend math in closed UIs | Employees under-use wellness budgets without a local coverage band | `WellnessStipendGapAdvisor` bands offline wellness spend vs employer stipend for HITL review and never auto-claims |
+![WellnessStipendGapAdvisor](assets/demo/wellness-stipend-gap-advisor.gif)
 | Levels.fyi/Blind/Carrot/Progyny bury fertility benefit math in closed UIs | Employees under-claim fertility coverage without a local cap band | `FertilityBenefitGapAdvisor` bands offline treatment cost vs employer cap for HITL review and never auto-claims |
 ![FertilityBenefitGapAdvisor](assets/demo/fertility-benefit-gap-advisor.gif)
 | Levels.fyi/Blind/Candor bury tuition reimbursement math in closed UIs | Employees under-claim learning budgets without a local coverage band | `TuitionReimbursementGapAdvisor` bands offline tuition vs employer cap for HITL review and never auto-claims |
