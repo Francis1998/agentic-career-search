@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `LegalInsuranceGapAdvisor` (`services/legal_insurance_gap.py`): offline HITL annual legal-service need vs employer legal-plan value coverage bands (never auto-enrolls). Gap vs LegalShield/ARAG/Levels.fyi/Blind legal-plan planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/LEGAL_INSURANCE_GAP_ADVISOR_GUIDE.md`.
 - `DependentCareFsaGapAdvisor` (`services/dependent_care_fsa_gap.py`): offline HITL annual daycare cost vs Dependent Care FSA contribution-limit coverage bands (never auto-enrolls). Gap vs WageWorks/Fidelity/Levels.fyi DCFSA planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/DEPENDENT_CARE_FSA_GAP_ADVISOR_GUIDE.md`.
 - `WellnessStipendGapAdvisor` (`services/wellness_stipend_gap.py`): offline HITL annual wellness spend vs employer wellness-stipend coverage bands (never auto-claims). Gap vs Ladder/Wellhub/Levels.fyi/Blind wellness-stipend planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/WELLNESS_STIPEND_GAP_ADVISOR_GUIDE.md`.
 - `PetInsuranceGapAdvisor` (`services/pet_insurance_gap.py`): offline HITL annual vet cost vs employer pet-insurance stipend coverage bands (never auto-claims). Gap vs Figo/Trupanion/Levels.fyi/Blind pet-insurance planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/PET_INSURANCE_GAP_ADVISOR_GUIDE.md`.
