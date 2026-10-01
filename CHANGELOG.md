@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `AdoptionAssistanceGapAdvisor` (`services/adoption_assistance_gap.py`): offline HITL adoption cost vs employer assistance coverage bands (never auto-claims). Gap vs Carrot/Progyny/Maven/Levels.fyi adoption planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/ADOPTION_ASSISTANCE_GAP_ADVISOR_GUIDE.md`.
 - `LtdDisabilityGapAdvisor` (`services/ltd_disability_gap.py`): offline HITL income-replacement need vs employer LTD coverage bands (never auto-enrolls). Gap vs Unum/MetLife/Guardian/Levels.fyi LTD planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/LTD_DISABILITY_GAP_ADVISOR_GUIDE.md`.
 - `IdentityTheftProtectionGapAdvisor` (`services/identity_theft_protection_gap.py`): offline HITL household identity-risk budget vs employer benefit coverage bands (never auto-enrolls). Gap vs Norton/LifeLock/Aura/Levels.fyi identity-theft planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/IDENTITY_THEFT_PROTECTION_GAP_ADVISOR_GUIDE.md`.
 - `BackupCareDaysGapAdvisor` (`services/backup_care_days_gap.py`): offline HITL needed vs employer backup-care day coverage bands (never auto-books). Gap vs Bright Horizons/Care.com/Levels.fyi backup-care planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/BACKUP_CARE_DAYS_GAP_ADVISOR_GUIDE.md`.
