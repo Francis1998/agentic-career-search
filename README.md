@@ -167,6 +167,8 @@ This project solves those issues with explicit agent engineering primitives:
 ![LegalInsuranceGapAdvisor](assets/demo/legal-insurance-gap-advisor.gif)
 | Bright Horizons/Care.com/Levels.fyi bury backup-care day math in closed UIs | Caregivers under-provision school-closure coverage without a local day band | `BackupCareDaysGapAdvisor` bands offline needed vs employer backup-care days for HITL review and never auto-books |
 ![BackupCareDaysGapAdvisor](assets/demo/backup-care-days-gap-advisor.gif)
+| Unum/MetLife/Guardian/Levels.fyi bury LTD disability math in closed UIs | Employees under-insure income replacement without a local LTD band | `LtdDisabilityGapAdvisor` bands offline income-replacement need vs employer LTD for HITL review and never auto-enrolls |
+![LtdDisabilityGapAdvisor](assets/demo/ltd-disability-gap-advisor.gif)
 | Norton/LifeLock/Aura/Levels.fyi bury identity-theft benefit math in closed UIs | Employees under-enroll ID protection without a local coverage band | `IdentityTheftProtectionGapAdvisor` bands offline risk budget vs employer benefit for HITL review and never auto-enrolls |
 ![IdentityTheftProtectionGapAdvisor](assets/demo/identity-theft-protection-gap-advisor.gif)
 | Levels.fyi/Blind/Carrot/Progyny bury fertility benefit math in closed UIs | Employees under-claim fertility coverage without a local cap band | `FertilityBenefitGapAdvisor` bands offline treatment cost vs employer cap for HITL review and never auto-claims |
