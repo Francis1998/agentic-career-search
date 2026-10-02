@@ -167,6 +167,8 @@ This project solves those issues with explicit agent engineering primitives:
 ![LegalInsuranceGapAdvisor](assets/demo/legal-insurance-gap-advisor.gif)
 | Bright Horizons/Care.com/Levels.fyi bury backup-care day math in closed UIs | Caregivers under-provision school-closure coverage without a local day band | `BackupCareDaysGapAdvisor` bands offline needed vs employer backup-care days for HITL review and never auto-books |
 ![BackupCareDaysGapAdvisor](assets/demo/backup-care-days-gap-advisor.gif)
+| Benevity/VolunteerMatch/Levels.fyi/Blind bury volunteer-hours math in closed UIs | Employees miss volunteer-PTO without a local coverage band | `EmployeeVolunteerHoursGapAdvisor` bands offline needed vs employer volunteer hours for HITL review and never auto-logs |
+![EmployeeVolunteerHoursGapAdvisor](assets/demo/employee-volunteer-hours-gap-advisor.gif)
 | WageWorks/CommuterBenefits/TransitChek/Levels.fyi bury transit-benefit math in closed UIs | Commuters under-enroll transit benefits without a local coverage band | `TransitCommuteBenefitGapAdvisor` bands offline transit need vs employer benefit for HITL review and never auto-enrolls |
 ![TransitCommuteBenefitGapAdvisor](assets/demo/transit-commute-benefit-gap-advisor.gif)
 | Carrot/Progyny/Maven/Levels.fyi bury adoption-assistance math in closed UIs | Families underfund adoption costs without a local assistance band | `AdoptionAssistanceGapAdvisor` bands offline adoption cost vs employer assistance for HITL review and never auto-claims |
