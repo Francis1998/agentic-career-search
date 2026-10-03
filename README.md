@@ -167,6 +167,8 @@ This project solves those issues with explicit agent engineering primitives:
 ![LegalInsuranceGapAdvisor](assets/demo/legal-insurance-gap-advisor.gif)
 | Bright Horizons/Care.com/Levels.fyi bury backup-care day math in closed UIs | Caregivers under-provision school-closure coverage without a local day band | `BackupCareDaysGapAdvisor` bands offline needed vs employer backup-care days for HITL review and never auto-books |
 ![BackupCareDaysGapAdvisor](assets/demo/backup-care-days-gap-advisor.gif)
+| MyVisaJobs/Levels.fyi/Boundless bury visa timeline math in closed UIs | Candidates miss start dates without a local processing-band | `VisaTimelineGapAdvisor` bands offline days-to-start vs visa processing for HITL review and never auto-applies |
+![VisaTimelineGapAdvisor](assets/demo/visa-timeline-gap-advisor.gif)
 | MetLife/Guardian/Prudential/Levels.fyi bury life-insurance math in closed UIs | Employees under-insure dependents without a local coverage band | `LifeInsuranceCoverageGapAdvisor` bands offline income need vs employer life cover for HITL review and never auto-enrolls |
 ![LifeInsuranceCoverageGapAdvisor](assets/demo/life-insurance-coverage-gap-advisor.gif)
 | Lyra/Spring Health/Modern Health/Levels.fyi bury EAP session-cap math in closed UIs | Employees under-use therapy sessions without a local coverage band | `MentalHealthEapSessionGapAdvisor` bands offline needed vs EAP session caps for HITL review and never auto-books |
