@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `EmergencyFundRunwayAdvisor` (`services/emergency_fund_runway.py`): offline HITL liquid savings vs monthly burn runway-month bands (never auto-transfers). Gap vs YNAB/Mint/Levels.fyi emergency-fund planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/EMERGENCY_FUND_RUNWAY_ADVISOR_GUIDE.md`.
 - `VisaTimelineGapAdvisor` (`services/visa_timeline_gap.py`): offline HITL days-to-start vs estimated visa-processing coverage bands (never auto-applies). Gap vs MyVisaJobs/Levels.fyi/Boundless visa timeline planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/VISA_TIMELINE_GAP_ADVISOR_GUIDE.md`.
 - `LifeInsuranceCoverageGapAdvisor` (`services/life_insurance_coverage_gap.py`): offline HITL income-replacement need vs employer life-insurance coverage bands (never auto-enrolls). Gap vs MetLife/Guardian/Prudential/Levels.fyi planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/LIFE_INSURANCE_COVERAGE_GAP_ADVISOR_GUIDE.md`.
 - `MentalHealthEapSessionGapAdvisor` (`services/mental_health_eap_session_gap.py`): offline HITL needed vs employer EAP/therapy session-cap coverage bands (never auto-books). Gap vs Lyra/Spring Health/Modern Health/Levels.fyi planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/MENTAL_HEALTH_EAP_SESSION_GAP_ADVISOR_GUIDE.md`.
