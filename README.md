@@ -167,6 +167,8 @@ This project solves those issues with explicit agent engineering primitives:
 ![LegalInsuranceGapAdvisor](assets/demo/legal-insurance-gap-advisor.gif)
 | Bright Horizons/Care.com/Levels.fyi bury backup-care day math in closed UIs | Caregivers under-provision school-closure coverage without a local day band | `BackupCareDaysGapAdvisor` bands offline needed vs employer backup-care days for HITL review and never auto-books |
 ![BackupCareDaysGapAdvisor](assets/demo/backup-care-days-gap-advisor.gif)
+| Rippling/Gusto/Levels.fyi bury remote-stipend tax math in closed UIs | Remote workers mis-budget net stipend without a local tax band | `RemoteWorkStipendTaxGapAdvisor` bands offline stipend vs tax withholding for HITL review and never auto-withholds |
+![RemoteWorkStipendTaxGapAdvisor](assets/demo/remote-work-stipend-tax-gap-advisor.gif)
 | YNAB/Mint/Levels.fyi bury emergency-fund runway math in closed UIs | Job seekers underfund runway without a local months band | `EmergencyFundRunwayAdvisor` bands offline liquid savings vs burn for HITL review and never auto-transfers |
 ![EmergencyFundRunwayAdvisor](assets/demo/emergency-fund-runway-advisor.gif)
 | MyVisaJobs/Levels.fyi/Boundless bury visa timeline math in closed UIs | Candidates miss start dates without a local processing-band | `VisaTimelineGapAdvisor` bands offline days-to-start vs visa processing for HITL review and never auto-applies |
