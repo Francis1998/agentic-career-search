@@ -171,6 +171,8 @@ This project solves those issues with explicit agent engineering primitives:
 ![RemoteWorkStipendTaxGapAdvisor](assets/demo/remote-work-stipend-tax-gap-advisor.gif)
 | YNAB/Mint/Levels.fyi bury emergency-fund runway math in closed UIs | Job seekers underfund runway without a local months band | `EmergencyFundRunwayAdvisor` bands offline liquid savings vs burn for HITL review and never auto-transfers |
 ![EmergencyFundRunwayAdvisor](assets/demo/emergency-fund-runway-advisor.gif)
+| MyVisaJobs/H1BGrader/Boundless bury H-1B lottery odds math in closed UIs | Candidates misjudge selection odds without a local registration-coverage band | `H1bLotteryOddsAdvisor` bands offline selected vs target H-1B registrations for HITL review and never auto-registers |
+![H1bLotteryOddsAdvisor](assets/demo/h1b-lottery-odds-advisor.gif)
 | MyVisaJobs/Levels.fyi/Boundless bury visa timeline math in closed UIs | Candidates miss start dates without a local processing-band | `VisaTimelineGapAdvisor` bands offline days-to-start vs visa processing for HITL review and never auto-applies |
 ![VisaTimelineGapAdvisor](assets/demo/visa-timeline-gap-advisor.gif)
 | MetLife/Guardian/Prudential/Levels.fyi bury life-insurance math in closed UIs | Employees under-insure dependents without a local coverage band | `LifeInsuranceCoverageGapAdvisor` bands offline income need vs employer life cover for HITL review and never auto-enrolls |

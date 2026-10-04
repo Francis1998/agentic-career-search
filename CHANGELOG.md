@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `H1bLotteryOddsAdvisor` (`services/h1b_lottery_odds.py`): offline HITL selected vs target H-1B registration coverage bands (never auto-registers). Gap vs MyVisaJobs/H1BGrader/Boundless lottery odds planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/H1B_LOTTERY_ODDS_ADVISOR_GUIDE.md`.
 - `RemoteWorkStipendTaxGapAdvisor` (`services/remote_work_stipend_tax_gap.py`): offline HITL remote stipend vs estimated tax-withholding coverage bands (never auto-withholds). Gap vs Rippling/Gusto/Levels.fyi remote-stipend tax planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/REMOTE_WORK_STIPEND_TAX_GAP_ADVISOR_GUIDE.md`.
 - `EmergencyFundRunwayAdvisor` (`services/emergency_fund_runway.py`): offline HITL liquid savings vs monthly burn runway-month bands (never auto-transfers). Gap vs YNAB/Mint/Levels.fyi emergency-fund planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/EMERGENCY_FUND_RUNWAY_ADVISOR_GUIDE.md`.
 - `VisaTimelineGapAdvisor` (`services/visa_timeline_gap.py`): offline HITL days-to-start vs estimated visa-processing coverage bands (never auto-applies). Gap vs MyVisaJobs/Levels.fyi/Boundless visa timeline planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/VISA_TIMELINE_GAP_ADVISOR_GUIDE.md`.
