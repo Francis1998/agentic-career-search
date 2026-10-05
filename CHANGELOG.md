@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `StockOptionExerciseWindowAdvisor` (`services/stock_option_exercise_window.py`): offline HITL days-remaining vs min exercise-window coverage bands (never auto-exercises). Gap vs Carta/Pulley/Levels.fyi post-termination option exercise-window planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/STOCK_OPTION_EXERCISE_WINDOW_ADVISOR_GUIDE.md`.
 - `InterviewTravelStipendGapAdvisor` (`services/interview_travel_stipend_gap.py`): offline HITL interview stipend vs travel-cost coverage bands (never auto-books). Gap vs Levels.fyi/Blind/Rippling interview travel stipend planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/INTERVIEW_TRAVEL_STIPEND_GAP_ADVISOR_GUIDE.md`.
 - `OfferExpirationUrgencyAdvisor` (`services/offer_expiration_urgency.py`): offline HITL days-until-expire vs decision-buffer coverage bands (never auto-declines). Gap vs Levels.fyi/Blind/Candor offer-expiration planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/OFFER_EXPIRATION_URGENCY_ADVISOR_GUIDE.md`.
 - `H1bLotteryOddsAdvisor` (`services/h1b_lottery_odds.py`): offline HITL selected vs target H-1B registration coverage bands (never auto-registers). Gap vs MyVisaJobs/H1BGrader/Boundless lottery odds planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/H1B_LOTTERY_ODDS_ADVISOR_GUIDE.md`.
