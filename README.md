@@ -175,6 +175,8 @@ This project solves those issues with explicit agent engineering primitives:
 ![StockOptionExerciseWindowAdvisor](assets/demo/stock-option-exercise-window-advisor.gif)
 | Carta/Levels.fyi/Blind bury change-of-control acceleration math in closed UIs | Employees under-negotiate double-trigger accel without a local coverage band | `ChangeOfControlAccelerationAdvisor` bands offline accelerated vs target pct for HITL review and never auto-accelerates |
 ![ChangeOfControlAccelerationAdvisor](assets/demo/change-of-control-acceleration-advisor.gif)
+| Mercer/PwC/Levels.fyi bury tax-equalization / gross-up math in closed UIs | Relocating workers underfund cross-border tax without a local gross-up band | `TaxEqualizationGrossUpAdvisor` bands offline gross-up vs tax delta for HITL review and never auto-grosses-up |
+![TaxEqualizationGrossUpAdvisor](assets/demo/tax-equalization-gross-up-advisor.gif)
 | Levels.fyi/Blind/Rippling bury interview travel-stipend math in closed UIs | Candidates underfund onsite travel without a local stipend-coverage band | `InterviewTravelStipendGapAdvisor` bands offline stipend vs travel cost for HITL review and never auto-books |
 ![InterviewTravelStipendGapAdvisor](assets/demo/interview-travel-stipend-gap-advisor.gif)
 | Levels.fyi/Blind/Candor bury offer-expiration urgency math in closed UIs | Candidates miss decision buffers without a local urgency band | `OfferExpirationUrgencyAdvisor` bands offline days-until-expire vs decision buffer for HITL review and never auto-declines |
