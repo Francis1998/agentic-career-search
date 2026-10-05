@@ -173,6 +173,8 @@ This project solves those issues with explicit agent engineering primitives:
 ![EmergencyFundRunwayAdvisor](assets/demo/emergency-fund-runway-advisor.gif)
 | Carta/Pulley/Levels.fyi bury post-termination option exercise-window math in closed UIs | Employees forfeit options without a local exercise-window band | `StockOptionExerciseWindowAdvisor` bands offline days-remaining vs min exercise window for HITL review and never auto-exercises |
 ![StockOptionExerciseWindowAdvisor](assets/demo/stock-option-exercise-window-advisor.gif)
+| Carta/Levels.fyi/Blind bury change-of-control acceleration math in closed UIs | Employees under-negotiate double-trigger accel without a local coverage band | `ChangeOfControlAccelerationAdvisor` bands offline accelerated vs target pct for HITL review and never auto-accelerates |
+![ChangeOfControlAccelerationAdvisor](assets/demo/change-of-control-acceleration-advisor.gif)
 | Levels.fyi/Blind/Rippling bury interview travel-stipend math in closed UIs | Candidates underfund onsite travel without a local stipend-coverage band | `InterviewTravelStipendGapAdvisor` bands offline stipend vs travel cost for HITL review and never auto-books |
 ![InterviewTravelStipendGapAdvisor](assets/demo/interview-travel-stipend-gap-advisor.gif)
 | Levels.fyi/Blind/Candor bury offer-expiration urgency math in closed UIs | Candidates miss decision buffers without a local urgency band | `OfferExpirationUrgencyAdvisor` bands offline days-until-expire vs decision buffer for HITL review and never auto-declines |
