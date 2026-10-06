@@ -157,6 +157,8 @@ This project solves those issues with explicit agent engineering primitives:
 ![BereavementLeaveGapAdvisor](assets/demo/bereavement-leave-gap-advisor.gif)
 | Student Loan Hero/Rippling/Levels.fyi bury employer SLPRP math in closed UIs | Workers underfund loan payments without a local contribution band | `StudentLoanRepaymentGapAdvisor` bands offline payment vs employer contribution for HITL review and never auto-enrolls |
 ![StudentLoanRepaymentGapAdvisor](assets/demo/student-loan-repayment-gap-advisor.gif)
+| Boundless/MyVisaJobs/Trackitt bury green-card sponsorship timeline math in closed UIs | Candidates mis-time GC filings without a local sponsorship-months band | `GreenCardSponsorshipTimelineAdvisor` bands offline sponsored vs wait months for HITL review and never auto-files |
+![GreenCardSponsorshipTimelineAdvisor](assets/demo/green-card-sponsorship-timeline-advisor.gif)
 | Figo/Trupanion/Levels.fyi/Blind bury pet insurance stipend math in closed UIs | Employees under-claim pet coverage without a local stipend band | `PetInsuranceGapAdvisor` bands offline vet cost vs employer pet stipend for HITL review and never auto-claims |
 ![PetInsuranceGapAdvisor](assets/demo/pet-insurance-gap-advisor.gif)
 | Ladder/Wellhub/Levels.fyi/Blind bury wellness stipend math in closed UIs | Employees under-use wellness budgets without a local coverage band | `WellnessStipendGapAdvisor` bands offline wellness spend vs employer stipend for HITL review and never auto-claims |
