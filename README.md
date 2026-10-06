@@ -157,6 +157,8 @@ This project solves those issues with explicit agent engineering primitives:
 ![BereavementLeaveGapAdvisor](assets/demo/bereavement-leave-gap-advisor.gif)
 | Student Loan Hero/Rippling/Levels.fyi bury employer SLPRP math in closed UIs | Workers underfund loan payments without a local contribution band | `StudentLoanRepaymentGapAdvisor` bands offline payment vs employer contribution for HITL review and never auto-enrolls |
 ![StudentLoanRepaymentGapAdvisor](assets/demo/student-loan-repayment-gap-advisor.gif)
+| Clerky/Carta/Blind bury side-project IP assignment math in closed UIs | Candidates over-assign side-project IP without a local retain band | `SideProjectIpAssignmentAdvisor` bands offline retained vs target IP pct for HITL review and never auto-assigns |
+![SideProjectIpAssignmentAdvisor](assets/demo/side-project-ip-assignment-advisor.gif)
 | Rippling/Gusto/Levels.fyi bury paid-family-leave state-mandate math in closed UIs | Workers under-provision leave without a local employer-vs-state week band | `PaidFamilyLeaveStateGapAdvisor` bands offline employer vs state-mandated weeks for HITL review and never auto-approves |
 ![PaidFamilyLeaveStateGapAdvisor](assets/demo/paid-family-leave-state-gap-advisor.gif)
 | Boundless/MyVisaJobs/Trackitt bury green-card sponsorship timeline math in closed UIs | Candidates mis-time GC filings without a local sponsorship-months band | `GreenCardSponsorshipTimelineAdvisor` bands offline sponsored vs wait months for HITL review and never auto-files |
