@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `ColAdjustedOfferAdvisor` (`services/col_adjusted_offer.py`): offline HITL offer vs COL-adjusted target coverage bands (never auto-accepts). Gap vs Levels.fyi/NerdWallet/Blind COL-adjusted offer planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/COL_ADJUSTED_OFFER_ADVISOR_GUIDE.md`.
 - `Four01kMatchVestingCliffAdvisor` (`services/four01k_match_vesting_cliff.py`): offline HITL vested-match vs target coverage bands (never auto-enrolls). Gap vs Fidelity/Vanguard/Schwab/Levels.fyi 401k match vesting-cliff planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/FOUR01K_MATCH_VESTING_CLIFF_ADVISOR_GUIDE.md`.
 - `NonCompeteGeoScopeAdvisor` (`services/noncompete_geo_scope.py`): offline HITL restricted vs acceptable radius coverage bands (never auto-signs). Gap vs Clerky/Blind/Levels.fyi non-compete geographic-scope planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/NON_COMPETE_GEO_SCOPE_ADVISOR_GUIDE.md`.
 - `SideProjectIpAssignmentAdvisor` (`services/side_project_ip_assignment.py`): offline HITL retained vs target side-project IP coverage bands (never auto-assigns). Gap vs Clerky/Carta/Blind side-project IP assignment planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/SIDE_PROJECT_IP_ASSIGNMENT_ADVISOR_GUIDE.md`.
