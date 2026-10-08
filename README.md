@@ -161,6 +161,8 @@ This project solves those issues with explicit agent engineering primitives:
 ![NonCompeteGeoScopeAdvisor](assets/demo/noncompete-geo-scope-advisor.gif)
 | Fidelity/Vanguard/Schwab bury 401k match vesting-cliff math in closed UIs | Workers forfeit match without a local vested-pct coverage band | `Four01kMatchVestingCliffAdvisor` bands offline vested match vs target for HITL review and never auto-enrolls |
 ![Four01kMatchVestingCliffAdvisor](assets/demo/four01k-match-vesting-cliff-advisor.gif)
+| Lattice/Rippling/Justworks bury eldercare leave math in closed UIs | Caregivers under-provision leave without a local days band | `EldercareLeaveDaysGapAdvisor` bands offline offered vs needed eldercare days for HITL review and never auto-approves |
+![EldercareLeaveDaysGapAdvisor](assets/demo/eldercare-leave-days-gap-advisor.gif)
 | Levels.fyi/NerdWallet/Blind bury COL-adjusted offer math in closed UIs | Candidates mis-rank offers without a local COL-adjusted coverage band | `ColAdjustedOfferAdvisor` bands offline offer vs COL-adjusted target for HITL review and never auto-accepts |
 ![ColAdjustedOfferAdvisor](assets/demo/col-adjusted-offer-advisor.gif)
 | Clerky/Carta/Blind bury side-project IP assignment math in closed UIs | Candidates over-assign side-project IP without a local retain band | `SideProjectIpAssignmentAdvisor` bands offline retained vs target IP pct for HITL review and never auto-assigns |
