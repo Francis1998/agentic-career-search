@@ -11,7 +11,9 @@ Distinct from `EquityVestingCliffAdvisor` and `SigningBonusClawbackAdvisor`.
 ## Usage
 
 ```python
-from autoapply_agent.services.change_of_control_acceleration import ChangeOfControlAccelerationAdvisor
+from autoapply_agent.services.change_of_control_acceleration import (
+    ChangeOfControlAccelerationAdvisor,
+)
 
 report = ChangeOfControlAccelerationAdvisor().advise(
     accelerated_pct=10.0,

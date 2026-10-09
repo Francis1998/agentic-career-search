@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `GardenLeaveGapAdvisor` (`services/garden_leave_gap.py`): offline HITL garden_leave_days vs needed_transition_days coverage bands (never auto-accepts garden leave). Gap vs Clerky/Blind/Levels.fyi garden-leave planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/GARDEN_LEAVE_GAP_ADVISOR_GUIDE.md`.
 - `HousingAllowanceGapAdvisor` (`services/housing_allowance_gap.py`): offline HITL housing allowance vs rent/mortgage coverage bands (never auto-claims). Gap vs NerdWallet/Levels.fyi/Blind housing allowance planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/HOUSING_ALLOWANCE_GAP_ADVISOR_GUIDE.md`.
 - `MealStipendGapAdvisor` (`services/meal_stipend_gap.py`): offline HITL meal stipend vs food-cost coverage bands (never auto-claims). Gap vs Levels.fyi/Blind/Rippling meal stipend planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/MEAL_STIPEND_GAP_ADVISOR_GUIDE.md`.
 - `EldercareLeaveDaysGapAdvisor` (`services/eldercare_leave_days_gap.py`): offline HITL offered vs needed eldercare-days coverage bands (never auto-approves). Gap vs Lattice/Rippling/Justworks eldercare leave planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/ELDERCARE_LEAVE_DAYS_GAP_ADVISOR_GUIDE.md`.
