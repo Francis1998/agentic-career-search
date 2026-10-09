@@ -165,6 +165,8 @@ This project solves those issues with explicit agent engineering primitives:
 ![EldercareLeaveDaysGapAdvisor](assets/demo/eldercare-leave-days-gap-advisor.gif)
 | Levels.fyi/Blind/Rippling bury meal stipend math in closed UIs | Workers underfund meals without a local stipend band | `MealStipendGapAdvisor` bands offline stipend vs food cost for HITL review and never auto-claims |
 ![MealStipendGapAdvisor](assets/demo/meal-stipend-gap-advisor.gif)
+| Clerky/Blind/Levels.fyi bury garden-leave math in closed UIs | Candidates under-negotiate transition buffers without a local days band | `GardenLeaveGapAdvisor` bands offline garden-leave vs needed transition days for HITL review and never auto-accepts |
+![GardenLeaveGapAdvisor](assets/demo/garden-leave-gap-advisor.gif)
 | NerdWallet/Levels.fyi/Blind bury housing allowance math in closed UIs | Candidates underfund rent without a local allowance band | `HousingAllowanceGapAdvisor` bands offline allowance vs housing cost for HITL review and never auto-claims |
 ![HousingAllowanceGapAdvisor](assets/demo/housing-allowance-gap-advisor.gif)
 | Levels.fyi/NerdWallet/Blind bury COL-adjusted offer math in closed UIs | Candidates mis-rank offers without a local COL-adjusted coverage band | `ColAdjustedOfferAdvisor` bands offline offer vs COL-adjusted target for HITL review and never auto-accepts |
