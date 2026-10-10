@@ -175,6 +175,8 @@ This project solves those issues with explicit agent engineering primitives:
 ![RsuRefreshCliffAdvisor](assets/demo/rsu-refresh-cliff-advisor.gif)
 | Remotive/Levels.fyi/Blind bury commute time-value math in closed UIs | Candidates underweight opportunity cost of commute hours without a local $/week band | `CommuteTimeValueAdvisor` bands offline weekly commute hours × opportunity cost for HITL review and never auto-accepts |
 ![CommuteTimeValueAdvisor](assets/demo/commute-time-value-advisor.gif)
+| Fidelity/Schwab/Carta bury ESPP lookback-discount math in closed UIs | Workers underfund ESPP without a local lookback-discount coverage band | `EsppLookbackGapAdvisor` bands offline lookback discount vs target for HITL review and never auto-enrolls |
+![EsppLookbackGapAdvisor](assets/demo/espp-lookback-gap-advisor.gif)
 | NerdWallet/Levels.fyi/Blind bury housing allowance math in closed UIs | Candidates underfund rent without a local allowance band | `HousingAllowanceGapAdvisor` bands offline allowance vs housing cost for HITL review and never auto-claims |
 ![HousingAllowanceGapAdvisor](assets/demo/housing-allowance-gap-advisor.gif)
 | Levels.fyi/NerdWallet/Blind bury COL-adjusted offer math in closed UIs | Candidates mis-rank offers without a local COL-adjusted coverage band | `ColAdjustedOfferAdvisor` bands offline offer vs COL-adjusted target for HITL review and never auto-accepts |
