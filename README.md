@@ -173,6 +173,8 @@ This project solves those issues with explicit agent engineering primitives:
 ![EquityBlackoutWindowAdvisor](assets/demo/equity-blackout-window-advisor.gif)
 | Carta/Pulley/Levels.fyi bury RSU refresh-cliff math in closed UIs | Workers mistime resignations without a local months-to-cliff band | `RsuRefreshCliffAdvisor` bands offline months-to-refresh-cliff vs buffer for HITL review and never auto-resigns |
 ![RsuRefreshCliffAdvisor](assets/demo/rsu-refresh-cliff-advisor.gif)
+| Remotive/Levels.fyi/Blind bury commute time-value math in closed UIs | Candidates underweight opportunity cost of commute hours without a local $/week band | `CommuteTimeValueAdvisor` bands offline weekly commute hours × opportunity cost for HITL review and never auto-accepts |
+![CommuteTimeValueAdvisor](assets/demo/commute-time-value-advisor.gif)
 | NerdWallet/Levels.fyi/Blind bury housing allowance math in closed UIs | Candidates underfund rent without a local allowance band | `HousingAllowanceGapAdvisor` bands offline allowance vs housing cost for HITL review and never auto-claims |
 ![HousingAllowanceGapAdvisor](assets/demo/housing-allowance-gap-advisor.gif)
 | Levels.fyi/NerdWallet/Blind bury COL-adjusted offer math in closed UIs | Candidates mis-rank offers without a local COL-adjusted coverage band | `ColAdjustedOfferAdvisor` bands offline offer vs COL-adjusted target for HITL review and never auto-accepts |
