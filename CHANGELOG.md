@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `NoticePeriodBuyoutGapAdvisor` (`services/notice_period_buyout_gap.py`): offline HITL buyout_weeks vs needed_weeks coverage bands (never auto-enrolls). Gap vs Clerky/Blind/Levels.fyi notice-period buyout planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/NOTICE_PERIOD_BUYOUT_GAP_ADVISOR_GUIDE.md`.
 - `SeveranceCobraTopupGapAdvisor` (`services/severance_cobra_topup_gap.py`): offline HITL topup_months vs needed_months coverage bands (never auto-enrolls). Gap vs NerdWallet/Levels.fyi/Blind severance COBRA top-up planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/SEVERANCE_COBRA_TOPUP_GAP_ADVISOR_GUIDE.md`.
 - `PtoAccrualCliffAdvisor` (`services/pto_accrual_cliff.py`): offline HITL accrued_hours vs cliff_hours coverage bands (never auto-enrolls). Gap vs Rippling/Gusto/Levels.fyi PTO accrual-cliff planners (distinct from PTO cash-out value). Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/PTO_ACCRUAL_CLIFF_ADVISOR_GUIDE.md`.
 - `EsppLookbackGapAdvisor` (`services/espp_lookback_gap.py`): offline HITL lookback_discount_pct vs target_discount_pct coverage bands (never auto-enrolls). Gap vs Fidelity/Schwab/Carta ESPP lookback-discount planners (distinct from flat ESPP discount value). Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/ESPP_LOOKBACK_GAP_ADVISOR_GUIDE.md`.
