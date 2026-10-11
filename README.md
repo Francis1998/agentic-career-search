@@ -175,6 +175,8 @@ This project solves those issues with explicit agent engineering primitives:
 ![RsuRefreshCliffAdvisor](assets/demo/rsu-refresh-cliff-advisor.gif)
 | Remotive/Levels.fyi/Blind bury commute time-value math in closed UIs | Candidates underweight opportunity cost of commute hours without a local $/week band | `CommuteTimeValueAdvisor` bands offline weekly commute hours × opportunity cost for HITL review and never auto-accepts |
 ![CommuteTimeValueAdvisor](assets/demo/commute-time-value-advisor.gif)
+| NerdWallet/Levels.fyi/Blind severance COBRA top-up planners bury related math in closed UIs | Workers underfund COBRA top-ups without a local months band | `SeveranceCobraTopupGapAdvisor` bands offline topup_months vs needed_months for HITL review and never auto-enrolls |
+![SeveranceCobraTopupGapAdvisor](assets/demo/severance-cobra-topup-gap-advisor.gif)
 | Rippling/Gusto/Levels.fyi bury PTO accrual-cliff math in closed UIs | Workers mistime leave without a local accrued-vs-cliff hours band | `PtoAccrualCliffAdvisor` bands offline accrued hours vs cliff for HITL review and never auto-enrolls |
 ![PtoAccrualCliffAdvisor](assets/demo/pto-accrual-cliff-advisor.gif)
 | Fidelity/Schwab/Carta bury ESPP lookback-discount math in closed UIs | Workers underfund ESPP without a local lookback-discount coverage band | `EsppLookbackGapAdvisor` bands offline lookback discount vs target for HITL review and never auto-enrolls |
