@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `IsoEarlyExerciseAmtLadderAdvisor` (`services/iso_early_exercise_amt_ladder.py`): offline HITL ladder_years vs needed_years coverage bands (never auto-enrolls). Gap vs Carta/Pulley/Levels.fyi ISO early-exercise AMT ladder planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/ISO_EARLY_EXERCISE_AMT_LADDER_ADVISOR_GUIDE.md`.
 - `NoticePeriodBuyoutGapAdvisor` (`services/notice_period_buyout_gap.py`): offline HITL buyout_weeks vs needed_weeks coverage bands (never auto-enrolls). Gap vs Clerky/Blind/Levels.fyi notice-period buyout planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/NOTICE_PERIOD_BUYOUT_GAP_ADVISOR_GUIDE.md`.
 - `SeveranceCobraTopupGapAdvisor` (`services/severance_cobra_topup_gap.py`): offline HITL topup_months vs needed_months coverage bands (never auto-enrolls). Gap vs NerdWallet/Levels.fyi/Blind severance COBRA top-up planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/SEVERANCE_COBRA_TOPUP_GAP_ADVISOR_GUIDE.md`.
 - `PtoAccrualCliffAdvisor` (`services/pto_accrual_cliff.py`): offline HITL accrued_hours vs cliff_hours coverage bands (never auto-enrolls). Gap vs Rippling/Gusto/Levels.fyi PTO accrual-cliff planners (distinct from PTO cash-out value). Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/PTO_ACCRUAL_CLIFF_ADVISOR_GUIDE.md`.
