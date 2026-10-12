@@ -175,6 +175,8 @@ This project solves those issues with explicit agent engineering primitives:
 ![RsuRefreshCliffAdvisor](assets/demo/rsu-refresh-cliff-advisor.gif)
 | Remotive/Levels.fyi/Blind bury commute time-value math in closed UIs | Candidates underweight opportunity cost of commute hours without a local $/week band | `CommuteTimeValueAdvisor` bands offline weekly commute hours × opportunity cost for HITL review and never auto-accepts |
 ![CommuteTimeValueAdvisor](assets/demo/commute-time-value-advisor.gif)
+| Levels.fyi/Blind/Rippling sign-on clawback planners bury related math in closed UIs | Workers lack a local clawback_months vs needed_months band | `SignOnClawbackGapAdvisor` bands offline clawback_months vs needed_months for HITL review and never auto-enrolls |
+![SignOnClawbackGapAdvisor](assets/demo/sign-on-clawback-gap-advisor.gif)
 | Carta/Schwab/Fidelity RSU supplemental-withholding gap planners bury related math in closed UIs | Workers lack a local withheld_rate vs marginal_rate band | `RsuSupplementalWithholdingGapAdvisor` bands offline withheld_rate vs marginal_rate for HITL review and never auto-enrolls |
 ![RsuSupplementalWithholdingGapAdvisor](assets/demo/rsu-supplemental-withholding-gap-advisor.gif)
 | Carta/Pulley/Levels.fyi ISO early-exercise AMT ladder planners bury related math in closed UIs | Workers lack a local ladder_years vs needed_years band | `IsoEarlyExerciseAmtLadderAdvisor` bands offline ladder_years vs needed_years for HITL review and never auto-enrolls |
