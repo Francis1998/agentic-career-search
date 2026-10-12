@@ -175,6 +175,8 @@ This project solves those issues with explicit agent engineering primitives:
 ![RsuRefreshCliffAdvisor](assets/demo/rsu-refresh-cliff-advisor.gif)
 | Remotive/Levels.fyi/Blind bury commute time-value math in closed UIs | Candidates underweight opportunity cost of commute hours without a local $/week band | `CommuteTimeValueAdvisor` bands offline weekly commute hours × opportunity cost for HITL review and never auto-accepts |
 ![CommuteTimeValueAdvisor](assets/demo/commute-time-value-advisor.gif)
+| Carta/Pulley/Levels.fyi ISO early-exercise AMT ladder planners bury related math in closed UIs | Workers lack a local ladder_years vs needed_years band | `IsoEarlyExerciseAmtLadderAdvisor` bands offline ladder_years vs needed_years for HITL review and never auto-enrolls |
+![IsoEarlyExerciseAmtLadderAdvisor](assets/demo/iso-early-exercise-amt-ladder-advisor.gif)
 | Clerky/Blind/Levels.fyi notice-period buyout planners bury related math in closed UIs | Candidates underfund notice buyouts without a local weeks band | `NoticePeriodBuyoutGapAdvisor` bands offline buyout_weeks vs needed_weeks for HITL review and never auto-enrolls |
 ![NoticePeriodBuyoutGapAdvisor](assets/demo/notice-period-buyout-gap-advisor.gif)
 | NerdWallet/Levels.fyi/Blind severance COBRA top-up planners bury related math in closed UIs | Workers underfund COBRA top-ups without a local months band | `SeveranceCobraTopupGapAdvisor` bands offline topup_months vs needed_months for HITL review and never auto-enrolls |
