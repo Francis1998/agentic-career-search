@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `YearEndBonusProrataGapAdvisor` (`services/year_end_bonus_prorata_gap.py`): offline HITL prorata_pct vs target_pct coverage bands (never auto-enrolls). Gap vs Levels.fyi/Blind/Rippling year-end bonus pro-rata planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/YEAR_END_BONUS_PRORATA_GAP_ADVISOR_GUIDE.md`.
 - `PtoCarryoverCapGapAdvisor` (`services/pto_carryover_cap_gap.py`): offline HITL carryover_hours vs needed_hours coverage bands (never auto-enrolls). Gap vs Rippling/Gusto/Levels.fyi PTO carryover-cap planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/PTO_CARRYOVER_CAP_GAP_ADVISOR_GUIDE.md`.
 - `SignOnClawbackGapAdvisor` (`services/sign_on_clawback_gap.py`): offline HITL clawback_months vs needed_months coverage bands (never auto-enrolls). Gap vs Levels.fyi/Blind/Rippling sign-on clawback planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/SIGN_ON_CLAWBACK_GAP_ADVISOR_GUIDE.md`.
 - `RsuSupplementalWithholdingGapAdvisor` (`services/rsu_supplemental_withholding_gap.py`): offline HITL withheld_rate vs marginal_rate coverage bands (never auto-enrolls). Gap vs Carta/Schwab/Fidelity RSU supplemental-withholding gap planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/RSU_SUPPLEMENTAL_WITHHOLDING_GAP_ADVISOR_GUIDE.md`.
