@@ -184,6 +184,8 @@ This project solves those issues with explicit agent engineering primitives:
 | Carta/Pulley/Levels.fyi IPO lockup-release planners bury related math in closed UIs | Workers lack a local days_to_lockup_end vs needed_liquidity_days band | `IpoLockupReleaseGapAdvisor` bands offline days_to_lockup_end vs needed_liquidity_days for HITL review and never auto-enrolls |
 ![IpoLockupReleaseGapAdvisor](assets/demo/ipo-lockup-release-gap-advisor.gif)
 | Carta/Schwab/Fidelity RSU supplemental-withholding gap planners bury related math in closed UIs | Workers lack a local withheld_rate vs marginal_rate band | `RsuSupplementalWithholdingGapAdvisor` bands offline withheld_rate vs marginal_rate for HITL review and never auto-enrolls |
+| Fidelity/Carta/Levels.fyi NQDC distribution-window planners bury related math in closed UIs | Workers lack a local days_to_distribution vs needed_liquidity_days band | `NqdcDistributionWindowGapAdvisor` bands offline days_to_distribution vs needed_liquidity_days for HITL review and never auto-enrolls |
+![NqdcDistributionWindowGapAdvisor](assets/demo/nqdc-distribution-window-gap-advisor.gif)
 ![RsuSupplementalWithholdingGapAdvisor](assets/demo/rsu-supplemental-withholding-gap-advisor.gif)
 | Carta/Pulley/Levels.fyi ISO early-exercise AMT ladder planners bury related math in closed UIs | Workers lack a local ladder_years vs needed_years band | `IsoEarlyExerciseAmtLadderAdvisor` bands offline ladder_years vs needed_years for HITL review and never auto-enrolls |
 ![IsoEarlyExerciseAmtLadderAdvisor](assets/demo/iso-early-exercise-amt-ladder-advisor.gif)
