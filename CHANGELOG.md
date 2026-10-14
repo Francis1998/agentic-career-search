@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `ParkingStipendGapAdvisor` (`services/parking_stipend_gap.py`): offline HITL offered_parking_usd vs needed_parking_usd coverage bands (never auto-enrolls). Gap vs Rippling/Gusto/Levels.fyi parking-stipend planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/PARKING_STIPEND_GAP_ADVISOR_GUIDE.md`.
 - `EquityForfeitureOnPipGapAdvisor` (`services/equity_forfeiture_on_pip_gap.py`): offline HITL protected_equity_usd vs unvested_equity_usd coverage bands (never auto-enrolls). Gap vs Carta/Pulley/Levels.fyi equity forfeiture-on-PIP planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/EQUITY_FORFEITURE_ON_PIP_GAP_ADVISOR_GUIDE.md`.
 - `IpoLockupReleaseGapAdvisor` (`services/ipo_lockup_release_gap.py`): offline HITL days_to_lockup_end vs needed_liquidity_days coverage bands (never auto-enrolls). Gap vs Carta/Pulley/Levels.fyi IPO lockup-release planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/IPO_LOCKUP_RELEASE_GAP_ADVISOR_GUIDE.md`.
 - `YearEndBonusProrataGapAdvisor` (`services/year_end_bonus_prorata_gap.py`): offline HITL prorata_pct vs target_pct coverage bands (never auto-enrolls). Gap vs Levels.fyi/Blind/Rippling year-end bonus pro-rata planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/YEAR_END_BONUS_PRORATA_GAP_ADVISOR_GUIDE.md`.
