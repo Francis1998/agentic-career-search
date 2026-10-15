@@ -186,6 +186,8 @@ This project solves those issues with explicit agent engineering primitives:
 | Carta/Schwab/Fidelity RSU supplemental-withholding gap planners bury related math in closed UIs | Workers lack a local withheld_rate vs marginal_rate band | `RsuSupplementalWithholdingGapAdvisor` bands offline withheld_rate vs marginal_rate for HITL review and never auto-enrolls |
 | Carta/Pulley/Levels.fyi equity forfeiture-on-PIP planners bury related math in closed UIs | Workers lack a local protected_equity_usd vs unvested_equity_usd band | `EquityForfeitureOnPipGapAdvisor` bands offline protected_equity_usd vs unvested_equity_usd for HITL review and never auto-enrolls |
 ![EquityForfeitureOnPipGapAdvisor](assets/demo/equity-forfeiture-on-pip-gap-advisor.gif)
+| Fidelity/Vanguard/Rippling 401(k) match true-up planners bury related math in closed UIs | Workers lack a local true_up_credited_usd vs true_up_owed_usd band | `Four01kMatchTrueUpGapAdvisor` bands offline true_up_credited_usd vs true_up_owed_usd for HITL review and never auto-enrolls |
+![Four01kMatchTrueUpGapAdvisor](assets/demo/four01k-match-true-up-gap-advisor.gif)
 | Rippling/Gusto/Levels.fyi parking-stipend planners bury related math in closed UIs | Workers lack a local offered_parking_usd vs needed_parking_usd band | `ParkingStipendGapAdvisor` bands offline offered_parking_usd vs needed_parking_usd for HITL review and never auto-enrolls |
 ![ParkingStipendGapAdvisor](assets/demo/parking-stipend-gap-advisor.gif)
 ![RsuSupplementalWithholdingGapAdvisor](assets/demo/rsu-supplemental-withholding-gap-advisor.gif)
