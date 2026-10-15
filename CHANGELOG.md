@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `ChildcareSubsidyGapAdvisor` (`services/childcare_subsidy_gap.py`): offline HITL offered_subsidy_usd vs needed_subsidy_usd coverage bands (never auto-enrolls). Gap vs Rippling/Gusto/Care.com childcare-subsidy planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/CHILDCARE_SUBSIDY_GAP_ADVISOR_GUIDE.md`.
 - `Four01kMatchTrueUpGapAdvisor` (`services/four01k_match_true_up.py`): offline HITL true_up_credited_usd vs true_up_owed_usd coverage bands (never auto-enrolls). Gap vs Fidelity/Vanguard/Rippling 401(k) match true-up planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/FOUR01K_MATCH_TRUE_UP_GAP_ADVISOR_GUIDE.md`.
 - `ParkingStipendGapAdvisor` (`services/parking_stipend_gap.py`): offline HITL offered_parking_usd vs needed_parking_usd coverage bands (never auto-enrolls). Gap vs Rippling/Gusto/Levels.fyi parking-stipend planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/PARKING_STIPEND_GAP_ADVISOR_GUIDE.md`.
 - `EquityForfeitureOnPipGapAdvisor` (`services/equity_forfeiture_on_pip_gap.py`): offline HITL protected_equity_usd vs unvested_equity_usd coverage bands (never auto-enrolls). Gap vs Carta/Pulley/Levels.fyi equity forfeiture-on-PIP planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/EQUITY_FORFEITURE_ON_PIP_GAP_ADVISOR_GUIDE.md`.
