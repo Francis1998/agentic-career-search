@@ -190,6 +190,8 @@ This project solves those issues with explicit agent engineering primitives:
 ![Four01kMatchTrueUpGapAdvisor](assets/demo/four01k-match-true-up-gap-advisor.gif)
 | Rippling/Gusto/Care.com childcare-subsidy planners bury related math in closed UIs | Workers lack a local offered_subsidy_usd vs needed_subsidy_usd band | `ChildcareSubsidyGapAdvisor` bands offline offered_subsidy_usd vs needed_subsidy_usd for HITL review and never auto-enrolls |
 ![ChildcareSubsidyGapAdvisor](assets/demo/childcare-subsidy-gap-advisor.gif)
+| Levels.fyi/Blind/Rippling unlimited-PTO utilization planners bury related math in closed UIs | Workers lack a local days_taken vs peer_median_days band | `UnlimitedPtoUtilizationGapAdvisor` bands offline days_taken vs peer_median_days for HITL review and never auto-enrolls |
+![UnlimitedPtoUtilizationGapAdvisor](assets/demo/unlimited-pto-utilization-gap-advisor.gif)
 | Rippling/Gusto/Levels.fyi parking-stipend planners bury related math in closed UIs | Workers lack a local offered_parking_usd vs needed_parking_usd band | `ParkingStipendGapAdvisor` bands offline offered_parking_usd vs needed_parking_usd for HITL review and never auto-enrolls |
 ![ParkingStipendGapAdvisor](assets/demo/parking-stipend-gap-advisor.gif)
 ![RsuSupplementalWithholdingGapAdvisor](assets/demo/rsu-supplemental-withholding-gap-advisor.gif)
