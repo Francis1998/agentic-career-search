@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `SummerFridayGapAdvisor` (`services/summer_friday_gap.py`): offline HITL offered_fridays vs peer_median_fridays coverage bands (never auto-enrolls). Gap vs Levels.fyi/Blind/Rippling summer-Friday planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/SUMMER_FRIDAY_GAP_ADVISOR_GUIDE.md`.
 - `ConferenceBudgetGapAdvisor` (`services/conference_budget_gap.py`): offline HITL offered_budget_usd vs needed_budget_usd coverage bands (never auto-enrolls). Gap vs Rippling/Culture Amp/Lattice conference-budget planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/CONFERENCE_BUDGET_GAP_ADVISOR_GUIDE.md`.
 - `UnlimitedPtoUtilizationGapAdvisor` (`services/unlimited_pto_utilization_gap.py`): offline HITL days_taken vs peer_median_days coverage bands (never auto-enrolls). Gap vs Levels.fyi/Blind/Rippling unlimited-PTO utilization planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/UNLIMITED_PTO_UTILIZATION_GAP_ADVISOR_GUIDE.md`.
 - `ChildcareSubsidyGapAdvisor` (`services/childcare_subsidy_gap.py`): offline HITL offered_subsidy_usd vs needed_subsidy_usd coverage bands (never auto-enrolls). Gap vs Rippling/Gusto/Care.com childcare-subsidy planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/CHILDCARE_SUBSIDY_GAP_ADVISOR_GUIDE.md`.
