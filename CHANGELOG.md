@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `ConferenceBudgetGapAdvisor` (`services/conference_budget_gap.py`): offline HITL offered_budget_usd vs needed_budget_usd coverage bands (never auto-enrolls). Gap vs Rippling/Culture Amp/Lattice conference-budget planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/CONFERENCE_BUDGET_GAP_ADVISOR_GUIDE.md`.
 - `UnlimitedPtoUtilizationGapAdvisor` (`services/unlimited_pto_utilization_gap.py`): offline HITL days_taken vs peer_median_days coverage bands (never auto-enrolls). Gap vs Levels.fyi/Blind/Rippling unlimited-PTO utilization planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/UNLIMITED_PTO_UTILIZATION_GAP_ADVISOR_GUIDE.md`.
 - `ChildcareSubsidyGapAdvisor` (`services/childcare_subsidy_gap.py`): offline HITL offered_subsidy_usd vs needed_subsidy_usd coverage bands (never auto-enrolls). Gap vs Rippling/Gusto/Care.com childcare-subsidy planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/CHILDCARE_SUBSIDY_GAP_ADVISOR_GUIDE.md`.
 - `Four01kMatchTrueUpGapAdvisor` (`services/four01k_match_true_up.py`): offline HITL true_up_credited_usd vs true_up_owed_usd coverage bands (never auto-enrolls). Gap vs Fidelity/Vanguard/Rippling 401(k) match true-up planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/FOUR01K_MATCH_TRUE_UP_GAP_ADVISOR_GUIDE.md`.
