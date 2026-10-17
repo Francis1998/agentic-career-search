@@ -198,6 +198,8 @@ This project solves those issues with explicit agent engineering primitives:
 ![SummerFridayGapAdvisor](assets/demo/summer-friday-gap-advisor.gif)
 | Rippling/Gusto/BambooHR floating-holiday planners bury related math in closed UIs | Workers lack a local offered_days vs needed_days band | `FloatingHolidayGapAdvisor` bands offline offered_days vs needed_days for HITL review and never auto-enrolls |
 ![FloatingHolidayGapAdvisor](assets/demo/floating-holiday-gap-advisor.gif)
+| Rippling/Guild/Levels.fyi learning-stipend planners bury related math in closed UIs | Workers lack a local offered_usd vs needed_usd band | `LearningStipendGapAdvisor` bands offline `offered_usd` vs `needed_usd` for HITL review and never auto-enrolls |
+![LearningStipendGapAdvisor](assets/demo/learning-stipend-gap-advisor.gif)
 | Rippling/Gusto/Levels.fyi parking-stipend planners bury related math in closed UIs | Workers lack a local offered_parking_usd vs needed_parking_usd band | `ParkingStipendGapAdvisor` bands offline offered_parking_usd vs needed_parking_usd for HITL review and never auto-enrolls |
 ![ParkingStipendGapAdvisor](assets/demo/parking-stipend-gap-advisor.gif)
 ![RsuSupplementalWithholdingGapAdvisor](assets/demo/rsu-supplemental-withholding-gap-advisor.gif)

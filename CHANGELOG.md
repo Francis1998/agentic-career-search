@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `LearningStipendGapAdvisor` (`services/learning_stipend_gap.py`): offline HITL `offered_usd` vs `needed_usd` coverage bands (never auto-enrolls). Gap vs Rippling/Guild/Levels.fyi learning-stipend planners. Distinct from `MealStipendGapAdvisor` / `ConferenceBudgetGapAdvisor`. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/LEARNING_STIPEND_GAP_ADVISOR_GUIDE.md`.
 - `FloatingHolidayGapAdvisor` (`services/floating_holiday_gap.py`): offline HITL offered_days vs needed_days coverage bands (never auto-enrolls). Gap vs Rippling/Gusto/BambooHR floating-holiday planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/FLOATING_HOLIDAY_GAP_ADVISOR_GUIDE.md`.
 - `SummerFridayGapAdvisor` (`services/summer_friday_gap.py`): offline HITL offered_fridays vs peer_median_fridays coverage bands (never auto-enrolls). Gap vs Levels.fyi/Blind/Rippling summer-Friday planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/SUMMER_FRIDAY_GAP_ADVISOR_GUIDE.md`.
 - `ConferenceBudgetGapAdvisor` (`services/conference_budget_gap.py`): offline HITL offered_budget_usd vs needed_budget_usd coverage bands (never auto-enrolls). Gap vs Rippling/Culture Amp/Lattice conference-budget planners. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/CONFERENCE_BUDGET_GAP_ADVISOR_GUIDE.md`.
