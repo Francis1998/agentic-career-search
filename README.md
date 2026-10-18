@@ -200,6 +200,8 @@ This project solves those issues with explicit agent engineering primitives:
 ![FloatingHolidayGapAdvisor](assets/demo/floating-holiday-gap-advisor.gif)
 | Benevity/YourCause/CyberGrants charitable-match planners bury related math in closed UIs | Workers lack a local `match_usd` vs `donation_usd` band | `CharitableMatchGapAdvisor` bands offline `match_usd` vs `donation_usd` for HITL review and never auto-enrolls |
 ![CharitableMatchGapAdvisor](assets/demo/charitable-match-gap-advisor.gif)
+| Rippling/Culture Amp/Total Rewards LSA planners bury related math in closed UIs | Workers lack a local `offered_usd` vs `needed_usd` band | `LifestyleSpendingAllowanceGapAdvisor` bands offline `offered_usd` vs `needed_usd` for HITL review and never auto-enrolls |
+![LifestyleSpendingAllowanceGapAdvisor](assets/demo/lifestyle-spending-allowance-gap-advisor.gif)
 | Lattice/Rippling/BambooHR pet-bereavement leave planners bury related math in closed UIs | Workers lack a local offered_days vs needed_days band | `PetBereavementLeaveGapAdvisor` bands offline `offered_days` vs `needed_days` for HITL review and never auto-approves |
 ![PetBereavementLeaveGapAdvisor](assets/demo/pet-bereavement-leave-gap-advisor.gif)
 | Rippling/WellnessLiving/Levels.fyi gym-membership planners bury related math in closed UIs | Workers lack a local offered_usd vs needed_usd band | `GymMembershipGapAdvisor` bands offline `offered_usd` vs `needed_usd` for HITL review and never auto-enrolls |
