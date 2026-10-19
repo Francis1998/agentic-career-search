@@ -204,6 +204,8 @@ This project solves those issues with explicit agent engineering primitives:
 ![LifestyleSpendingAllowanceGapAdvisor](assets/demo/lifestyle-spending-allowance-gap-advisor.gif)
 | Progyny/Carrot/Maven fertility-travel stipend planners bury related math in closed UIs | Workers lack a local `offered_usd` vs `needed_usd` band | `FertilityTravelStipendGapAdvisor` bands offline `offered_usd` vs `needed_usd` for HITL review and never auto-enrolls |
 ![FertilityTravelStipendGapAdvisor](assets/demo/fertility-travel-stipend-gap-advisor.gif)
+| Maven/Carrot/Progyny menopause-benefit planners bury related math in closed UIs | Workers lack a local `offered_usd` vs `needed_usd` band | `MenopauseBenefitGapAdvisor` bands offline `offered_usd` vs `needed_usd` for HITL review and never auto-enrolls |
+![MenopauseBenefitGapAdvisor](assets/demo/menopause-benefit-gap-advisor.gif)
 | Lattice/Rippling/BambooHR pet-bereavement leave planners bury related math in closed UIs | Workers lack a local offered_days vs needed_days band | `PetBereavementLeaveGapAdvisor` bands offline `offered_days` vs `needed_days` for HITL review and never auto-approves |
 ![PetBereavementLeaveGapAdvisor](assets/demo/pet-bereavement-leave-gap-advisor.gif)
 | Rippling/WellnessLiving/Levels.fyi gym-membership planners bury related math in closed UIs | Workers lack a local offered_usd vs needed_usd band | `GymMembershipGapAdvisor` bands offline `offered_usd` vs `needed_usd` for HITL review and never auto-enrolls |
