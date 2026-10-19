@@ -534,6 +534,9 @@ uv run uvicorn autoapply_agent.main:app --reload
 ./scripts/generate_demo_gif.sh
 ```
 
+| Rippling/Gusto/BambooHR jury-duty pay planners bury related math in closed UIs | Workers lack a local `offered_days` vs `needed_days` band | `JuryDutyPayGapAdvisor` bands offline `offered_days` vs `needed_days` for HITL review and never auto-approves |
+![JuryDutyPayGapAdvisor](assets/demo/jury-duty-pay-gap-advisor.gif)
+
 ## License
 
 MIT © [Francis1998](https://github.com/Francis1998)
