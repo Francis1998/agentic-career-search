@@ -537,6 +537,8 @@ uv run uvicorn autoapply_agent.main:app --reload
 | Rippling/Gusto/BambooHR jury-duty pay planners bury related math in closed UIs | Workers lack a local `offered_days` vs `needed_days` band | `JuryDutyPayGapAdvisor` bands offline `offered_days` vs `needed_days` for HITL review and never auto-approves |
 ![JuryDutyPayGapAdvisor](assets/demo/jury-duty-pay-gap-advisor.gif)
 
+| Fidelity/Vanguard/Schwab employer 529 match planners bury related math in closed UIs | Workers lack a local `offered_days` vs `needed_days` band | `College529MatchGapAdvisor` bands offline `offered_days` vs `needed_days` for HITL review and never auto-approves |
+![College529MatchGapAdvisor](assets/demo/college-529-match-gap-advisor.gif)
 | Benevity/YourCause/Rippling disaster-relief leave planners bury related math in closed UIs | Workers lack a local `offered_days` vs `needed_days` band | `DisasterReliefLeaveGapAdvisor` bands offline `offered_days` vs `needed_days` for HITL review and never auto-approves |
 ![DisasterReliefLeaveGapAdvisor](assets/demo/disaster-relief-leave-gap-advisor.gif)
 
