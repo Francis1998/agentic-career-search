@@ -6,6 +6,85 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `OrganDonorLeaveGapAdvisor` (`services/organ_donor_leave_gap.py`): offline HITL `offered_days` vs `needed_days` coverage bands (never auto-approves). Gap vs Rippling/BambooHR/Workday organ-donor leave planners. Distinct from `JuryDutyPayGapAdvisor` / `DisasterReliefLeaveGapAdvisor`. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/ORGAN_DONOR_LEAVE_GAP_ADVISOR_GUIDE.md`.
+- `JsonLdAdapter` left the location unset for remote-only postings that expressed
+- `GreenhouseAdapter` fallback anchor matching accepted any href containing the
+- `LeverAdapter` fallback anchor matching (used when the primary `div.posting`
+- `JsonLdAdapter` (`source_type: jsonld`): a vendor-neutral source adapter that
+- `AshbyAdapter` (`source_type: ashby`): a dedicated adapter for public Ashby
+- `WorkableAdapter` (`source_type: workable`): a dedicated adapter for public
+- `RecruiteeAdapter` (`source_type: recruitee`): a dedicated adapter for public
+- `SmartRecruitersAdapter` (`source_type: smartrecruiters`): a dedicated adapter
+- `TeamtailorAdapter` (`source_type: teamtailor`): a dedicated adapter for public
+- `PersonioAdapter` (`source_type: personio`): a dedicated adapter for public
+- `BambooHrAdapter` (`source_type: bamboohr`): the package's first structured-JSON
+- `JsonLdAdapter`: distinct `JobPosting` blocks that omit their own `url` no
+- `JsonLdAdapter`: `JobPosting` blocks whose `@type` is a fully-qualified IRI
+- `JsonLdAdapter`: a `hiringOrganization` expressed as a (possibly
+- `JsonLdAdapter`: a `Place.address` expressed as a (possibly single-element)
+- `JsonLdAdapter`: `jobLocationType` values expressed as IRIs
+- `SmartRecruitersAdapter`: posting hrefs whose optional title slug uses
+- `JobviteAdapter`: empty-text posting anchors that expose the role name on the
+- `JobviteAdapter` (`source_type: jobvite`): a dedicated adapter for public
+- `IcimsAdapter` (`source_type: icims`): a dedicated adapter for public iCIMS
+- `WorkdayAdapter` (`source_type: workday`): a structured-JSON adapter for public
+- `OracleTaleoAdapter` (`source_type: oracle_taleo`): a dedicated adapter for
+- `SuccessFactorsAdapter` (`source_type: successfactors`): a dedicated adapter
+- `BreezyHrAdapter` (`source_type: breezyhr`): a dedicated adapter for public
+- `ZohoRecruitAdapter` (`source_type: zoho_recruit`): a dedicated adapter for
+- `FountainAdapter` (`source_type: fountain`): public Fountain careers boards
+- `PinpointAdapter` (`source_type: pinpoint`): public Pinpoint HR careers boards
+- `RipplingAdapter` (`source_type: rippling`): public Rippling careers boards
+- `PhenomPeopleAdapter` (`source_type: phenom`): a dedicated adapter for public
+- `ComeetAdapter` (`source_type: comeet`): public Comeet careers boards
+- `GemAdapter` (`source_type: gem`): public Gem careers boards
+- `AvatureAdapter` (`source_type: avature`): public Avature careers portals.
+- `EightfoldAdapter` (`source_type: eightfold`): public Eightfold AI careers
+- `JobScoreAdapter` (`source_type: jobscore`): public JobScore careers boards
+- `HomerunAdapter` (`source_type: homerun`): public Homerun careers boards
+- `DayforceAdapter` (`source_type: dayforce`): public Dayforce (Ceridian) careers
+- `HireologyAdapter` (`source_type: hireology`): public Hireology careers boards
+- `RecruiterflowAdapter` (`source_type: recruiterflow`): public Recruiterflow
+- `AppliedAdapter` (`source_type: applied`): public Applied careers boards
+- `ClearCompanyAdapter` (`source_type: clearcompany`): public ClearCompany careers
+- `SoftgardenAdapter` (`source_type: softgarden`): public Softgarden careers boards
+- `JoinAdapter` (`source_type: join`): public Join careers boards (`join.com`).
+- `ManatalAdapter` (`source_type: manatal`): public Manatal careers boards
+- `FactorialAdapter` (`source_type: factorial`): public Factorial HR careers boards
+- `BullhornAdapter` (`source_type: bullhorn`): public Bullhorn careers boards
+- `PaylocityAdapter` (`source_type: paylocity`): public Paylocity careers boards
+- `HibobAdapter` (`source_type: hibob`): public HiBob (Bob) careers boards
+- `LoxoAdapter` (`source_type: loxo`): public Loxo careers boards
+- `PolymerAdapter` (`source_type: polymer`): public Polymer careers boards
+- `DoverAdapter` (`source_type: dover`): public Dover careers boards
+- `JobAdderAdapter` (`source_type: jobadder`): public JobAdder careers boards
+- `JobylonAdapter` (`source_type: jobylon`): public Jobylon careers boards
+- `CeipalAdapter` (`source_type: ceipal`): public Ceipal careers boards
+- `PageUpAdapter` (`source_type: pageup`): public PageUp careers boards
+- `TalentLyftAdapter` (`source_type: talentlyft`): public TalentLyft careers boards
+- `ApplicantStackAdapter` (`source_type: applicantstack`): public ApplicantStack
+- `TrackerRmsAdapter` (`source_type: trackerrms`): public TrackerRMS careers
+- `CareerPlugAdapter` (`source_type: careerplug`): public CareerPlug careers
+- `RecruitCrmAdapter` (`source_type: recruitcrm`): public RecruitCRM careers
+- `VincereAdapter` (`source_type: vincere`): public Vincere careers
+- `TribepadAdapter` (`source_type: tribepad`): public Tribepad careers
+- `CrelateAdapter` (`source_type: crelate`): public Crelate careers
+- `JobDivaAdapter` (`source_type: jobdiva`): public JobDiva careers
+- `PCRecruiterAdapter` (`source_type: pcrecruiter`): public PCRecruiter careers
+- `CornerstoneAdapter` (`source_type: cornerstone`): public Cornerstone OnDemand careers
+- `BeameryAdapter` (`source_type: beamery`): public Beamery careers
+- `EployAdapter` (`source_type: eploy`): public Eploy careers
+- `BrassringAdapter` (`source_type: brassring`): public IBM Kenexa BrassRing
+- `ApplicantProAdapter` (`source_type: applicantpro`): public ApplicantPro
+- `CatsoneAdapter` (`source_type: catsone`): public CATS careers boards
+- `ParadoxAdapter` (`source_type: paradox`): public Paradox Olivia careers
+- `AdpAdapter` (`source_type: adp`): public ADP Recruiting boards
+- `SilkRoadAdapter` (`source_type: silkroad`): public SilkRoad Recruiting boards
+- `RadancyAdapter` (`source_type: radancy`): public Radancy careers boards
+- `JibeAdapter` (`source_type: jibe`): public Jibe careers boards
+- `HireVueAdapter` (`source_type: hirevue`): public HireVue careers boards.
+- `PaycomAdapter` (`source_type: paycom`): public Paycom careers boards.
+- `YelloAdapter` (`source_type: yello`): public Yello careers boards. Postings
 - `College529MatchGapAdvisor` (`services/college_529_match_gap.py`): offline HITL `offered_days` vs `needed_days` coverage bands (never auto-approves). Gap vs Fidelity/Vanguard/Schwab employer 529 match planners. Distinct from `StudentLoanRepaymentGapAdvisor` / `TuitionReimbursementGapAdvisor`. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/COLLEGE_529_MATCH_GAP_ADVISOR_GUIDE.md`.
 - `DisasterReliefLeaveGapAdvisor` (`services/disaster_relief_leave_gap.py`): offline HITL `offered_days` vs `needed_days` coverage bands (never auto-approves). Gap vs Benevity/YourCause/Rippling disaster-relief leave planners. Distinct from `EldercareLeaveDaysGapAdvisor` / `BackupCareDaysGapAdvisor`. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/DISASTER_RELIEF_LEAVE_GAP_ADVISOR_GUIDE.md`.
 - `JuryDutyPayGapAdvisor` (`services/jury_duty_pay_gap.py`): offline HITL `offered_days` vs `needed_days` coverage bands (never auto-approves). Gap vs Rippling/Gusto/BambooHR jury-duty pay planners. Distinct from `BereavementLeaveGapAdvisor` / `FloatingHolidayGapAdvisor`. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/JURY_DUTY_PAY_GAP_ADVISOR_GUIDE.md`.
