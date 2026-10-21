@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `CaregiverBackupCareGapAdvisor` (`services/caregiver_backup_care_gap.py`): offline HITL `offered_days` vs `needed_days` coverage bands (never auto-approves). Gap vs BrightHorizons/Care.com/Workplace Options caregiver backup-care planners. Distinct from `AdoptionAssistanceGapAdvisor` / `DisasterReliefLeaveGapAdvisor`. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/CAREGIVER_BACKUP_CARE_GAP_ADVISOR_GUIDE.md`.
 - `GenderAffirmingCareGapAdvisor` (`services/gender_affirming_care_gap.py`): offline HITL `offered_days` vs `needed_days` coverage bands (never auto-approves). Gap vs Folx/Plume/Progyny gender-affirming care benefit planners. Distinct from `FertilityTravelStipendGapAdvisor` / `MenopauseBenefitGapAdvisor`. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/GENDER_AFFIRMING_CARE_GAP_ADVISOR_GUIDE.md`.
 - `JsonLdAdapter` left the location unset for remote-only postings that expressed
 - `GreenhouseAdapter` fallback anchor matching accepted any href containing the
