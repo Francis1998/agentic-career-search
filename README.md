@@ -549,6 +549,9 @@ uv run uvicorn autoapply_agent.main:app --reload
 | BrightHorizons/Care.com/Workplace Options caregiver backup-care planners bury related math in closed UIs | Workers lack a local `offered_days` vs `needed_days` band | `CaregiverBackupCareGapAdvisor` bands offline `offered_days` vs `needed_days` for HITL review and never auto-approves |
 ![CaregiverBackupCareGapAdvisor](assets/demo/caregiver-backup-care-gap-advisor.gif)
 
+| BambooHR/Workday/Rippling election-day civic-leave planners bury related math in closed UIs | Workers lack a local `offered_days` vs `needed_days` band | `ElectionDayPtoGapAdvisor` bands offline `offered_days` vs `needed_days` for HITL review and never auto-approves |
+![ElectionDayPtoGapAdvisor](assets/demo/election-day-pto-gap-advisor.gif)
+
 ## License
 
 MIT © [Francis1998](https://github.com/Francis1998)
