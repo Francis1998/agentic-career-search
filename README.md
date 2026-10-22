@@ -555,6 +555,9 @@ uv run uvicorn autoapply_agent.main:app --reload
 | Carrot/Progyny/Kindbody surrogacy benefit planners bury related math in closed UIs | Workers lack a local `offered_days` vs `needed_days` band | `SurrogacyBenefitGapAdvisor` bands offline `offered_days` vs `needed_days` for HITL review and never auto-approves |
 ![SurrogacyBenefitGapAdvisor](assets/demo/surrogacy-benefit-gap-advisor.gif)
 
+| Rippling/Workday/BambooHR military-leave differential planners bury related math in closed UIs | Workers lack a local `offered_days` vs `needed_days` band | `MilitaryLeaveDifferentialGapAdvisor` bands offline `offered_days` vs `needed_days` for HITL review and never auto-approves |
+![MilitaryLeaveDifferentialGapAdvisor](assets/demo/military-leave-differential-gap-advisor.gif)
+
 | Progyny/Carrot/Maven egg-freezing benefit planners bury related math in closed UIs | Workers lack a local `offered_days` vs `needed_days` band | `EggFreezingBenefitGapAdvisor` bands offline `offered_days` vs `needed_days` for HITL review and never auto-approves |
 ![EggFreezingBenefitGapAdvisor](assets/demo/egg-freezing-benefit-gap-advisor.gif)
 
