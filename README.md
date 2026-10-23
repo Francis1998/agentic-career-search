@@ -558,6 +558,8 @@ uv run uvicorn autoapply_agent.main:app --reload
 | Rippling/Workday/BambooHR military-leave differential planners bury related math in closed UIs | Workers lack a local `offered_days` vs `needed_days` band | `MilitaryLeaveDifferentialGapAdvisor` bands offline `offered_days` vs `needed_days` for HITL review and never auto-approves |
 ![MilitaryLeaveDifferentialGapAdvisor](assets/demo/military-leave-differential-gap-advisor.gif)
 
+| Lattice/Workday/BambooHR sabbatical accrual planners bury related math in closed UIs | Workers lack a local `offered_months` vs `needed_months` band | `SabbaticalAccrualGapAdvisor` bands offline `offered_months` vs `needed_months` for HITL review and never auto-approves |
+![SabbaticalAccrualGapAdvisor](assets/demo/sabbatical-accrual-gap-advisor.gif)
 | Right Management/RiseSmart/CareerBuilder outplacement planners bury related math in closed UIs | Workers lack a local `offered_days` vs `needed_days` band | `OutplacementServiceGapAdvisor` bands offline `offered_days` vs `needed_days` for HITL review and never auto-approves |
 ![OutplacementServiceGapAdvisor](assets/demo/outplacement-service-gap-advisor.gif)
 
