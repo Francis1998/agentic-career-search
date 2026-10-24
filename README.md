@@ -564,6 +564,9 @@ uv run uvicorn autoapply_agent.main:app --reload
 ![ParentalBondingLeaveGapAdvisor](assets/demo/parental-bonding-leave-gap-advisor.gif)
 | Progyny/Carrot/Maven fertility medication coverage planners bury related math in closed UIs | Workers lack a local `offered_usd` vs `needed_usd` band | `FertilityMedicationCoverageGapAdvisor` bands offline `offered_usd` vs `needed_usd` for HITL review and never auto-approves |
 ![FertilityMedicationCoverageGapAdvisor](assets/demo/fertility-medication-coverage-gap-advisor.gif)
+| SoFi/CommonBond/Gradifi student-loan refinance stipend planners bury related math in closed UIs | Workers lack a local `offered_usd` vs `needed_usd` band | `StudentLoanRefinanceStipendGapAdvisor` bands offline `offered_usd` vs `needed_usd` for HITL review and never auto-approves |
+![StudentLoanRefinanceStipendGapAdvisor](assets/demo/student-loan-refinance-stipend-gap-advisor.gif)
+
 | Right Management/RiseSmart/CareerBuilder outplacement planners bury related math in closed UIs | Workers lack a local `offered_days` vs `needed_days` band | `OutplacementServiceGapAdvisor` bands offline `offered_days` vs `needed_days` for HITL review and never auto-approves |
 ![OutplacementServiceGapAdvisor](assets/demo/outplacement-service-gap-advisor.gif)
 
