@@ -10,7 +10,9 @@ Optional polish via **GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2**.
 ## Usage
 
 ```python
-from autoapply_agent.services.student_loan_refinance_stipend_gap import StudentLoanRefinanceStipendGapAdvisor
+from autoapply_agent.services.student_loan_refinance_stipend_gap import (
+    StudentLoanRefinanceStipendGapAdvisor,
+)
 
 report = StudentLoanRefinanceStipendGapAdvisor().advise(
     offered_usd=50.0,

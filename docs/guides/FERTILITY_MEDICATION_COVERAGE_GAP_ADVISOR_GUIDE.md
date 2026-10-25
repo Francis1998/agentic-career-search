@@ -10,7 +10,9 @@ Optional polish via **GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2**.
 ## Usage
 
 ```python
-from autoapply_agent.services.fertility_medication_coverage_gap import FertilityMedicationCoverageGapAdvisor
+from autoapply_agent.services.fertility_medication_coverage_gap import (
+    FertilityMedicationCoverageGapAdvisor,
+)
 
 report = FertilityMedicationCoverageGapAdvisor().advise(
     offered_usd=50.0,
