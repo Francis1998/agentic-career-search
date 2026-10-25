@@ -10,7 +10,9 @@ Optional polish via **GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2**.
 ## Usage
 
 ```python
-from autoapply_agent.services.lifestyle_spending_allowance_gap import LifestyleSpendingAllowanceGapAdvisor
+from autoapply_agent.services.lifestyle_spending_allowance_gap import (
+    LifestyleSpendingAllowanceGapAdvisor,
+)
 
 report = LifestyleSpendingAllowanceGapAdvisor().advise(
     offered_usd=50.0,
