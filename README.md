@@ -574,6 +574,8 @@ uv run uvicorn autoapply_agent.main:app --reload
 ![InternetStipendGapAdvisor](assets/demo/internet-stipend-gap-advisor.gif)
 | WeWork/Industrious/Deskpass coworking stipend planners bury related math in closed UIs | Workers lack a local `offered_usd` vs `needed_usd` band | `CoworkingStipendGapAdvisor` bands offline `offered_usd` vs `needed_usd` for HITL review and never auto-approves |
 ![CoworkingStipendGapAdvisor](assets/demo/coworking-stipend-gap-advisor.gif)
+| Rippling/Gusto/BambooHR cell-phone stipend planners bury related math in closed UIs | Workers lack a local `offered_usd` vs `needed_usd` band | `CellPhoneStipendGapAdvisor` bands offline `offered_usd` vs `needed_usd` for HITL review and never auto-approves |
+![CellPhoneStipendGapAdvisor](assets/demo/cell-phone-stipend-gap-advisor.gif)
 | WageWorks/BenefitWallet/Optum eldercare FSA planners bury related math in closed UIs | Workers lack a local `offered_usd` vs `needed_usd` band | `EldercareFsaGapAdvisor` bands offline `offered_usd` vs `needed_usd` for HITL review and never auto-approves |
 ![EldercareFsaGapAdvisor](assets/demo/eldercare-fsa-gap-advisor.gif)
 
