@@ -602,6 +602,10 @@ uv run uvicorn autoapply_agent.main:app --reload
 ![FamilyBuildingLeaveGapAdvisor](assets/demo/family-building-leave-gap-advisor.gif)
 
 
+| Guild/EdAssist/Workday tuition reimbursement annual-cap planners bury related math in closed UIs | Workers lack a local `offered_usd` vs `needed_usd` band | `TuitionReimbursementCapGapAdvisor` bands offline `offered_usd` vs `needed_usd` for HITL review and never auto-approves |
+![TuitionReimbursementCapGapAdvisor](assets/demo/tuition-reimbursement-cap-gap-advisor.gif)
+
+
 ## License
 
 MIT © [Francis1998](https://github.com/Francis1998)
