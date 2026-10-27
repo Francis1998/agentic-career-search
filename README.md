@@ -598,6 +598,10 @@ uv run uvicorn autoapply_agent.main:app --reload
 ![AdoptionLeaveTopUpGapAdvisor](assets/demo/adoption-leave-top-up-gap-advisor.gif)
 
 
+| Carrot/Progyny/Maven family-building leave planners bury related math in closed UIs | Workers lack a local `offered_days` vs `needed_days` band | `FamilyBuildingLeaveGapAdvisor` bands offline `offered_days` vs `needed_days` for HITL review and never auto-approves |
+![FamilyBuildingLeaveGapAdvisor](assets/demo/family-building-leave-gap-advisor.gif)
+
+
 ## License
 
 MIT © [Francis1998](https://github.com/Francis1998)
