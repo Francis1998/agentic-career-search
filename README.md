@@ -606,6 +606,10 @@ uv run uvicorn autoapply_agent.main:app --reload
 ![TuitionReimbursementCapGapAdvisor](assets/demo/tuition-reimbursement-cap-gap-advisor.gif)
 
 
+| Rippling/Workday/BambooHR climate-resilience leave planners bury related math in closed UIs | Workers lack a local `offered_days` vs `needed_days` band | `ClimateResilienceLeaveGapAdvisor` bands offline `offered_days` vs `needed_days` for HITL review and never auto-approves |
+![ClimateResilienceLeaveGapAdvisor](assets/demo/climate-resilience-leave-gap-advisor.gif)
+
+
 ## License
 
 MIT © [Francis1998](https://github.com/Francis1998)

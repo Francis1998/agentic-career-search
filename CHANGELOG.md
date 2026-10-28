@@ -6,6 +6,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `ClimateResilienceLeaveGapAdvisor` (`services/climate_resilience_leave_gap.py`): offline HITL `offered_days` vs `needed_days` coverage bands (never auto-approves). Gap vs Rippling/Workday/BambooHR climate-resilience leave planners. Distinct from `DisasterReliefLeaveGapAdvisor` / `CaregiverRespiteGapAdvisor`. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/CLIMATE_RESILIENCE_LEAVE_GAP_ADVISOR_GUIDE.md`.
 - Security: bump locked deps so `pip-audit` is clean on main (pillow>=13.0.0, anyio>=4.14.2, certifi>=2026.10.23, soupsieve>=2.9).
 - `TuitionReimbursementCapGapAdvisor` (`services/tuition_reimbursement_cap_gap.py`): offline HITL `offered_usd` vs `needed_usd` coverage bands (never auto-approves). Gap vs Guild/EdAssist/Workday tuition reimbursement annual-cap planners. Distinct from `TuitionReimbursementGapAdvisor` / `LearningStipendGapAdvisor`. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/TUITION_REIMBURSEMENT_CAP_GAP_ADVISOR_GUIDE.md`.
 - `FamilyBuildingLeaveGapAdvisor` (`services/family_building_leave_gap.py`): offline HITL `offered_days` vs `needed_days` coverage bands (never auto-approves). Gap vs Carrot/Progyny/Maven family-building leave planners. Distinct from `FertilityBenefitGapAdvisor` / `SurrogacyBenefitGapAdvisor`. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/FAMILY_BUILDING_LEAVE_GAP_ADVISOR_GUIDE.md`.
