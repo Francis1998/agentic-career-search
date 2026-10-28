@@ -614,6 +614,10 @@ uv run uvicorn autoapply_agent.main:app --reload
 ![CaregivingLeaveTopUpGapAdvisor](assets/demo/caregiving-leave-top-up-gap-advisor.gif)
 
 
+| Guild/LinkedIn Learning/Workday professional-development stipend planners bury related math in closed UIs | Workers lack a local `offered_usd` vs `needed_usd` band | `ProfessionalDevelopmentStipendGapAdvisor` bands offline `offered_usd` vs `needed_usd` for HITL review and never auto-approves |
+![ProfessionalDevelopmentStipendGapAdvisor](assets/demo/professional-development-stipend-gap-advisor.gif)
+
+
 ## License
 
 MIT © [Francis1998](https://github.com/Francis1998)
