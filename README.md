@@ -610,6 +610,10 @@ uv run uvicorn autoapply_agent.main:app --reload
 ![ClimateResilienceLeaveGapAdvisor](assets/demo/climate-resilience-leave-gap-advisor.gif)
 
 
+| Wellthy/Cariloop/Torchlight caregiving leave top-up planners bury related math in closed UIs | Workers lack a local `offered_days` vs `needed_days` band | `CaregivingLeaveTopUpGapAdvisor` bands offline `offered_days` vs `needed_days` for HITL review and never auto-approves |
+![CaregivingLeaveTopUpGapAdvisor](assets/demo/caregiving-leave-top-up-gap-advisor.gif)
+
+
 ## License
 
 MIT © [Francis1998](https://github.com/Francis1998)
