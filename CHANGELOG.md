@@ -5,6 +5,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+- `EsppContributionGapAdvisor` (`services/espp_contribution_gap.py`): offline HITL `offered_pct` vs `needed_pct` coverage bands (never auto-approves). Gap vs Carta/Shareworks/E*TRADE ESPP contribution planners. Distinct from `EsppLookbackGapAdvisor` / `RsuSupplementalWithholdingGapAdvisor`. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/ESPP_CONTRIBUTION_GAP_ADVISOR_GUIDE.md`.
 - `StudentLoanForgivenessMatchGapAdvisor` (`services/student_loan_forgiveness_match_gap.py`): offline HITL `offered_usd` vs `needed_usd` coverage bands (never auto-approves). Gap vs Peanut Butter/Goodly/Gradifi student-loan forgiveness match planners. Distinct from `StudentLoanRepaymentGapAdvisor` / `TuitionReimbursementCapGapAdvisor`. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/STUDENT_LOAN_FORGIVENESS_MATCH_GAP_ADVISOR_GUIDE.md`.
 ### Added
 - `ProfessionalDevelopmentStipendGapAdvisor` (`services/professional_development_stipend_gap.py`): offline HITL `offered_usd` vs `needed_usd` coverage bands (never auto-approves). Gap vs Guild/LinkedIn Learning/Workday professional-development stipend planners. Distinct from `LearningStipendGapAdvisor` / `TuitionReimbursementCapGapAdvisor`. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/PROFESSIONAL_DEVELOPMENT_STIPEND_GAP_ADVISOR_GUIDE.md`.
