@@ -617,6 +617,9 @@ uv run uvicorn autoapply_agent.main:app --reload
 | Guild/LinkedIn Learning/Workday professional-development stipend planners bury related math in closed UIs | Workers lack a local `offered_usd` vs `needed_usd` band | `ProfessionalDevelopmentStipendGapAdvisor` bands offline `offered_usd` vs `needed_usd` for HITL review and never auto-approves |
 ![ProfessionalDevelopmentStipendGapAdvisor](assets/demo/professional-development-stipend-gap-advisor.gif)
 
+| Remote.com/Deel/Rippling relocation lump-sum tax gross-up planners bury related math in closed UIs | Workers lack a local `offered_usd` vs `needed_usd` band | `RelocationLumpSumTaxGrossUpGapAdvisor` bands offline `offered_usd` vs `needed_usd` for HITL review and never auto-approves |
+![RelocationLumpSumTaxGrossUpGapAdvisor](assets/demo/relocation-lump-sum-tax-gross-up-gap-advisor.gif)
+
 | Carta/Shareworks/E*TRADE ESPP contribution planners bury related math in closed UIs | Workers lack a local `offered_pct` vs `needed_pct` band | `EsppContributionGapAdvisor` bands offline `offered_pct` vs `needed_pct` for HITL review and never auto-approves |
 ![EsppContributionGapAdvisor](assets/demo/espp-contribution-gap-advisor.gif)
 
