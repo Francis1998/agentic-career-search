@@ -10,7 +10,9 @@ Optional polish via **GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2**.
 ## Usage
 
 ```python
-from autoapply_agent.services.professional_development_stipend_gap import ProfessionalDevelopmentStipendGapAdvisor
+from autoapply_agent.services.professional_development_stipend_gap import (
+    ProfessionalDevelopmentStipendGapAdvisor,
+)
 
 report = ProfessionalDevelopmentStipendGapAdvisor().advise(
     offered_usd=50.0,

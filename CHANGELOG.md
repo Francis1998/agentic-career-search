@@ -5,6 +5,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+- `StudentLoanForgivenessMatchGapAdvisor` (`services/student_loan_forgiveness_match_gap.py`): offline HITL `offered_usd` vs `needed_usd` coverage bands (never auto-approves). Gap vs Peanut Butter/Goodly/Gradifi student-loan forgiveness match planners. Distinct from `StudentLoanRepaymentGapAdvisor` / `TuitionReimbursementCapGapAdvisor`. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/STUDENT_LOAN_FORGIVENESS_MATCH_GAP_ADVISOR_GUIDE.md`.
 ### Added
 - `ProfessionalDevelopmentStipendGapAdvisor` (`services/professional_development_stipend_gap.py`): offline HITL `offered_usd` vs `needed_usd` coverage bands (never auto-approves). Gap vs Guild/LinkedIn Learning/Workday professional-development stipend planners. Distinct from `LearningStipendGapAdvisor` / `TuitionReimbursementCapGapAdvisor`. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/PROFESSIONAL_DEVELOPMENT_STIPEND_GAP_ADVISOR_GUIDE.md`.
 - `CaregivingLeaveTopUpGapAdvisor` (`services/caregiving_leave_top_up_gap.py`): offline HITL `offered_days` vs `needed_days` coverage bands (never auto-approves). Gap vs Wellthy/Cariloop/Torchlight caregiving leave top-up planners. Distinct from `CaregiverBackupCareGapAdvisor` / `CaregiverRespiteGapAdvisor`. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/CAREGIVING_LEAVE_TOP_UP_GAP_ADVISOR_GUIDE.md`.
