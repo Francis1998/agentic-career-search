@@ -619,6 +619,8 @@ uv run uvicorn autoapply_agent.main:app --reload
 
 | Remote.com/Deel/Rippling relocation lump-sum tax gross-up planners bury related math in closed UIs | Workers lack a local `offered_usd` vs `needed_usd` band | `RelocationLumpSumTaxGrossUpGapAdvisor` bands offline `offered_usd` vs `needed_usd` for HITL review and never auto-approves |
 ![RelocationLumpSumTaxGrossUpGapAdvisor](assets/demo/relocation-lump-sum-tax-gross-up-gap-advisor.gif)
+| Carta/Pulley/Shareworks phantom-equity liquidity planners bury related math in closed UIs | Workers lack a local `offered_usd` vs `needed_usd` band | `PhantomEquityLiquidityGapAdvisor` bands offline `offered_usd` vs `needed_usd` for HITL review and never auto-approves |
+![PhantomEquityLiquidityGapAdvisor](assets/demo/phantom-equity-liquidity-gap-advisor.gif)
 | Unum/Lincoln Financial/MetLife disability insurance buy-up planners bury related math in closed UIs | Workers lack a local `offered_pct` vs `needed_pct` band | `DisabilityInsuranceBuyupGapAdvisor` bands offline `offered_pct` vs `needed_pct` for HITL review and never auto-approves |
 ![DisabilityInsuranceBuyupGapAdvisor](assets/demo/disability-insurance-buyup-gap-advisor.gif)
 | Unum/Guardian/Colonial Life long-term-care insurance planners bury related math in closed UIs | Workers lack a local `offered_usd` vs `needed_usd` band | `LongTermCareInsuranceGapAdvisor` bands offline `offered_usd` vs `needed_usd` for HITL review and never auto-approves |
