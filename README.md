@@ -636,6 +636,9 @@ uv run uvicorn autoapply_agent.main:app --reload
 | Carrot/Progyny/Maven adoption-travel stipend planners bury related math in closed UIs | Workers lack a local `offered_usd` vs `needed_usd` band | `AdoptionTravelGapAdvisor` bands offline `offered_usd` vs `needed_usd` for HITL review and never auto-approves |
 ![AdoptionTravelGapAdvisor](assets/demo/adoption-travel-gap-advisor.gif)
 
+| Lattice/Culture Amp/Workday sabbatical pay-rate planners bury related math in closed UIs | Workers lack a local `offered_pct` vs `needed_pct` band | `SabbaticalPayRateGapAdvisor` bands offline `offered_pct` vs `needed_pct` for HITL review and never auto-approves |
+![SabbaticalPayRateGapAdvisor](assets/demo/sabbatical-pay-rate-gap-advisor.gif)
+
 ## License
 
 MIT © [Francis1998](https://github.com/Francis1998)
