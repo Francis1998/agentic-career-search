@@ -639,6 +639,9 @@ uv run uvicorn autoapply_agent.main:app --reload
 | Lattice/Culture Amp/Workday sabbatical pay-rate planners bury related math in closed UIs | Workers lack a local `offered_pct` vs `needed_pct` band | `SabbaticalPayRateGapAdvisor` bands offline `offered_pct` vs `needed_pct` for HITL review and never auto-approves |
 ![SabbaticalPayRateGapAdvisor](assets/demo/sabbatical-pay-rate-gap-advisor.gif)
 
+| Carta/Pulley/Shareworks equity-refresh grant planners bury related math in closed UIs | Workers lack a local `offered_usd` vs `needed_usd` band | `EquityRefreshGrantGapAdvisor` bands offline `offered_usd` vs `needed_usd` for HITL review and never auto-approves |
+![EquityRefreshGrantGapAdvisor](assets/demo/equity-refresh-grant-gap-advisor.gif)
+
 ## License
 
 MIT © [Francis1998](https://github.com/Francis1998)
