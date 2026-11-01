@@ -648,6 +648,9 @@ uv run uvicorn autoapply_agent.main:app --reload
 | Rippling/Deel/Remote.com housing stipend COLA planners bury related math in closed UIs | Workers lack a local `offered_usd` vs `needed_usd` band | `HousingStipendColaGapAdvisor` bands offline `offered_usd` vs `needed_usd` for HITL review and never auto-approves |
 ![HousingStipendColaGapAdvisor](assets/demo/housing-stipend-cola-gap-advisor.gif)
 
+| Rippling/Workday/BambooHR bereavement-travel stipend planners bury related math in closed UIs | Workers lack a local `offered_usd` vs `needed_usd` band | `BereavementTravelGapAdvisor` bands offline `offered_usd` vs `needed_usd` for HITL review and never auto-approves |
+![BereavementTravelGapAdvisor](assets/demo/bereavement-travel-gap-advisor.gif)
+
 ## License
 
 MIT © [Francis1998](https://github.com/Francis1998)
