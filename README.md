@@ -650,6 +650,9 @@ uv run uvicorn autoapply_agent.main:app --reload
 
 | Rippling/Workday/BambooHR bereavement-travel stipend planners bury related math in closed UIs | Workers lack a local `offered_usd` vs `needed_usd` band | `BereavementTravelGapAdvisor` bands offline `offered_usd` vs `needed_usd` for HITL review and never auto-approves |
 ![BereavementTravelGapAdvisor](assets/demo/bereavement-travel-gap-advisor.gif)
+| Notion/Rippling/Deel cybersecurity / hardware-security stipend planners bury related math in closed UIs | Workers lack a local `offered_usd` vs `needed_usd` band | `CybersecurityStipendGapAdvisor` bands offline `offered_usd` vs `needed_usd` for HITL review and never auto-approves |
+![CybersecurityStipendGapAdvisor](assets/demo/cybersecurity-stipend-gap-advisor.gif)
+
 | Rippling/Lattice/BambooHR pet-adoption stipend planners bury related math in closed UIs | Workers lack a local `offered_usd` vs `needed_usd` band | `PetAdoptionStipendGapAdvisor` bands offline `offered_usd` vs `needed_usd` for HITL review and never auto-approves |
 ![PetAdoptionStipendGapAdvisor](assets/demo/pet-adoption-stipend-gap-advisor.gif)
 
