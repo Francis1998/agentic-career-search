@@ -5,6 +5,8 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+- `ClimateCommuteOffsetGapAdvisor` (`services/climate_commute_offset_gap.py`): offline HITL `offered_usd` vs `needed_usd` coverage bands (never auto-approves). Gap vs Watershed/Normative/Sweep climate commute-carbon offset planners. Distinct from `ClimateResilienceLeaveGapAdvisor` / `TransitCommuteBenefitGapAdvisor`. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/CLIMATE_COMMUTE_OFFSET_GAP_ADVISOR_GUIDE.md`.
+
 - `EmergencyBackupChildcareGapAdvisor` (`services/emergency_backup_childcare_gap.py`): offline HITL `offered_usd` vs `needed_usd` coverage bands (never auto-approves). Gap vs Bright Horizons/Care.com/Rippling emergency backup-childcare planners. Distinct from `ChildcareSubsidyGapAdvisor` / `ParentalBondingLeaveGapAdvisor`. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/EMERGENCY_BACKUP_CHILDCARE_GAP_ADVISOR_GUIDE.md`.
 
 - `SabbaticalTravelStipendGapAdvisor` (`services/sabbatical_travel_stipend_gap.py`): offline HITL `offered_usd` vs `needed_usd` coverage bands (never auto-approves). Gap vs Notion/Rippling/Deel sabbatical-travel stipend planners. Distinct from `SabbaticalAccrualGapAdvisor` / `SabbaticalPayRateGapAdvisor`. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/SABBATICAL_TRAVEL_STIPEND_GAP_ADVISOR_GUIDE.md`.
