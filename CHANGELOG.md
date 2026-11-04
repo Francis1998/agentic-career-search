@@ -5,6 +5,8 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+- `RemoteStipendClawbackGapAdvisor` (`services/remote_stipend_clawback_gap.py`): offline HITL `offered_usd` vs `needed_usd` coverage bands (never auto-approves). Gap vs Deel/Remote.com/Rippling remote stipend clawback planners. Distinct from `HomeOfficeStipendGapAdvisor` / `RelocationPackageGapAdvisor`. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/REMOTE_STIPEND_CLAWBACK_GAP_ADVISOR_GUIDE.md`.
+
 - `WellnessStipendRolloverGapAdvisor` (`services/wellness_stipend_rollover_gap.py`): offline HITL `offered_usd` vs `needed_usd` coverage bands (never auto-approves). Gap vs Rippling/Lattice/Wellhub wellness stipend year-end rollover planners. Distinct from `WellnessStipendGapAdvisor` / `GymMembershipGapAdvisor`. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/WELLNESS_STIPEND_ROLLOVER_GAP_ADVISOR_GUIDE.md`.
 
 - `ClimateCommuteOffsetGapAdvisor` (`services/climate_commute_offset_gap.py`): offline HITL `offered_usd` vs `needed_usd` coverage bands (never auto-approves). Gap vs Watershed/Normative/Sweep climate commute-carbon offset planners. Distinct from `ClimateResilienceLeaveGapAdvisor` / `TransitCommuteBenefitGapAdvisor`. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/CLIMATE_COMMUTE_OFFSET_GAP_ADVISOR_GUIDE.md`.

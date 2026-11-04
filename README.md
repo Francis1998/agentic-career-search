@@ -656,6 +656,8 @@ uv run uvicorn autoapply_agent.main:app --reload
 ![ClimateCommuteOffsetGapAdvisor](assets/demo/climate-commute-offset-gap-advisor.gif)
 | Rippling/Lattice/Wellhub wellness stipend year-end rollover planners bury related math in closed UIs | Workers lack a local `offered_usd` vs `needed_usd` band | `WellnessStipendRolloverGapAdvisor` bands offline `offered_usd` vs `needed_usd` for HITL review and never auto-approves |
 ![WellnessStipendRolloverGapAdvisor](assets/demo/wellness-stipend-rollover-gap-advisor.gif)
+| Deel/Remote.com/Rippling remote stipend clawback planners bury related math in closed UIs | Workers lack a local `offered_usd` vs `needed_usd` band | `RemoteStipendClawbackGapAdvisor` bands offline `offered_usd` vs `needed_usd` for HITL review and never auto-approves |
+![RemoteStipendClawbackGapAdvisor](assets/demo/remote-stipend-clawback-gap-advisor.gif)
 | Bright Horizons/Care.com/Rippling emergency backup-childcare planners bury related math in closed UIs | Workers lack a local `offered_usd` vs `needed_usd` band | `EmergencyBackupChildcareGapAdvisor` bands offline `offered_usd` vs `needed_usd` for HITL review and never auto-approves |
 ![EmergencyBackupChildcareGapAdvisor](assets/demo/emergency-backup-childcare-gap-advisor.gif)
 
