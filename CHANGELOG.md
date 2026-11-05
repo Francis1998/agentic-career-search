@@ -5,6 +5,9 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+- `CriticalIllnessInsuranceGapAdvisor` (`services/critical_illness_insurance_gap.py`): offline HITL `offered_usd` vs `needed_usd` coverage bands (never auto-approves). Gap vs Unum/Aflac/MetLife critical-illness insurance planners. Distinct from `LtdDisabilityGapAdvisor` / `LifeInsuranceCoverageGapAdvisor`. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/CRITICAL_ILLNESS_INSURANCE_GAP_ADVISOR_GUIDE.md`.
+
+
 - `HsaEmployerSeedGapAdvisor` (`services/hsa_employer_seed_gap.py`): offline HITL `offered_usd` vs `needed_usd` coverage bands (never auto-approves). Gap vs WageWorks/Optum/Fidelity HSA employer-seed planners. Distinct from `HsaContributionGapAdvisor` / `DependentCareFsaGapAdvisor`. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/HSA_EMPLOYER_SEED_GAP_ADVISOR_GUIDE.md`.
 
 
