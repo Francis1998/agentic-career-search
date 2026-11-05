@@ -5,6 +5,9 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+- `MentalHealthSessionCapGapAdvisor` (`services/mental_health_session_cap_gap.py`): offline HITL `offered_sessions` vs `needed_sessions` coverage bands (never auto-approves). Gap vs Lyra/Spring Health/Modern Health mental-health session-cap planners. Distinct from `MentalHealthEapSessionGapAdvisor` / `WellnessStipendGapAdvisor`. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/MENTAL_HEALTH_SESSION_CAP_GAP_ADVISOR_GUIDE.md`.
+
+
 - `RemoteStipendClawbackGapAdvisor` (`services/remote_stipend_clawback_gap.py`): offline HITL `offered_usd` vs `needed_usd` coverage bands (never auto-approves). Gap vs Deel/Remote.com/Rippling remote stipend clawback planners. Distinct from `HomeOfficeStipendGapAdvisor` / `RelocationPackageGapAdvisor`. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/REMOTE_STIPEND_CLAWBACK_GAP_ADVISOR_GUIDE.md`.
 
 - `WellnessStipendRolloverGapAdvisor` (`services/wellness_stipend_rollover_gap.py`): offline HITL `offered_usd` vs `needed_usd` coverage bands (never auto-approves). Gap vs Rippling/Lattice/Wellhub wellness stipend year-end rollover planners. Distinct from `WellnessStipendGapAdvisor` / `GymMembershipGapAdvisor`. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/WELLNESS_STIPEND_ROLLOVER_GAP_ADVISOR_GUIDE.md`.
