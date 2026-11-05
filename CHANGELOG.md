@@ -5,6 +5,9 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+- `HsaEmployerSeedGapAdvisor` (`services/hsa_employer_seed_gap.py`): offline HITL `offered_usd` vs `needed_usd` coverage bands (never auto-approves). Gap vs WageWorks/Optum/Fidelity HSA employer-seed planners. Distinct from `HsaContributionGapAdvisor` / `DependentCareFsaGapAdvisor`. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/HSA_EMPLOYER_SEED_GAP_ADVISOR_GUIDE.md`.
+
+
 - `MentalHealthSessionCapGapAdvisor` (`services/mental_health_session_cap_gap.py`): offline HITL `offered_sessions` vs `needed_sessions` coverage bands (never auto-approves). Gap vs Lyra/Spring Health/Modern Health mental-health session-cap planners. Distinct from `MentalHealthEapSessionGapAdvisor` / `WellnessStipendGapAdvisor`. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/MENTAL_HEALTH_SESSION_CAP_GAP_ADVISOR_GUIDE.md`.
 
 
