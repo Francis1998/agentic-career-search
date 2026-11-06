@@ -660,6 +660,8 @@ uv run uvicorn autoapply_agent.main:app --reload
 ![MentalHealthSessionCapGapAdvisor](assets/demo/mental-health-session-cap-gap-advisor.gif)
 | WageWorks/Optum/Fidelity HSA employer-seed planners bury related math in closed UIs | Workers lack a local `offered_usd` vs `needed_usd` band | `HsaEmployerSeedGapAdvisor` bands offline `offered_usd` vs `needed_usd` for HITL review and never auto-approves |
 ![HsaEmployerSeedGapAdvisor](assets/demo/hsa-employer-seed-gap-advisor.gif)
+| Carrot/Progyny/Maven egg-freezing annual storage-fee planners bury related math in closed UIs | Workers lack a local `offered_usd` vs `needed_usd` band | `FertilityEggFreezingStorageGapAdvisor` bands offline `offered_usd` vs `needed_usd` for HITL review and never auto-approves |
+![FertilityEggFreezingStorageGapAdvisor](assets/demo/fertility-egg-freezing-storage-gap-advisor.gif)
 | Unum/Aflac/MetLife critical-illness insurance planners bury related math in closed UIs | Workers lack a local `offered_usd` vs `needed_usd` band | `CriticalIllnessInsuranceGapAdvisor` bands offline `offered_usd` vs `needed_usd` for HITL review and never auto-approves |
 ![CriticalIllnessInsuranceGapAdvisor](assets/demo/critical-illness-insurance-gap-advisor.gif)
 | Deel/Remote.com/Rippling remote stipend clawback planners bury related math in closed UIs | Workers lack a local `offered_usd` vs `needed_usd` band | `RemoteStipendClawbackGapAdvisor` bands offline `offered_usd` vs `needed_usd` for HITL review and never auto-approves |
