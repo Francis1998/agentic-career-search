@@ -19,10 +19,12 @@ curl -X POST localhost:8000/source-configs \
   -d '{
     "name": "careerbuilder-jobs",
     "source_type": "careerbuilder",
-    "base_url": "https://www.careerbuilder.com/jobs",
-    "max_jobs": 50
+    "base_url": "https://www.careerbuilder.com/jobs"
   }'
 ```
+
+The per-source job cap is the global `MAX_JOBS_PER_SOURCE` setting (default `50`);
+source configs have no `max_jobs` field.
 
 ## Recognised URL shapes
 

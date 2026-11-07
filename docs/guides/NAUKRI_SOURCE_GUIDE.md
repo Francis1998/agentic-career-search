@@ -19,10 +19,12 @@ curl -X POST localhost:8000/source-configs \
   -d '{
     "name": "naukri-jobs",
     "source_type": "naukri",
-    "base_url": "https://www.naukri.com/jobs",
-    "max_jobs": 50
+    "base_url": "https://www.naukri.com/jobs"
   }'
 ```
+
+The per-source job cap is the global `MAX_JOBS_PER_SOURCE` setting (default `50`);
+source configs have no `max_jobs` field.
 
 ## Recognised URL shapes
 

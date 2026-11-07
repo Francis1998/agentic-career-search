@@ -862,6 +862,20 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Bumped the `pillow` dev-dependency floor to `>=12.3.0` so the scheduled
   Security Scan (`pip-audit`) no longer fails on the five advisories
   (PYSEC-2026-2253..2257) affecting the previously resolved 12.2.0.
+- Docs: 96 source guides (ADP, AI Jobs, AngelList, … ZipRecruiter) embedded a
+  1×1-pixel, 34–43-byte placeholder GIF (six did not even decode), so readers saw
+  nothing where the guide promised a demo. The same `assets/demo/{slug}-source.gif`
+  paths now hold real demos (800–840 × 390–542 px, 13–18 KB): terminal transcripts
+  of each adapter's real `fetch_jobs` run over its recorded unit-test fixture
+  (`*_SAMPLE_HTML`) served through an `httpx.MockTransport` (no network), showing the
+  guide's source config and the normalized jobs it returns (title, company,
+  location, remote flag, URL). `scripts/render_source_demos.py` re-renders them
+  reproducibly; `tests/unit/test_demo_gifs_real.py` fails if a GIF embedded in
+  README/docs is missing, not a GIF, smaller than 200×100 px or under 2 KB, and
+  `tests/unit/test_render_source_demos.py` keeps every demo replayable offline.
+- Docs: the AngelList, CareerBuilder, Glassdoor, Handshake, Indeed, Monster, Naukri,
+  Seek and Totaljobs guides passed `"max_jobs": 50` to `POST /source-configs`, a key the
+  API silently drops; they now say the cap is the global `MAX_JOBS_PER_SOURCE`.
 
 ### Added
 - `BambooHrAdapter` (`source_type: bamboohr`): the package's first structured-JSON

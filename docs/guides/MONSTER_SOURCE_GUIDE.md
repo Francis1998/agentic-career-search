@@ -19,10 +19,12 @@ curl -X POST localhost:8000/source-configs \
   -d '{
     "name": "monster-jobs",
     "source_type": "monster",
-    "base_url": "https://www.monster.com/jobs",
-    "max_jobs": 50
+    "base_url": "https://www.monster.com/jobs"
   }'
 ```
+
+The per-source job cap is the global `MAX_JOBS_PER_SOURCE` setting (default `50`);
+source configs have no `max_jobs` field.
 
 ## Recognised URL shapes
 
