@@ -167,9 +167,7 @@ import pandas as pd
 jobs = pd.read_csv("http://localhost:8000/jobs/export?format=csv&remote=true")
 top = jobs.sort_values("score", ascending=False).head(10)[["title", "company", "url"]]
 
-detail = pd.read_json(
-    "http://localhost:8000/jobs/export?format=jsonl&dedupe=true", lines=True
-)
+detail = pd.read_json("http://localhost:8000/jobs/export?format=jsonl&dedupe=true", lines=True)
 ```
 
 **jq / shell.**
