@@ -764,6 +764,16 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `reasoning_effort: none`.
 
 ### Fixed
+- `POST /runs/{run_id}/cancel`: a cancel sent while a run was ingesting its last source
+  no longer leaves the finished run stuck in `cancel_requested`. On SQLite the cancel's
+  write waits for the worker's ingestion transaction, and the worker completes the run
+  as soon as that transaction commits; the handler then wrote the status it had derived
+  from its earlier read, turning the `completed` run into `cancel_requested` (events
+  `run.completed`, `run.cancel_requested`) — a non-terminal status the finished worker
+  never leaves, so clients polling for a terminal status waited forever. The run is now
+  flagged with one conditional `UPDATE` that only matches a run that has not finished,
+  and the response is decided on the row as re-read after it: a run that finished
+  meanwhile keeps its final status and gets `run.cancel_ignored`, like any finished run.
 - API: integers outside SQLite's signed 64-bit `INTEGER` range no longer crash
   requests with `OverflowError` (HTTP 500). `GET /jobs` `offset` and
   `source_config_id` (also on `/jobs/export` and `/jobs/feed.atom`), the `job_id` and

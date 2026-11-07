@@ -65,7 +65,8 @@ When no enabled source configs match a run, the worker sets `completed` and emit
 - `run.created`, `run.started`, `run.completed`, `run.failed`, `run.cancelled`
 - `run.no_sources` — run completed with no matching enabled sources (does not emit `run.completed`)
 - `run.cancel_requested` — cancel flagged while run is active
-- `run.cancel_ignored` — cancel requested on a terminal run
+- `run.cancel_ignored` — cancel requested on a terminal run, including one that finished
+  while the cancel request waited for the database (the run keeps its final status)
 - `source.started`, `source.completed`, `source.failed`, `source.unsupported`
 - `agent.decision` with score, priority tier, and matched terms
 - `agent.llm_enrichment` with provider/model metadata when LLM integration is enabled
