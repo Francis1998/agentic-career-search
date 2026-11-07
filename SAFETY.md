@@ -13,6 +13,9 @@
 - Source-level and run-level failures are persisted as events.
 - Runs support cancellation and surface cancellation events.
 - Per-source result volume is bounded by configuration (`MAX_JOBS_PER_SOURCE`).
+- The MCP server (`career-search-mcp`) is read-only: its tools search and explain stored
+  jobs and runs but cannot start or cancel runs, edit sources or apply; SQLite connections
+  run `PRAGMA query_only`, and logs/audit records never contain tool arguments or results.
 
 ## Data Handling
 

@@ -91,7 +91,7 @@ _KNOWN_METHODS = _LEGACY_METHODS | _MODERN_METHODS
 _DATABASE_ERROR_MESSAGE = (
     "The job database could not be read. Check that --database-url (or DATABASE_URL) points "
     "at the agentic-career-search database and that its schema is up to date "
-    "(start the API once or run `alembic upgrade head`)."
+    "(start the API once against it, or apply the Alembic migrations)."
 )
 
 
