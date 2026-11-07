@@ -148,9 +148,8 @@ class InProcessWorker:
                         return
 
                     await self._process_source(session, run, source_config, seen_urls)
-
-                if run.status == RunStatus.CANCELLED.value:
-                    return
+                    if run.status == RunStatus.CANCELLED.value:
+                        return
 
                 run.status = RunStatus.COMPLETED.value
                 run.finished_at = utc_now()
@@ -333,15 +332,24 @@ class InProcessWorker:
     async def _is_cancel_requested(self, session: AsyncSession, run_id: str) -> bool:
         """Check if cancellation was requested for a run.
 
+        The run row is re-read from the database: the worker keeps one session per
+        run with ``expire_on_commit=False``, so an identity-map hit would return the
+        stale flag and miss cancellations committed by the API in another session.
+
         Args:
             session: Active async DB session.
             run_id: Run identifier.
 
         Returns:
             True if cancellation flag is set.
+
+        Raises:
+            ValueError: If run does not exist.
         """
 
-        run = await self._load_run_or_raise(session, run_id)
+        run = await session.get(Run, run_id, populate_existing=True)
+        if run is None:
+            raise ValueError(f"run not found: {run_id}")
         return bool(run.cancel_requested)
 
     @staticmethod
