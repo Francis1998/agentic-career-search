@@ -855,3 +855,28 @@ def test_hosted_board_jobs_are_attributed_to_the_board_owner() -> None:
         for url in ("https://careers.example.com/jobs", "https://careers.mygreenhouse.io/jobs")
     ] + [lever._parse_html("https://careers.clever.co/jobs", LEVER_LIVE_BOARD_HTML, 1)[0].company]
     assert self_hosted == ["careers.example.com", "careers.mygreenhouse.io", "careers.clever.co"]
+
+
+LEVER_MIXED_ANCHORS_HTML = """
+<div class="posting">
+  <div class="posting-apply">
+    <a class="posting-btn-submit" href="https://jobs.lever.co/acme/1111aaaa-0000-4000-8000-000000000001">Apply</a>
+  </div>
+  <a class="posting-title" href="https://jobs.lever.co/acme/1111aaaa-0000-4000-8000-000000000001">
+    <h5 data-qa="posting-name">Backend Engineer</h5>
+  </a>
+</div>
+<div class="posting">
+  <a href="https://jobs.lever.co/acme/2222bbbb-0000-4000-8000-000000000002">Data Engineer</a>
+</div>
+"""
+
+
+def test_lever_keeps_plain_title_anchors_next_to_preferred_ones() -> None:
+    """Preferring ``a.posting-title`` must not drop postings rendered without it."""
+
+    jobs = LeverAdapter(user_agent="test-agent")._parse_html(
+        "https://jobs.lever.co/acme", LEVER_MIXED_ANCHORS_HTML, max_jobs=10
+    )
+
+    assert sorted(job.title for job in jobs) == ["Backend Engineer", "Data Engineer"]

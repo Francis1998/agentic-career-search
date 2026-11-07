@@ -68,11 +68,18 @@ class LeverAdapter(CareerSourceAdapter):
             return []
         soup = BeautifulSoup(html, "html.parser")
         # Live boards render an Apply button linking to the posting URL itself before
-        # the title anchor, so title anchors must win over the other posting links.
-        anchors = list(soup.select("div.posting a.posting-title")) or [
-            anchor
-            for anchor in soup.select("div.posting a")
-            if "posting-btn-submit" not in (anchor.get("class") or [])
+        # the title anchor. Title anchors go first so URL de-duplication keeps them;
+        # other non-Apply posting links follow, so postings without one still count.
+        title_anchors = soup.select("div.posting a.posting-title")
+        preferred = {id(anchor) for anchor in title_anchors}
+        anchors = [
+            *title_anchors,
+            *(
+                anchor
+                for anchor in soup.select("div.posting a")
+                if id(anchor) not in preferred
+                and "posting-btn-submit" not in (anchor.get("class") or [])
+            ),
         ]
         if not anchors:
             fallback_anchors = list(soup.select("a[href]"))
