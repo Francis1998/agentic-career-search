@@ -6,7 +6,8 @@ committed by the API in another session was never observed: the run kept ingesti
 jobs, processed every remaining source and finished as ``completed``.
 
 A cancel committed while the final source is fetching must also be honoured when that
-fetch yields no jobs or fails, because neither path reaches the per-job check.
+fetch yields no jobs or fails, because neither path reaches the per-job check, and a
+cancel committed while sources are being resolved must stop the run before any fetch.
 """
 
 from __future__ import annotations
@@ -23,20 +24,23 @@ from fastapi.testclient import TestClient
 from autoapply_agent.adapters.base import JobCandidate, SourceAdapterError
 from autoapply_agent.adapters.greenhouse import GreenhouseAdapter
 from autoapply_agent.core.config import Settings
+from autoapply_agent.db.models import Run, SourceConfig
 from autoapply_agent.main import create_app
+from autoapply_agent.services.worker import InProcessWorker
 
 if TYPE_CHECKING:
     from _pytest.monkeypatch import MonkeyPatch
+    from sqlalchemy.ext.asyncio import AsyncSession
 
 FetchJobs = Callable[[GreenhouseAdapter, str, float, int], Awaitable[list[JobCandidate]]]
 
-_FETCH_STARTED = threading.Event()
+_PAUSED = threading.Event()
 _CANCEL_SENT = threading.Event()
 
 
 async def _pause_until_cancel_sent() -> None:
-    """Signal that a fetch is in flight, then wait (max ~5 s) for the API cancel."""
-    _FETCH_STARTED.set()
+    """Signal that the worker reached the paused step, then wait (max ~5 s) for the cancel."""
+    _PAUSED.set()
     for _ in range(500):
         if _CANCEL_SENT.is_set():
             return
@@ -66,7 +70,7 @@ async def _fetch_blocking_until_cancel_sent(
 ) -> list[JobCandidate]:
     """Pause the first fetch until the test has cancelled the run through the API."""
     del self, timeout_seconds, max_jobs
-    if not _FETCH_STARTED.is_set():
+    if not _PAUSED.is_set():
         await _pause_until_cancel_sent()
     return _jobs_for(base_url, 3)
 
@@ -110,14 +114,14 @@ def _cancel_mid_fetch(
     Args:
         database_url: Isolated sqlite URL for this test.
         monkeypatch: Pytest monkeypatch fixture.
-        fetch_jobs: Fake ``GreenhouseAdapter.fetch_jobs`` that calls
-            ``_pause_until_cancel_sent`` for exactly one source.
+        fetch_jobs: Fake ``GreenhouseAdapter.fetch_jobs``; it (or another patched worker
+            step) calls ``_pause_until_cancel_sent`` exactly once.
         boards: Greenhouse board tokens, one source config each, in processing order.
 
     Returns:
         Final run payload, ordered run events, and persisted jobs for the run.
     """
-    _FETCH_STARTED.clear()
+    _PAUSED.clear()
     _CANCEL_SENT.clear()
     monkeypatch.setattr(GreenhouseAdapter, "fetch_jobs", fetch_jobs)
 
@@ -147,7 +151,7 @@ def _cancel_mid_fetch(
         assert run_response.status_code == 201
         run_id = run_response.json()["id"]
 
-        assert _FETCH_STARTED.wait(timeout=5), "worker never reached the paused fetch"
+        assert _PAUSED.wait(timeout=5), "worker never reached the paused step"
         cancel_response = client.post(f"/runs/{run_id}/cancel")
         assert cancel_response.status_code == 200
         assert cancel_response.json()["status"] == "cancel_requested"
@@ -224,3 +228,43 @@ def test_cancel_during_final_fetch_without_jobs_is_honored(
     assert "run.completed" not in event_types
     assert [job["external_id"] for job in jobs] == ["running-cancel-0"]
     assert [entry["sequence"] for entry in events] == list(range(1, len(events) + 1))
+
+
+def test_cancel_during_source_resolution_skips_the_first_fetch(
+    sqlite_database_url: str,
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """A cancel committed while sources are resolved must stop the run before any fetch."""
+    fetched_urls: list[str] = []
+    resolve_sources = InProcessWorker._resolve_sources
+
+    async def resolve_then_pause(
+        self: InProcessWorker, session: AsyncSession, run: Run
+    ) -> list[SourceConfig]:
+        sources = await resolve_sources(self, session, run)
+        await _pause_until_cancel_sent()
+        return sources
+
+    async def record_fetch(
+        self: GreenhouseAdapter,
+        base_url: str,
+        timeout_seconds: float,
+        max_jobs: int,
+    ) -> list[JobCandidate]:
+        del self, timeout_seconds, max_jobs
+        fetched_urls.append(base_url)
+        return _jobs_for(base_url, 1)
+
+    monkeypatch.setattr(InProcessWorker, "_resolve_sources", resolve_then_pause)
+    status_payload, events, jobs = _cancel_mid_fetch(
+        sqlite_database_url,
+        monkeypatch,
+        record_fetch,
+        ("only",),
+    )
+    event_types = [entry["event_type"] for entry in events]
+
+    assert status_payload["status"] == "cancelled", event_types
+    assert event_types == ["run.created", "run.started", "run.cancel_requested", "run.cancelled"]
+    assert fetched_urls == []
+    assert jobs == []

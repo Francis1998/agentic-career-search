@@ -145,6 +145,8 @@ class InProcessWorker:
 
                 seen_urls: set[str] = set()
                 for source_config in sources:
+                    if await self._cancel_if_requested(session, run):
+                        return
                     await self._process_source(session, run, source_config, seen_urls)
                     # Empty fetches and source errors never reach the per-job check, so
                     # re-read the flag after every source, before completing the run.

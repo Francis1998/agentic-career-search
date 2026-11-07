@@ -741,8 +741,9 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - `InProcessWorker`: a cancel committed while the final source is fetching is no
   longer lost when that fetch returns no jobs or raises `SourceAdapterError`
   (neither path reaches the per-job check). The worker now re-checks the
-  persisted cancellation flag before resolving sources and after every source,
-  before marking the run `completed`.
+  persisted cancellation flag before resolving sources and before and after
+  every source, so a cancel committed during source resolution also skips the
+  first fetch and no run is marked `completed` after an acknowledged cancel.
 - `TeamtailorAdapter`: mixed-case / Title-Case optional title slugs in
   `/jobs/{jobId}-{Slug}` posting URLs are now accepted.
 
