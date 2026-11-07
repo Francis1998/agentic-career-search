@@ -61,6 +61,14 @@ def _wrap_lines(text: str, max_chars: int) -> list[str]:
     return lines
 
 
+# Slide palette, shared with the source-demo transcripts (scripts/render_source_demos.py).
+BASE_COLOR = (10, 14, 29)
+PANEL_COLOR = (16, 23, 42)
+TEXT_PRIMARY = (241, 245, 249)
+TEXT_SECONDARY = (203, 213, 225)
+ACCENT_TEXT = (56, 189, 248)
+
+
 def _render_slide(
     slide: Slide,
     title_font: ImageFont.FreeTypeFont | ImageFont.ImageFont,
@@ -69,11 +77,11 @@ def _render_slide(
 ) -> Image.Image:
     """Render one slide image for GIF composition."""
 
-    base_color = (10, 14, 29)
-    panel_color = (16, 23, 42)
-    text_primary = (241, 245, 249)
-    text_secondary = (203, 213, 225)
-    accent_text = (56, 189, 248)
+    base_color = BASE_COLOR
+    panel_color = PANEL_COLOR
+    text_primary = TEXT_PRIMARY
+    text_secondary = TEXT_SECONDARY
+    accent_text = ACCENT_TEXT
 
     image = Image.new("RGB", (WIDTH, HEIGHT), base_color)
     draw = ImageDraw.Draw(image)
