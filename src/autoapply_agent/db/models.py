@@ -11,6 +11,7 @@ from sqlalchemy import (
     DateTime,
     Float,
     ForeignKey,
+    Index,
     Integer,
     String,
     Text,
@@ -226,7 +227,12 @@ class Job(Base):
     """Normalized job listing captured for a run."""
 
     __tablename__ = "jobs"
-    __table_args__ = (UniqueConstraint("run_id", "url", name="uq_jobs_run_url"),)
+    __table_args__ = (
+        UniqueConstraint("run_id", "url", name="uq_jobs_run_url"),
+        # Back the job search orderings (newest / score) and their keyset batches.
+        Index("ix_jobs_created_at_id", "created_at", "id"),
+        Index("ix_jobs_score_created_at_id", "score", "created_at", "id"),
+    )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     run_id: Mapped[str] = mapped_column(

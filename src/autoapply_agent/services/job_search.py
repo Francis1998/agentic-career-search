@@ -12,7 +12,7 @@ from datetime import UTC, datetime
 from enum import StrEnum
 from typing import Any
 
-from sqlalchemy import ColumnElement, and_, func, not_, or_, select, true
+from sqlalchemy import ColumnElement, and_, func, not_, or_, select, true, tuple_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from autoapply_agent.db.models import Job
@@ -202,15 +202,16 @@ def _order_by(sort: JobSort) -> tuple[ColumnElement[Any], ...]:
 
 
 def _after(job: Job, sort: JobSort) -> ColumnElement[bool]:
-    """Keyset condition selecting the rows that sort after ``job``."""
+    """Keyset condition selecting the rows that sort after ``job``.
 
-    newer = or_(
-        Job.created_at < job.created_at,
-        and_(Job.created_at == job.created_at, Job.id < job.id),
-    )
+    A row-value comparison over the ``ORDER BY`` columns, so SQLite and PostgreSQL
+    seek through ``ix_jobs_created_at_id`` / ``ix_jobs_score_created_at_id`` instead
+    of rescanning and sorting the table for every batch.
+    """
+
     if sort == JobSort.SCORE:
-        return or_(Job.score < job.score, and_(Job.score == job.score, newer))
-    return newer
+        return tuple_(Job.score, Job.created_at, Job.id) < (job.score, job.created_at, job.id)
+    return tuple_(Job.created_at, Job.id) < (job.created_at, job.id)
 
 
 async def _distinct_postings(

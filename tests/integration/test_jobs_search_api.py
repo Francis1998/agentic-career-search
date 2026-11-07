@@ -755,8 +755,14 @@ def test_atom_feed_escapes_hostile_titles_and_falls_back_for_unsafe_links(
     assert b"javascript:" not in response.content
 
 
-async def _seed_many(database_url: str, count: int) -> None:
-    """Insert ``count`` jobs in one transaction (bulk export fixture)."""
+async def _seed_many(database_url: str, count: int, *, same_time: bool = False) -> None:
+    """Insert ``count`` jobs in one transaction (bulk export fixture).
+
+    Args:
+        database_url: Async SQLite URL.
+        count: Number of jobs.
+        same_time: Give every job the same capture time and score (all ties).
+    """
 
     engine = create_engine(database_url)
     async with engine.begin() as connection:
@@ -772,7 +778,7 @@ async def _seed_many(database_url: str, count: int) -> None:
                 url=f"https://jobs.example.com/bulk/{index}",
                 score=0.5,
                 plan_steps=[],
-                created_at=BASE_TIME + timedelta(seconds=index),
+                created_at=BASE_TIME + timedelta(seconds=0 if same_time else index),
             )
             for index in range(count)
         )
@@ -809,3 +815,22 @@ async def test_streamed_export_does_not_block_concurrent_sqlite_writes(
     assert len({job.id for job in exported}) == 1_234
     assert exported[0].title == "Engineer 1233"
     assert exported[-1].title == "Engineer 0"
+
+
+@pytest.mark.parametrize("sort", [JobSort.NEWEST, JobSort.SCORE])
+async def test_keyset_export_keeps_rows_tied_on_every_sort_column_but_id(
+    tmp_path: Path, sort: JobSort
+) -> None:
+    """Batch boundaries inside a run of equal capture times/scores lose no rows."""
+
+    database_url = f"sqlite+aiosqlite:///{tmp_path / 'ties.db'}"
+    await _seed_many(database_url, 1_100, same_time=True)
+    engine = create_engine(database_url)
+    try:
+        async with create_session_factory(engine)() as session:
+            ids = [job.id async for job in iter_jobs(session, JobSearchFilters(sort=sort))]
+    finally:
+        await engine.dispose()
+
+    assert ids == sorted(ids, reverse=True)
+    assert len(set(ids)) == 1_100

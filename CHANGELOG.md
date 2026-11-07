@@ -53,7 +53,9 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `GET /jobs/{job_id}`, streamed `GET /jobs/export?format=csv|jsonl` (OWASP
   CSV-injection hardening, http(s)-only links) and an RFC 4287
   `GET /jobs/feed.atom` with entry ids that stay stable across re-captures, board
-  mirrors and time windows. `scripts/seed_demo_jobs.py` seeds demo data. See
+  mirrors and time windows. New composite indexes `ix_jobs_created_at_id` and
+  `ix_jobs_score_created_at_id` (Alembic `c41f2a7d9e60`) back the orderings and keyset
+  export batches. `scripts/seed_demo_jobs.py` seeds demo data. See
   `docs/guides/JOB_SEARCH_EXPORT_GUIDE.md`.
 - `ProfessionalDevelopmentStipendGapAdvisor` (`services/professional_development_stipend_gap.py`): offline HITL `offered_usd` vs `needed_usd` coverage bands (never auto-approves). Gap vs Guild/LinkedIn Learning/Workday professional-development stipend planners. Distinct from `LearningStipendGapAdvisor` / `TuitionReimbursementCapGapAdvisor`. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/PROFESSIONAL_DEVELOPMENT_STIPEND_GAP_ADVISOR_GUIDE.md`.
 - `CaregivingLeaveTopUpGapAdvisor` (`services/caregiving_leave_top_up_gap.py`): offline HITL `offered_days` vs `needed_days` coverage bands (never auto-approves). Gap vs Wellthy/Cariloop/Torchlight caregiving leave top-up planners. Distinct from `CaregiverBackupCareGapAdvisor` / `CaregiverRespiteGapAdvisor`. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/CAREGIVING_LEAVE_TOP_UP_GAP_ADVISOR_GUIDE.md`.
