@@ -7,8 +7,8 @@ Compare multiple job offers side-by-side with a deterministic
 auto-accepts. Closes the gap vs Levels.fyi / Blind comparison UIs that are
 browser-bound.
 
-Optional later narrative polish via **GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x /
-Kimi K2**. The ranking itself stays deterministic.
+Optional later narrative polish via **GPT-6 Astra / Claude Opus 5.5 / Gemini 4 Argon /
+Kimi K3.1 Pro**. The ranking itself stays deterministic.
 
 ## Why this exists
 

@@ -746,6 +746,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `external_id`. See ADR-086.
 
 ### Changed
+- Guides, the use-case catalog, and module docstrings no longer name the retired "GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x (or 2.5) / Kimi K2" stack for optional LLM enrichment (407 changed lines across 356 files). They now name the provider flagships verified on 2026-11-07: GPT-6 Astra, Claude Opus 5.5, Gemini 4 Argon, and Kimi K3.1 Pro. Architecture decision records keep their original wording because they record the context of past decisions. `tests/unit/test_docs_model_stack_current.py` now fails if retired names (GPT-5.x, GPT-4o, Claude Sonnet/Opus 4.x, Kimi K2, Gemini 2.5) reappear in README/docs or `src`/`scripts`, except on lines announcing a retirement.
 - README restructured into a focused product page: pitch, hero demo, why, architecture
   diagram, 60-second quickstart (offline seed and live boards), feature map, current
   model stack, API overview and docs map. The demo gallery, use-case/advisor tables and

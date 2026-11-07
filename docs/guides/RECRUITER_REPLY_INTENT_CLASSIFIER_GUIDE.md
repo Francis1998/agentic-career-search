@@ -6,7 +6,7 @@ Classify offline recruiter replies into interested / scheduling / rejection /
 nurture intents. Never auto-sends. Closes the Teal / Huntr / Superhuman inbox
 labeling gap.
 
-Optional later polish via **GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2**.
+Optional later polish via **GPT-6 Astra / Claude Opus 5.5 / Gemini 4 Argon / Kimi K3.1 Pro**.
 
 Distinct from `RecruiterOutreachDraftService` and `ApplicationFollowUpCadencePlanner`.
 

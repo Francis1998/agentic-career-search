@@ -5,7 +5,7 @@
 Detect **local interview calendar overlaps** for human review. Never writes
 calendars. Closes the gap vs Teal/Huntr calendar sync that auto-writes events.
 
-Optional later polish via **GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2**.
+Optional later polish via **GPT-6 Astra / Claude Opus 5.5 / Gemini 4 Argon / Kimi K3.1 Pro**.
 The overlap check itself stays deterministic.
 
 ## Why this exists

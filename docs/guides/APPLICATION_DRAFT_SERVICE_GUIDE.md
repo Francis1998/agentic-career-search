@@ -6,8 +6,8 @@ Generate **human-reviewed** resume bullets and a short cover note from a job
 title, company, and optional search query. Drafts are deterministic templates —
 they never submit applications over HTTP.
 
-Optional LLM polish can later use GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x /
-Kimi K2. The draft generator itself stays network-free and SAFETY-aligned.
+Optional LLM polish can later use GPT-6 Astra / Claude Opus 5.5 / Gemini 4 Argon /
+Kimi K3.1 Pro. The draft generator itself stays network-free and SAFETY-aligned.
 
 ## Why this exists
 

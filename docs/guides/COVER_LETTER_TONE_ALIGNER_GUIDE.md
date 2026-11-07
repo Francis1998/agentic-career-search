@@ -6,7 +6,7 @@ Align offline cover-letter tone bands (formal / energetic / collaborative /
 technical) to JD culture and pace cues. Never auto-sends. Closes the Teal /
 Rezi / Kickresume tone-matcher gap.
 
-Optional later polish via **GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2**.
+Optional later polish via **GPT-6 Astra / Claude Opus 5.5 / Gemini 4 Argon / Kimi K3.1 Pro**.
 
 Distinct from `JdCultureSignalExtractor` and `RecruiterOutreachDraftService`.
 

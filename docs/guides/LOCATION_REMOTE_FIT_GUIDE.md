@@ -7,8 +7,8 @@ remote policy. Returns `fit_score` in `[0.0, 1.0]` plus human-readable reasons.
 Closes the gap vs RemoteOK / WeWorkRemotely preference filters that are
 board-UI-only.
 
-Optional later narrative polish via **GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x /
-Kimi K2**. The score itself stays deterministic.
+Optional later narrative polish via **GPT-6 Astra / Claude Opus 5.5 / Gemini 4 Argon /
+Kimi K3.1 Pro**. The score itself stays deterministic.
 
 ## Why this exists
 

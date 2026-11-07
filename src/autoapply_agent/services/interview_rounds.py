@@ -7,7 +7,7 @@ never auto-advances candidates and never performs network I/O.
 
 Distinct from ``ApplicationStageTracker`` (saved/applied/interview/offer CRM
 stages) and ``PhoneScreenAgendaPlanner`` (single-screen agendas). Optional
-later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2 must stay
+later polish via GPT-6 Astra / Claude Opus 5.5 / Gemini 4 Argon / Kimi K3.1 Pro must stay
 advisory.
 """
 

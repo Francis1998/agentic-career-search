@@ -9,8 +9,8 @@ v1 is an in-process state machine with explicit allowed transitions. Durable DB
 persistence can come later; this module keeps agent loops able to reason about
 pipeline stage without auto-submitting applications.
 
-Optional LLM notes polish can later use GPT-5.5 / Claude Sonnet 4.6 /
-Gemini 3.x / Kimi K2. Stage transitions themselves stay deterministic.
+Optional LLM notes polish can later use GPT-6 Astra / Claude Opus 5.5 /
+Gemini 4 Argon / Kimi K3.1 Pro. Stage transitions themselves stay deterministic.
 
 ## Why this exists
 

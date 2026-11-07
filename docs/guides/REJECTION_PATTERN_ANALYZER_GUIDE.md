@@ -6,7 +6,7 @@ Cluster deterministic, offline **rejection reasons** into coarse themes with
 HITL next actions. Never auto-rewrites resumes. Closes the gap vs Teal Insights /
 Huntr analytics locked inside proprietary dashboards.
 
-Optional later polish via **GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2**.
+Optional later polish via **GPT-6 Astra / Claude Opus 5.5 / Gemini 4 Argon / Kimi K3.1 Pro**.
 Clustering itself stays deterministic.
 
 Distinct from `SkillGapLearningPathPlanner` (skill milestones) and

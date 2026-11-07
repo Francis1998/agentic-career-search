@@ -6,8 +6,8 @@ Use this guide to notify Slack, Discord, or a custom endpoint whenever the
 agent marks a posting as **high** priority. Alerts are fail-soft: webhook
 errors are logged and never fail the run.
 
-Optional LLM polish of alert copy can later use GPT-5.5 / Claude Sonnet 4.6 /
-Gemini 3.x / Kimi K2 — the webhook payload itself stays deterministic JSON.
+Optional LLM polish of alert copy can later use GPT-6 Astra / Claude Opus 5.5 /
+Gemini 4 Argon / Kimi K3.1 Pro — the webhook payload itself stays deterministic JSON.
 
 ## Why this exists
 
