@@ -127,10 +127,12 @@ class InProcessWorker:
         try:
             async with self._session_factory() as session:
                 run = await self._load_run_or_raise(session, run_id)
+                sources = await self._resolve_sources(session, run)
+                # Checked after resolving, so a cancel committed meanwhile stops the run
+                # before the first fetch and before an empty source list completes it.
                 if await self._cancel_if_requested(session, run):
                     return
 
-                sources = await self._resolve_sources(session, run)
                 if not sources:
                     run.status = RunStatus.COMPLETED.value
                     run.finished_at = utc_now()
@@ -145,11 +147,10 @@ class InProcessWorker:
 
                 seen_urls: set[str] = set()
                 for source_config in sources:
-                    if await self._cancel_if_requested(session, run):
-                        return
                     await self._process_source(session, run, source_config, seen_urls)
                     # Empty fetches and source errors never reach the per-job check, so
-                    # re-read the flag after every source, before completing the run.
+                    # re-read the flag after every source: before the next source starts
+                    # and before the run is completed.
                     if await self._cancel_if_requested(session, run):
                         return
 

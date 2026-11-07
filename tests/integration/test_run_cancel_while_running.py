@@ -7,7 +7,8 @@ jobs, processed every remaining source and finished as ``completed``.
 
 A cancel committed while the final source is fetching must also be honoured when that
 fetch yields no jobs or fails, because neither path reaches the per-job check, and a
-cancel committed while sources are being resolved must stop the run before any fetch.
+cancel committed while sources are being resolved must stop the run before any fetch
+(or before an empty source list completes it).
 """
 
 from __future__ import annotations
@@ -230,11 +231,19 @@ def test_cancel_during_final_fetch_without_jobs_is_honored(
     assert [entry["sequence"] for entry in events] == list(range(1, len(events) + 1))
 
 
+@pytest.mark.parametrize(
+    "boards",
+    [pytest.param(("only",), id="one-source"), pytest.param((), id="no-sources")],
+)
 def test_cancel_during_source_resolution_skips_the_first_fetch(
     sqlite_database_url: str,
     monkeypatch: MonkeyPatch,
+    boards: tuple[str, ...],
 ) -> None:
-    """A cancel committed while sources are resolved must stop the run before any fetch."""
+    """A cancel committed while sources are resolved must win before any fetch.
+
+    With no matching sources the run must not complete via ``run.no_sources`` either.
+    """
     fetched_urls: list[str] = []
     resolve_sources = InProcessWorker._resolve_sources
 
@@ -260,7 +269,7 @@ def test_cancel_during_source_resolution_skips_the_first_fetch(
         sqlite_database_url,
         monkeypatch,
         record_fetch,
-        ("only",),
+        boards,
     )
     event_types = [entry["event_type"] for entry in events]
 
