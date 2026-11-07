@@ -96,6 +96,21 @@ def company_from_url(base_url: str) -> str:
     return host.removeprefix("www.")
 
 
+def is_host_or_subdomain(hostname: str | None, domain: str) -> bool:
+    """Return True for ``domain`` itself or a dot-delimited subdomain of it.
+
+    Args:
+        hostname: URL hostname, possibly missing.
+        domain: Registrable domain such as ``greenhouse.io``.
+
+    Returns:
+        Whether the host belongs to ``domain`` (``mygreenhouse.io`` does not).
+    """
+
+    host = (hostname or "").lower()
+    return host == domain or host.endswith(f".{domain}")
+
+
 def find_location_text(anchor: object, container_class_pattern: re.Pattern[str]) -> str | None:
     """Resolve a posting location from an anchor's surrounding markup.
 

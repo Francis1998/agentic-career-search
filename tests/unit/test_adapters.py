@@ -850,9 +850,8 @@ def test_hosted_board_jobs_are_attributed_to_the_board_owner() -> None:
     ]
 
     assert [jobs[0].company for jobs in cases] == ["gitlab", "gitlab", "gitlab", "palantir"]
-    assert (
-        greenhouse._parse_html(
-            "https://careers.example.com/jobs", GREENHOUSE_LIVE_BOARD_HTML, max_jobs=1
-        )[0].company
-        == "careers.example.com"
-    )
+    self_hosted = [
+        greenhouse._parse_html(url, GREENHOUSE_LIVE_BOARD_HTML, max_jobs=1)[0].company
+        for url in ("https://careers.example.com/jobs", "https://careers.mygreenhouse.io/jobs")
+    ] + [lever._parse_html("https://careers.clever.co/jobs", LEVER_LIVE_BOARD_HTML, 1)[0].company]
+    assert self_hosted == ["careers.example.com", "careers.mygreenhouse.io", "careers.clever.co"]

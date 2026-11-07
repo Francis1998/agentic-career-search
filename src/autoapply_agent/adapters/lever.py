@@ -8,7 +8,12 @@ from urllib.parse import urljoin, urlparse
 
 from bs4 import BeautifulSoup
 
-from autoapply_agent.adapters.base import CareerSourceAdapter, JobCandidate, company_from_url
+from autoapply_agent.adapters.base import (
+    CareerSourceAdapter,
+    JobCandidate,
+    company_from_url,
+    is_host_or_subdomain,
+)
 
 _POSTING_ID_PATTERN = re.compile(
     r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
@@ -131,7 +136,7 @@ class LeverAdapter(CareerSourceAdapter):
 
         parsed = urlparse(base_url)
         segments = [part for part in parsed.path.split("/") if part]
-        if (parsed.hostname or "").endswith("lever.co") and segments:
+        if is_host_or_subdomain(parsed.hostname, "lever.co") and segments:
             return segments[0]
         return company_from_url(base_url)
 

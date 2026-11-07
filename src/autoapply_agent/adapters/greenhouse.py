@@ -7,7 +7,12 @@ from urllib.parse import parse_qs, urljoin, urlparse
 
 from bs4 import BeautifulSoup
 
-from autoapply_agent.adapters.base import CareerSourceAdapter, JobCandidate, company_from_url
+from autoapply_agent.adapters.base import (
+    CareerSourceAdapter,
+    JobCandidate,
+    company_from_url,
+    is_host_or_subdomain,
+)
 
 
 class GreenhouseAdapter(CareerSourceAdapter):
@@ -119,7 +124,7 @@ class GreenhouseAdapter(CareerSourceAdapter):
         """
 
         parsed = urlparse(base_url)
-        if (parsed.hostname or "").endswith("greenhouse.io"):
+        if is_host_or_subdomain(parsed.hostname, "greenhouse.io"):
             board = parse_qs(parsed.query).get("for", [""])[0]
             segments = [part for part in parsed.path.split("/") if part]
             if not board and segments and segments[0] != "embed":
