@@ -207,9 +207,11 @@ async def _distinct_postings(
     """Collapse matching jobs into distinct postings, in the requested order.
 
     Identity ignores the filters: every stored job is visited in capture order
-    (``created_at``, then ``id``) and joins the posting of the first earlier job with
-    the same URL (case-insensitive) or the same :func:`posting_key`. The filters only
-    decide which postings match and which capture represents each one (the first
+    (``created_at``, then ``id``) and joins the posting of an earlier job with the
+    same URL (case-insensitive) or the same :func:`posting_key`; when the two lookups
+    find different postings, the one first seen earlier wins. A job's posting depends
+    only on earlier captures, so it never changes as new captures arrive. The filters
+    only decide which postings match and which capture represents each one (the first
     matching capture), so a posting keeps its identity when, for example,
     ``hours_old`` drops its oldest captures. Only narrow columns are loaded.
 
@@ -229,16 +231,19 @@ async def _distinct_postings(
     ).order_by(Job.created_at.asc(), Job.id.asc())
     by_url: dict[str, PostingIdentity] = {}
     by_key: dict[str, PostingIdentity] = {}
+    first_seen_order: dict[PostingIdentity, int] = {}
     representatives: dict[PostingIdentity, tuple[int, float]] = {}
     rows = (await session.execute(statement)).all()
-    for job_id, url, title, company, location, score, created_at, matched in rows:
+    for position, row in enumerate(rows):
+        job_id, url, title, company, location, score, created_at, matched = row
         url_key = url.strip().lower()
         key = posting_key(title, company, location)
-        identity = (
-            by_url.get(url_key)
-            or by_key.get(key)
-            or PostingIdentity(url=url, first_seen=as_utc(created_at))
-        )
+        known = [found for found in (by_url.get(url_key), by_key.get(key)) if found is not None]
+        if known:
+            identity = min(known, key=first_seen_order.__getitem__)
+        else:
+            identity = PostingIdentity(url=url, first_seen=as_utc(created_at))
+            first_seen_order[identity] = position
         by_url.setdefault(url_key, identity)
         by_key.setdefault(key, identity)
         if matched and identity not in representatives:

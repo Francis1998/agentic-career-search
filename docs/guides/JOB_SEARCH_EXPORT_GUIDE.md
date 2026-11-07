@@ -113,9 +113,10 @@ become `Remote`), so the same rule drives the `remote` filter, the CSV `remote`
 column and the feed summary.
 
 **Dedupe rule.** With `dedupe=true` results are *postings*, not captures. Every
-stored job is visited in capture order and joins the posting of the first earlier job
-with the same URL (case-insensitive) **or** the same normalized
-title + company + location. Normalization reuses `services/cross_source_dedup.py` and
+stored job is visited in capture order and joins the posting of an earlier job with
+the same URL (case-insensitive) **or** the same normalized title + company + location;
+if those two point to different postings, the one first seen earlier wins, so a
+capture's posting depends only on earlier captures and never changes later. Normalization reuses `services/cross_source_dedup.py` and
 works for every script (NFKC, case-folding; punctuation, spacing and legal suffixes
 such as `Inc`/`LLC`/`GmbH` are ignored, while letters such as `東京` vs `大阪` are
 kept), so `Senior Python Engineer · Acme Robotics, Inc. · Remote - US` on Lever and

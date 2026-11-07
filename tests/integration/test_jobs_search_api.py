@@ -598,6 +598,61 @@ def test_dedupe_keeps_distinct_non_latin_postings(sqlite_database_url: str) -> N
         ]
 
 
+CONFLICT_JOBS = (
+    SeedJob(
+        "senior-at-a",
+        "run-a",
+        1,
+        "Senior Engineer",
+        "Hooli",
+        "Austin, TX",
+        "https://boards.example.com/hooli/a",
+        0.8,
+        0,
+    ),
+    SeedJob(
+        "staff-at-b",
+        "run-a",
+        2,
+        "Staff Engineer",
+        "Hooli",
+        "Austin, TX",
+        "https://jobs.example.com/hooli/b",
+        0.7,
+        1,
+    ),
+    SeedJob(
+        "senior-at-b",
+        "run-b",
+        2,
+        "Senior Engineer",
+        "Hooli",
+        "Austin, TX",
+        "https://jobs.example.com/hooli/b",
+        0.75,
+        2,
+    ),
+)
+
+
+def test_dedupe_prefers_the_earliest_posting_when_url_and_key_disagree(
+    sqlite_database_url: str,
+) -> None:
+    """A capture matching one posting by URL and an earlier one by key joins the earlier."""
+
+    for client in _client_for(sqlite_database_url, CONFLICT_JOBS):
+        senior = client.get("/jobs", params={"q": "senior", "dedupe": "true"})
+        entries = _feed(client, {"q": "senior"}).findall(f"{ATOM}entry")
+        first_capture = _feed(client, {"q": "senior", "hours_old": "9"}).findall(f"{ATOM}entry")
+
+        assert _keys(senior) == ["senior-at-a"]
+        assert senior.headers["x-total-count"] == "1"
+        assert len(entries) == 1
+        assert [entry.findtext(f"{ATOM}id") for entry in first_capture] == [
+            entries[0].findtext(f"{ATOM}id")
+        ]
+
+
 HOSTILE_JOBS = (
     SeedJob(
         "+cmd|' /C calc'!A0",
