@@ -127,6 +127,9 @@ class InProcessWorker:
         try:
             async with self._session_factory() as session:
                 run = await self._load_run_or_raise(session, run_id)
+                if await self._cancel_if_requested(session, run):
+                    return
+
                 sources = await self._resolve_sources(session, run)
                 if not sources:
                     run.status = RunStatus.COMPLETED.value
@@ -142,13 +145,10 @@ class InProcessWorker:
 
                 seen_urls: set[str] = set()
                 for source_config in sources:
-                    cancellation_requested = await self._is_cancel_requested(session, run.id)
-                    if cancellation_requested:
-                        await self._mark_cancelled(session, run)
-                        return
-
                     await self._process_source(session, run, source_config, seen_urls)
-                    if run.status == RunStatus.CANCELLED.value:
+                    # Empty fetches and source errors never reach the per-job check, so
+                    # re-read the flag after every source, before completing the run.
+                    if await self._cancel_if_requested(session, run):
                         return
 
                 run.status = RunStatus.COMPLETED.value
@@ -227,8 +227,7 @@ class InProcessWorker:
 
         inserted_count = 0
         for job_candidate in jobs:
-            if await self._is_cancel_requested(session, run.id):
-                await self._mark_cancelled(session, run)
+            if await self._cancel_if_requested(session, run):
                 return
 
             if job_candidate.url in seen_urls:
@@ -293,6 +292,27 @@ class InProcessWorker:
             payload={"source_config_id": source_config.id, "jobs_inserted": inserted_count},
         )
         await session.commit()
+
+    async def _cancel_if_requested(self, session: AsyncSession, run: Run) -> bool:
+        """Mark the run cancelled if cancellation was requested.
+
+        Safe to call repeatedly: a run that is already ``cancelled`` is left as is, so
+        no duplicate ``run.cancelled`` event is written.
+
+        Args:
+            session: Active async DB session.
+            run: Run model being processed.
+
+        Returns:
+            True when the run is cancelled and processing must stop.
+        """
+
+        if run.status == RunStatus.CANCELLED.value:
+            return True
+        if not await self._is_cancel_requested(session, run.id):
+            return False
+        await self._mark_cancelled(session, run)
+        return True
 
     async def _mark_cancelled(self, session: AsyncSession, run: Run) -> None:
         """Mark run as cancelled and persist event.

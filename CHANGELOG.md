@@ -738,6 +738,11 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   remaining job/source and finish as `completed`. The source loop now also exits
   as soon as a source cancels the run, so exactly one `run.cancelled` event is
   written.
+- `InProcessWorker`: a cancel committed while the final source is fetching is no
+  longer lost when that fetch returns no jobs or raises `SourceAdapterError`
+  (neither path reaches the per-job check). The worker now re-checks the
+  persisted cancellation flag before resolving sources and after every source,
+  before marking the run `completed`.
 - `TeamtailorAdapter`: mixed-case / Title-Case optional title slugs in
   `/jobs/{jobId}-{Slug}` posting URLs are now accepted.
 
