@@ -671,16 +671,28 @@ async def _list_sources(session: AsyncSession, arguments: dict[str, Any]) -> Too
 # Schemas
 # ---------------------------------------------------------------------------
 
+
+def _nullable(schema: dict[str, Any], description: str | None = None) -> dict[str, Any]:
+    """Allow ``null`` besides ``schema`` with single-type ``anyOf`` branches.
+
+    Type arrays such as ``["string", "null"]`` are valid JSON Schema, but clients that map
+    tool schemas onto a single-``type`` dialect (for example the OpenAPI subset used for
+    Gemini function declarations) may reject them.
+    """
+
+    nullable: dict[str, Any] = {"anyOf": [schema, {"type": "null"}]}
+    if description is not None:
+        nullable["description"] = description
+    return nullable
+
+
 _STRING: dict[str, Any] = {"type": "string"}
-_NULLABLE_STRING: dict[str, Any] = {"type": ["string", "null"]}
+_NULLABLE_STRING: dict[str, Any] = _nullable(_STRING)
 _STRING_LIST: dict[str, Any] = {"type": "array", "items": {"type": "string"}}
 _TIMESTAMP: dict[str, Any] = {"type": "string", "description": "RFC 3339 UTC timestamp."}
-_NULLABLE_TIMESTAMP: dict[str, Any] = {
-    "type": ["string", "null"],
-    "description": "RFC 3339 UTC timestamp.",
-}
+_NULLABLE_TIMESTAMP: dict[str, Any] = _nullable(_STRING, "RFC 3339 UTC timestamp.")
 _COUNT: dict[str, Any] = {"type": "integer", "minimum": 0}
-_NULLABLE_COUNT: dict[str, Any] = {"type": ["integer", "null"], "minimum": 0}
+_NULLABLE_INTEGER: dict[str, Any] = _nullable({"type": "integer"})
 _ID_ARGUMENT: dict[str, Any] = {"type": "integer", "minimum": 1, "maximum": SQLITE_MAX_INTEGER}
 _PAGE_ARGUMENTS: dict[str, Any] = {
     "limit": {
@@ -702,10 +714,7 @@ _PAGE_FIELDS: dict[str, Any] = {
     "total": _COUNT,
     "offset": _COUNT,
     "limit": _COUNT,
-    "next_offset": {
-        **_NULLABLE_COUNT,
-        "description": "Offset of the next page; null on the last page.",
-    },
+    "next_offset": _nullable(_COUNT, "Offset of the next page; null on the last page."),
 }
 _RUN_STATUSES = [status.value for status in RunStatus]
 
@@ -721,14 +730,11 @@ def _closed_object(properties: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-_LLM_ENRICHMENT_OUTPUT: dict[str, Any] = {
-    "anyOf": [
-        _closed_object(
-            {"provider": _NULLABLE_STRING, "model": _NULLABLE_STRING, "summary": _NULLABLE_STRING}
-        ),
-        {"type": "null"},
-    ]
-}
+_LLM_ENRICHMENT_OUTPUT: dict[str, Any] = _nullable(
+    _closed_object(
+        {"provider": _NULLABLE_STRING, "model": _NULLABLE_STRING, "summary": _NULLABLE_STRING}
+    )
+)
 _JOB_SUMMARY_PROPERTIES: dict[str, Any] = {
     "id": {"type": "integer"},
     "title": _STRING,
@@ -736,28 +742,23 @@ _JOB_SUMMARY_PROPERTIES: dict[str, Any] = {
     "location": _NULLABLE_STRING,
     "remote": {"type": "boolean"},
     "score": {"type": "number"},
-    "priority_tier": {
-        **_NULLABLE_STRING,
-        "description": "Tier recorded in the decision trace (null when not recorded).",
-    },
-    "url": {
-        **_NULLABLE_STRING,
-        "description": "Posting link; null unless it is an absolute http(s) URL.",
-    },
-    "source_config_id": {"type": ["integer", "null"]},
+    "priority_tier": _nullable(
+        _STRING, "Tier recorded in the decision trace (null when not recorded)."
+    ),
+    "url": _nullable(_STRING, "Posting link; null unless it is an absolute http(s) URL."),
+    "source_config_id": _NULLABLE_INTEGER,
     "run_id": _STRING,
     "captured_at": _TIMESTAMP,
-    "first_seen_at": {
-        **_NULLABLE_TIMESTAMP,
-        "description": "With dedupe: first capture of the posting; otherwise null.",
-    },
+    "first_seen_at": _nullable(
+        _STRING, "With dedupe: RFC 3339 time of the posting's first capture; otherwise null."
+    ),
 }
 _RUN_OUTPUT: dict[str, Any] = _closed_object(
     {
         "id": _STRING,
         "status": _STRING,
         "query": _NULLABLE_STRING,
-        "source_config_ids": {"type": ["array", "null"], "items": {"type": "integer"}},
+        "source_config_ids": _nullable({"type": "array", "items": {"type": "integer"}}),
         "cancel_requested": {"type": "boolean"},
         "error_message": _NULLABLE_STRING,
         "created_at": _TIMESTAMP,
@@ -841,10 +842,9 @@ _SEARCH_OUTPUT: dict[str, Any] = _closed_object(
         **_PAGE_FIELDS,
         "sort": {"type": "string", "enum": [sort.value for sort in JobSort]},
         "dedupe": {"type": "boolean"},
-        "captured_since": {
-            **_NULLABLE_TIMESTAMP,
-            "description": "Effective capture-time lower bound from created_after/hours_old.",
-        },
+        "captured_since": _nullable(
+            _STRING, "Effective capture-time lower bound (RFC 3339) from created_after/hours_old."
+        ),
         "jobs": {"type": "array", "items": _closed_object(_JOB_SUMMARY_PROPERTIES)},
     }
 )
@@ -866,20 +866,12 @@ _GET_JOB_OUTPUT: dict[str, Any] = _closed_object(
                 "llm_enrichment": _LLM_ENRICHMENT_OUTPUT,
             }
         ),
-        "run": {
-            "anyOf": [
-                _closed_object({"id": _STRING, "query": _NULLABLE_STRING, "status": _STRING}),
-                {"type": "null"},
-            ]
-        },
-        "source": {
-            "anyOf": [
-                _closed_object(
-                    {"id": {"type": "integer"}, "name": _STRING, "source_type": _STRING}
-                ),
-                {"type": "null"},
-            ]
-        },
+        "run": _nullable(
+            _closed_object({"id": _STRING, "query": _NULLABLE_STRING, "status": _STRING})
+        ),
+        "source": _nullable(
+            _closed_object({"id": {"type": "integer"}, "name": _STRING, "source_type": _STRING})
+        ),
         "source_payload": {
             "type": "object",
             "description": "Adapter fields captured with the job (decision trace excluded).",
@@ -897,14 +889,11 @@ _EXPLAIN_OUTPUT: dict[str, Any] = _closed_object(
         "tier_thresholds": _closed_object(
             {"high": {"type": "number"}, "medium": {"type": "number"}}
         ),
-        "next_tier": {
-            "anyOf": [
-                _closed_object(
-                    {"tier": _TIER_ENUM, "min_score": {"type": "number"}, "gap": {"type": "number"}}
-                ),
-                {"type": "null"},
-            ]
-        },
+        "next_tier": _nullable(
+            _closed_object(
+                {"tier": _TIER_ENUM, "min_score": {"type": "number"}, "gap": {"type": "number"}}
+            )
+        ),
         "run_query": _NULLABLE_STRING,
         "query_terms": _STRING_LIST,
         "matched_terms": _STRING_LIST,
@@ -974,7 +963,7 @@ _GET_RUN_OUTPUT: dict[str, Any] = _closed_object(
                     "sequence": {"type": "integer"},
                     "event_type": _STRING,
                     "message": _STRING,
-                    "payload": {"type": ["object", "null"]},
+                    "payload": _nullable({"type": "object"}),
                     "created_at": _TIMESTAMP,
                 }
             ),

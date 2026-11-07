@@ -183,6 +183,30 @@ async def test_tools_list_exposes_no_write_paths(server: CareerSearchMcpServer) 
     assert set(mcp_server.TOOLS_BY_NAME) == names
 
 
+def _type_arrays(schema: Any, path: str = "") -> list[str]:
+    """Paths of every ``"type": [...]`` in a schema (single-type dialects reject them)."""
+
+    found: list[str] = []
+    if isinstance(schema, dict):
+        if isinstance(schema.get("type"), list):
+            found.append(path or "/")
+        for key, value in schema.items():
+            found.extend(_type_arrays(value, f"{path}/{key}"))
+    elif isinstance(schema, list):
+        for index, item in enumerate(schema):
+            found.extend(_type_arrays(item, f"{path}/{index}"))
+    return found
+
+
+async def test_tool_schemas_use_single_type_branches(server: CareerSearchMcpServer) -> None:
+    response = await server.handle_message(modern("tools/list"))
+
+    assert response is not None
+    for tool in response["result"]["tools"]:
+        assert _type_arrays(tool["inputSchema"]) == [], tool["name"]
+        assert _type_arrays(tool["outputSchema"]) == [], tool["name"]
+
+
 async def test_search_jobs_input_schema_mirrors_the_http_filters(
     server: CareerSearchMcpServer,
 ) -> None:
