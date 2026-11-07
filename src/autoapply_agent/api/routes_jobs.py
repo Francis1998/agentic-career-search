@@ -216,8 +216,9 @@ async def jobs_feed(
 ) -> Response:
     """Publish the newest distinct matching postings as an Atom 1.0 feed.
 
-    The feed is always deduplicated, and entry ids derive from the posting URL, so a
-    feed reader notifies once per posting even when later runs capture it again.
+    The feed is always deduplicated and entry ids derive from each posting's first
+    capture, so a feed reader notifies once per posting even when later runs or other
+    boards capture it again. The feed id derives from the canonical feed URL.
 
     Args:
         request: Incoming request (self link and fallback entry links).
@@ -235,14 +236,15 @@ async def jobs_feed(
         (key, value) for key, value in request.query_params.multi_items() if key != "limit"
     )
     summary = ", ".join(f"{key}={value}" for key, value in criteria)
-    feed_key = f"agentic-career-search:jobs-feed?{urlencode(criteria)}"
+    # The canonical feed URL (installation + filters, without limit) keeps ids global.
+    canonical_url = str(request.url.replace(query=urlencode(criteria), fragment=""))
 
     def fallback_link(job: Job) -> str:
         return str(request.url_for("get_job", job_id=job.id))
 
     document = render_atom_feed(
-        page.items,
-        feed_id=f"urn:uuid:{uuid.uuid5(uuid.NAMESPACE_URL, feed_key)}",
+        [(job, page.postings[job.id]) for job in page.items],
+        feed_id=f"urn:uuid:{uuid.uuid5(uuid.NAMESPACE_URL, canonical_url)}",
         title=f"{settings.app_name} jobs" + (f" ({summary})" if summary else ""),
         self_url=str(request.url),
         fallback_link=fallback_link,

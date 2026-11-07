@@ -1,5 +1,5 @@
 $ DATABASE_URL=sqlite+aiosqlite:///./demo.db uv run python scripts/seed_demo_jobs.py
-seeded 8 jobs (run 24517623-7424-4fc0-b6b4-209fb67d8099) into sqlite+aiosqlite:///./demo.db
+seeded 8 jobs (run 0e4a8f11-7d7e-4b36-b9d2-049bf632c341) into sqlite+aiosqlite:///./demo.db
 $ DATABASE_URL=sqlite+aiosqlite:///./demo.db ENABLE_WORKER=false uv run uvicorn autoapply_agent.main:app --port 8000 --log-level warning &
 $ curl -s 'localhost:8000/jobs?q=python&remote=true&sort=score' | jq -c '.[] | [.id, .company, .score]'
 [1,"Acme Robotics",0.92]

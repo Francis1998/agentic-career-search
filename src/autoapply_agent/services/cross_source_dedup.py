@@ -8,13 +8,13 @@ JobSpy / Teal triage gaps without pulling in heavy fuzzy libraries.
 
 from __future__ import annotations
 
-import re
+import unicodedata
 from collections.abc import Sequence
 from dataclasses import dataclass
 from difflib import SequenceMatcher
+from functools import lru_cache
 from typing import Protocol
 
-_NON_ALNUM_RE = re.compile(r"[^a-z0-9]+")
 _DEFAULT_THRESHOLD = 0.88
 
 
@@ -44,6 +44,24 @@ class DedupResult:
     dropped_count: int
 
 
+@lru_cache(maxsize=8192)
+def _is_token_char(char: str) -> bool:
+    """Letters, numbers and combining marks of any script belong to a token."""
+
+    return unicodedata.category(char)[0] in "LNM"
+
+
+def _tokens(text: str) -> list[str]:
+    """Split NFKC-normalized, case-folded text on everything but token characters.
+
+    ASCII input yields the same tokens as an ``[^a-z0-9]`` split after lowercasing;
+    non-Latin letters are kept instead of being dropped, so ``東京`` and ``大阪`` differ.
+    """
+
+    folded = unicodedata.normalize("NFKC", text).casefold()
+    return "".join(char if _is_token_char(char) else " " for char in folded).split()
+
+
 def normalize_title(title: str) -> str:
     """Normalize a job title for fuzzy comparison.
 
@@ -51,11 +69,10 @@ def normalize_title(title: str) -> str:
         title: Raw job title.
 
     Returns:
-        Lowercased alphanumeric-collapsed title string.
+        Case-folded title tokens joined by single spaces (any script).
     """
 
-    collapsed = _NON_ALNUM_RE.sub(" ", (title or "").strip().lower())
-    return " ".join(collapsed.split())
+    return " ".join(_tokens(title or ""))
 
 
 def normalize_company(company: str | None) -> str:
@@ -65,16 +82,16 @@ def normalize_company(company: str | None) -> str:
         company: Raw company string or None.
 
     Returns:
-        Lowercased alphanumeric-collapsed company string (empty if missing).
+        Case-folded company tokens (any script) without legal suffixes, joined by
+        single spaces (empty if missing).
     """
 
     if not company:
         return ""
-    collapsed = _NON_ALNUM_RE.sub(" ", company.strip().lower())
     # Drop common legal suffixes that inflate false mismatches.
     tokens = [
         token
-        for token in collapsed.split()
+        for token in _tokens(company)
         if token not in {"inc", "llc", "ltd", "corp", "co", "gmbh", "plc"}
     ]
     return " ".join(tokens)

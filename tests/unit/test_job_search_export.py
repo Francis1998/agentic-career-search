@@ -19,7 +19,12 @@ from autoapply_agent.services.job_export import (
     rfc3339,
     safe_http_url,
 )
-from autoapply_agent.services.job_search import as_utc, is_remote_location, posting_key
+from autoapply_agent.services.job_search import (
+    PostingIdentity,
+    as_utc,
+    is_remote_location,
+    posting_key,
+)
 
 ATOM = "{http://www.w3.org/2005/Atom}"
 
@@ -71,7 +76,21 @@ def test_posting_key_normalizes_company_suffixes_but_keeps_locations_apart() -> 
     assert posting_key("Senior SWE", "Acme, Inc.", "Remote - US") == posting_key(
         "senior swe", "ACME", "remote (us)"
     )
+    assert posting_key("Front-end Engineer", "Acme", None) == posting_key(
+        "Frontend Engineer", "Acme", ""
+    )
     assert posting_key("Senior SWE", "Acme", "Berlin") != posting_key("Senior SWE", "Acme", "Paris")
+
+
+def test_posting_key_keeps_non_latin_postings_distinct() -> None:
+    """Non-Latin titles, companies and locations are part of the identity."""
+
+    tokyo = posting_key("ソフトウェアエンジニア", "株式会社サンプル", "東京")
+
+    assert tokyo != posting_key("ソフトウェアエンジニア", "株式会社サンプル", "大阪")
+    assert tokyo != posting_key("ソフトウェアエンジニア", "株式会社テスト", "東京")
+    assert tokyo != posting_key("データエンジニア", "株式会社サンプル", "東京")
+    assert tokyo == posting_key("ソフトウェアエンジニア", "株式会社サンプル Inc.", "東京")
 
 
 def test_as_utc_and_rfc3339_treat_naive_values_as_utc() -> None:
@@ -165,12 +184,18 @@ def test_job_jsonl_line_round_trips() -> None:
     assert JobRead.model_validate_json(line) == JobRead.model_validate(job)
 
 
-def test_entry_id_is_a_stable_uuid_urn_per_posting_url() -> None:
-    """Re-captures of one URL share an id; different URLs do not."""
+def _posting(url: str = "https://jobs.example.com/7") -> PostingIdentity:
+    """Build a posting identity first seen at a fixed time."""
 
-    assert entry_id(_job(id=1)) == entry_id(_job(id=99, title="Renamed"))
-    assert entry_id(_job(url="https://jobs.example.com/8")) != entry_id(_job())
-    assert entry_id(_job()).startswith("urn:uuid:")
+    return PostingIdentity(url=url, first_seen=datetime(2026, 11, 5, 8, 0, tzinfo=UTC))
+
+
+def test_entry_id_is_a_stable_uuid_urn_per_posting() -> None:
+    """The id depends only on the posting's first-capture URL."""
+
+    assert entry_id(_posting()) == entry_id(_posting())
+    assert entry_id(_posting("https://jobs.example.com/8")) != entry_id(_posting())
+    assert entry_id(_posting()).startswith("urn:uuid:")
 
 
 def test_render_atom_feed_with_and_without_entries() -> None:
@@ -188,7 +213,7 @@ def test_render_atom_feed_with_and_without_entries() -> None:
         )
     )
     document = render_atom_feed(
-        [_job(url="javascript:alert(1)", title="A & B <c>")],
+        [(_job(url="javascript:alert(1)", title="A & B <c>"), _posting())],
         feed_id="urn:uuid:feed",
         title="Jobs",
         self_url="http://localhost:8000/jobs/feed.atom?q=a&remote=true",
@@ -207,7 +232,9 @@ def test_render_atom_feed_with_and_without_entries() -> None:
     link = entry.find(f"{ATOM}link")
     assert link is not None
     assert link.get("href") == "http://localhost:8000/jobs/7"
-    assert populated.findtext(f"{ATOM}updated") == "2026-11-06T18:30:05Z"
+    assert populated.findtext(f"{ATOM}updated") == "2026-11-05T08:00:00Z"
+    assert entry.findtext(f"{ATOM}published") == "2026-11-05T08:00:00Z"
+    assert entry.findtext(f"{ATOM}id") == entry_id(_posting())
     assert entry.findtext(f"{ATOM}summary") == (
         "Company: Acme | Location: Remote - US | Remote: yes | Score: 0.88 | Priority: high"
     )

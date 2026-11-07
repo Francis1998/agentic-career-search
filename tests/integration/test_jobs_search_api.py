@@ -490,6 +490,51 @@ def test_atom_feed_ids_are_stable_and_limit_does_not_change_feed_identity(
     assert _feed(client, {"remote": "false"}).findtext(f"{ATOM}id") != first.findtext(f"{ATOM}id")
 
 
+def test_atom_entry_identity_survives_time_windows(client: TestClient) -> None:
+    """``hours_old`` must not re-identify a posting whose first capture aged out.
+
+    ``py-acme-gh`` (first capture) falls outside an 8-hour window while its Lever
+    mirror and a re-capture stay inside it; the entry keeps the first capture's id and
+    publication time, so feed readers do not notify twice.
+    """
+
+    def acme_entry(params: dict[str, str]) -> ET.Element:
+        feed = _feed(client, params)
+        entries = [
+            entry
+            for entry in feed.findall(f"{ATOM}entry")
+            if "Acme" in entry.findtext(f"{ATOM}title", "")
+        ]
+        assert len(entries) == 1
+        return entries[0]
+
+    everything = acme_entry({"q": "acme"})
+    recent = acme_entry({"q": "acme", "hours_old": "8"})
+
+    assert recent.findtext(f"{ATOM}id") == everything.findtext(f"{ATOM}id")
+    assert recent.findtext(f"{ATOM}published") == everything.findtext(f"{ATOM}published")
+    assert everything.findtext(f"{ATOM}published") == (BASE_TIME.isoformat().replace("+00:00", "Z"))
+
+
+def test_atom_feed_id_includes_the_installation_url(client: TestClient) -> None:
+    """Feeds served from different hosts never share an id; parameter order does not matter."""
+
+    here = _feed(client, {"q": "python", "remote": "true"}).findtext(f"{ATOM}id")
+    reordered = ET.fromstring(
+        client.get("/jobs/feed.atom?remote=true&limit=5&q=python").content
+    ).findtext(f"{ATOM}id")
+    elsewhere = ET.fromstring(
+        client.get(
+            "/jobs/feed.atom",
+            params={"q": "python", "remote": "true"},
+            headers={"host": "jobs.example"},
+        ).content
+    ).findtext(f"{ATOM}id")
+
+    assert here == reordered
+    assert here != elsewhere
+
+
 def test_atom_feed_without_matches_is_still_valid(client: TestClient) -> None:
     """An empty feed keeps id, title and updated."""
 
@@ -498,6 +543,59 @@ def test_atom_feed_without_matches_is_still_valid(client: TestClient) -> None:
     assert feed.findall(f"{ATOM}entry") == []
     assert feed.findtext(f"{ATOM}updated", "").endswith("Z")
     assert feed.findtext(f"{ATOM}id", "").startswith("urn:uuid:")
+
+
+UNICODE_JOBS = (
+    SeedJob(
+        "tokyo",
+        "run-a",
+        1,
+        "ソフトウェアエンジニア",
+        "株式会社サンプル",
+        "東京",
+        "https://example.jp/jobs/1",
+        0.8,
+        0,
+    ),
+    SeedJob(
+        "osaka",
+        "run-a",
+        1,
+        "ソフトウェアエンジニア",
+        "株式会社サンプル",
+        "大阪",
+        "https://example.jp/jobs/2",
+        0.7,
+        1,
+    ),
+    SeedJob(
+        "tokyo-mirror",
+        "run-a",
+        2,
+        "ソフトウェア・エンジニア",
+        "株式会社サンプル",
+        "東京",
+        "https://boards.example.com/jp/9",
+        0.75,
+        2,
+    ),
+)
+
+
+def test_dedupe_keeps_distinct_non_latin_postings(sqlite_database_url: str) -> None:
+    """Same title and company in two cities stay two postings; the mirror collapses."""
+
+    for client in _client_for(sqlite_database_url, UNICODE_JOBS):
+        response = client.get("/jobs", params={"dedupe": "true"})
+        feed = _feed(client)
+
+        assert _keys(response) == ["osaka", "tokyo"]
+        assert response.headers["x-total-count"] == "2"
+        summaries = [entry.findtext(f"{ATOM}summary", "") for entry in feed.findall(f"{ATOM}entry")]
+        assert [summary.split(" | ")[1] for summary in summaries] == [
+            "Location: 大阪",
+            "Location: 東京",
+        ]
 
 
 HOSTILE_JOBS = (

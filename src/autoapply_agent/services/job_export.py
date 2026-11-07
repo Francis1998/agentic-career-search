@@ -15,14 +15,16 @@ import csv
 import io
 import re
 import uuid
-import xml.etree.ElementTree as ET  # nosec B405 - only builds XML, never parses it
+
+# ElementTree only builds and serializes the feed here; it never parses input.
+import xml.etree.ElementTree as ET  # nosec B405
 from collections.abc import AsyncIterable, AsyncIterator, Callable, Sequence
 from datetime import datetime
 from urllib.parse import urlsplit
 
 from autoapply_agent.db.models import Job
 from autoapply_agent.schemas.jobs import JobRead
-from autoapply_agent.services.job_search import as_utc, is_remote_location
+from autoapply_agent.services.job_search import PostingIdentity, as_utc, is_remote_location
 
 CSV_COLUMNS: tuple[str, ...] = (
     "id",
@@ -191,14 +193,14 @@ def _add_text(parent: ET.Element, tag: str, text: str) -> ET.Element:
     return element
 
 
-def entry_id(job: Job) -> str:
-    """Return the Atom entry id: a UUIDv5 URN of the posting URL.
+def entry_id(posting: PostingIdentity) -> str:
+    """Return the Atom entry id: a UUIDv5 URN of the posting's first-capture URL.
 
-    The id survives re-captures of the same posting by later runs, so feed readers
-    do not notify twice for one job.
+    The id survives re-captures and cross-board mirrors of the same posting, so feed
+    readers do not notify twice for one job.
     """
 
-    return f"urn:uuid:{uuid.uuid5(uuid.NAMESPACE_URL, job.url)}"
+    return f"urn:uuid:{uuid.uuid5(uuid.NAMESPACE_URL, posting.url)}"
 
 
 def entry_summary(job: Job) -> str:
@@ -213,7 +215,7 @@ def entry_summary(job: Job) -> str:
 
 
 def render_atom_feed(
-    jobs: Sequence[Job],
+    entries: Sequence[tuple[Job, PostingIdentity]],
     *,
     feed_id: str,
     title: str,
@@ -224,7 +226,8 @@ def render_atom_feed(
     """Render jobs as an Atom 1.0 (RFC 4287) feed document.
 
     Args:
-        jobs: Entries, newest first.
+        entries: ``(job, posting)`` pairs, newest first; the job supplies the content,
+            the posting the stable id and publication time.
         feed_id: Permanent IRI identifying this feed.
         title: Human-readable feed title.
         self_url: URL the feed was requested from (``rel="self"``).
@@ -238,7 +241,7 @@ def render_atom_feed(
     feed = ET.Element("feed", {"xmlns": ATOM_NAMESPACE})
     _add_text(feed, "id", feed_id)
     _add_text(feed, "title", title)
-    updated = max((as_utc(job.created_at) for job in jobs), default=as_utc(generated_at))
+    updated = max((posting.first_seen for _, posting in entries), default=as_utc(generated_at))
     _add_text(feed, "updated", rfc3339(updated))
     ET.SubElement(
         feed,
@@ -249,17 +252,17 @@ def render_atom_feed(
     generator = _add_text(feed, "generator", "agentic-career-search")
     generator.set("uri", PROJECT_URL)
 
-    for job in jobs:
+    for job, posting in entries:
         entry = ET.SubElement(feed, "entry")
-        _add_text(entry, "id", entry_id(job))
+        _add_text(entry, "id", entry_id(posting))
         _add_text(entry, "title", f"{job.title} at {job.company}" if job.company else job.title)
         link = safe_http_url(job.url) or fallback_link(job)
         ET.SubElement(
             entry, "link", {"rel": "alternate", "type": "text/html", "href": _xml_text(link)}
         )
-        captured_at = rfc3339(job.created_at)
-        _add_text(entry, "published", captured_at)
-        _add_text(entry, "updated", captured_at)
+        first_seen = rfc3339(posting.first_seen)
+        _add_text(entry, "published", first_seen)
+        _add_text(entry, "updated", first_seen)
         _add_text(entry, "summary", entry_summary(job))
 
     return ET.tostring(feed, encoding="utf-8", xml_declaration=True)

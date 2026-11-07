@@ -52,8 +52,9 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   and `offset` (total in `X-Total-Count`; defaults unchanged), plus
   `GET /jobs/{job_id}`, streamed `GET /jobs/export?format=csv|jsonl` (OWASP
   CSV-injection hardening, http(s)-only links) and an RFC 4287
-  `GET /jobs/feed.atom` with stable entry ids. `scripts/seed_demo_jobs.py` seeds
-  demo data. See `docs/guides/JOB_SEARCH_EXPORT_GUIDE.md`.
+  `GET /jobs/feed.atom` with entry ids that stay stable across re-captures, board
+  mirrors and time windows. `scripts/seed_demo_jobs.py` seeds demo data. See
+  `docs/guides/JOB_SEARCH_EXPORT_GUIDE.md`.
 - `ProfessionalDevelopmentStipendGapAdvisor` (`services/professional_development_stipend_gap.py`): offline HITL `offered_usd` vs `needed_usd` coverage bands (never auto-approves). Gap vs Guild/LinkedIn Learning/Workday professional-development stipend planners. Distinct from `LearningStipendGapAdvisor` / `TuitionReimbursementCapGapAdvisor`. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/PROFESSIONAL_DEVELOPMENT_STIPEND_GAP_ADVISOR_GUIDE.md`.
 - `CaregivingLeaveTopUpGapAdvisor` (`services/caregiving_leave_top_up_gap.py`): offline HITL `offered_days` vs `needed_days` coverage bands (never auto-approves). Gap vs Wellthy/Cariloop/Torchlight caregiving leave top-up planners. Distinct from `CaregiverBackupCareGapAdvisor` / `CaregiverRespiteGapAdvisor`. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/CAREGIVING_LEAVE_TOP_UP_GAP_ADVISOR_GUIDE.md`.
 - `ClimateResilienceLeaveGapAdvisor` (`services/climate_resilience_leave_gap.py`): offline HITL `offered_days` vs `needed_days` coverage bands (never auto-approves). Gap vs Rippling/Workday/BambooHR climate-resilience leave planners. Distinct from `DisasterReliefLeaveGapAdvisor` / `CaregiverRespiteGapAdvisor`. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/CLIMATE_RESILIENCE_LEAVE_GAP_ADVISOR_GUIDE.md`.
@@ -740,6 +741,10 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `external_id`. See ADR-086.
 
 ### Fixed
+- `cross_source_dedup.normalize_title` / `normalize_company`: letters and digits of
+  non-Latin scripts are kept (NFKC + case-folding) instead of being stripped, so
+  postings such as `エンジニア` at `トヨタ` and at `ソニー` no longer collapse into one
+  empty key. ASCII output is unchanged.
 - `InProcessWorker`: `POST /runs/{id}/cancel` now stops a run that is already
   `running`. The cancellation check re-reads the run row
   (`populate_existing=True`) instead of trusting the long-lived worker session's

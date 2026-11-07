@@ -123,3 +123,25 @@ def test_deterministic() -> None:
     ]
     deduper = CrossSourceJobDeduper(threshold=0.85)
     assert deduper.dedupe(jobs) == deduper.dedupe(jobs)
+
+
+def test_normalize_helpers_preserve_non_latin_letters() -> None:
+    """Non-ASCII letters are identity, not punctuation; ASCII output is unchanged."""
+
+    fullwidth_parens = "ソフトウェア・エンジニア\uff08東京\uff09"
+    fullwidth_senior = "\uff33\uff45\uff4e\uff49\uff4f\uff52  Ingénieur"
+
+    assert normalize_title(fullwidth_parens) == "ソフトウェア エンジニア 東京"
+    assert normalize_title(fullwidth_senior) == "senior ingénieur"
+    assert normalize_company("株式会社サンプル Inc.") == "株式会社サンプル"
+
+
+def test_non_latin_companies_are_not_merged() -> None:
+    """Different non-Latin companies must not collapse into one empty key."""
+
+    jobs = [
+        _Job("エンジニア", "トヨタ", "https://a.example/1"),
+        _Job("エンジニア", "ソニー", "https://b.example/2"),
+    ]
+
+    assert CrossSourceJobDeduper().dedupe(jobs).kept_indices == (0, 1)

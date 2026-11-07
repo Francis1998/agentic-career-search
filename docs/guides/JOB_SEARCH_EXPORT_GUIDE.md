@@ -95,7 +95,7 @@ are literal characters; SQLite only case-folds ASCII).
 | `run_id` | string | Captured by this run (the original filter) | — |
 | `created_after` | ISO-8601 instant | Captured at or after this time; naive values are UTC | — |
 | `hours_old` | int `1`–`8760` | Captured within the last N hours (with `created_after`, the later bound wins) | `hours_old` |
-| `sort` | `newest` (default) / `score` | `newest`: capture time, then id, descending. `score`: highest score first, ties newest first | — |
+| `sort` | `newest` (default) / `score` | `newest`: capture time, then id, descending (with `dedupe`: when the posting was first seen). `score`: highest score first, ties newest first | — |
 | `dedupe` | `true` / `false` (default) | Collapse duplicates, see below (feed: always on) | — |
 | `limit` | `/jobs`: 1–500 (50) · export: 1–100000 (all) · feed: 1–200 (50) | Page size / row cap / entry count | `results_wanted` |
 | `offset` | int ≥ 0 (0), `/jobs` only | Matches to skip | `offset` |
@@ -112,15 +112,20 @@ Adapters normalize remote signals into the location (for example JSON-LD
 become `Remote`), so the same rule drives the `remote` filter, the CSV `remote`
 column and the feed summary.
 
-**Dedupe rule.** Matches are visited in capture order and a row is dropped when an
-earlier row has the same URL (case-insensitive) **or** the same normalized
-title + company + location. Normalization reuses `services/cross_source_dedup.py`
-(case, punctuation and legal suffixes such as `Inc`/`LLC`/`GmbH` are ignored), so
-`Senior Python Engineer · Acme Robotics, Inc. · Remote - US` on Lever and
-`Senior Python Engineer · Acme Robotics · Remote - US` on Greenhouse count once; the
-first capture wins. Keeping the location in the key means the same title in two
-cities stays two jobs. (`CrossSourceJobDeduper`'s fuzzy difflib clustering remains
-available offline; it is O(n²) and therefore not run per request.)
+**Dedupe rule.** With `dedupe=true` results are *postings*, not captures. Every
+stored job is visited in capture order and joins the posting of the first earlier job
+with the same URL (case-insensitive) **or** the same normalized
+title + company + location. Normalization reuses `services/cross_source_dedup.py` and
+works for every script (NFKC, case-folding; punctuation, spacing and legal suffixes
+such as `Inc`/`LLC`/`GmbH` are ignored, while letters such as `東京` vs `大阪` are
+kept), so `Senior Python Engineer · Acme Robotics, Inc. · Remote - US` on Lever and
+`Senior Python Engineer · Acme Robotics · Remote - US` on Greenhouse count once, but
+the same title in two cities stays two jobs. Identity is resolved over the whole
+capture history, independent of the filters; the filters only decide which postings
+match, and each posting is shown through its first matching capture. That keeps a
+posting's identity stable when, for example, `hours_old` drops its oldest captures.
+(`CrossSourceJobDeduper`'s fuzzy difflib clustering remains available offline; it is
+O(n²) and therefore not run per request.)
 
 **Paging.** Read `X-Total-Count` once, then step `offset` by `limit`:
 
@@ -179,14 +184,19 @@ two formats without extra dependencies.
 `GET /jobs/feed.atom` accepts every filter above plus `limit` and returns
 `application/atom+xml; charset=utf-8`:
 
-- one entry per **distinct posting** (dedupe is always on), newest capture first;
-- entry `id` = `urn:uuid:` + UUIDv5 of the posting URL, so later runs that re-capture
-  the posting never produce a "new" item;
-- entry `title` = `<title> at <company>`, `published`/`updated` = first capture time,
-  `link rel="alternate"` = the posting URL, `summary` =
-  `Company: … | Location: … | Remote: yes/no | Score: 0.88 | Priority: high`;
-- feed `id` = UUIDv5 of the filter set (`limit` excluded), `title` names the filters,
-  `link rel="self"` is the request URL, `updated` = newest entry.
+- one entry per **distinct posting** (dedupe is always on), most recently
+  discovered first;
+- entry `id` = `urn:uuid:` + UUIDv5 of the URL of the posting's first capture, so
+  re-captures by later runs, mirrors on other boards and time windows such as
+  `hours_old` never produce a "new" item;
+- entry `published`/`updated` = when the posting was first seen; `title` =
+  `<title> at <company>`, `link rel="alternate"` = the posting URL, `summary` =
+  `Company: … | Location: … | Remote: yes/no | Score: 0.88 | Priority: high`, all
+  taken from the first capture that matches the filters;
+- feed `id` = UUIDv5 of the canonical feed URL (scheme, host, path and sorted filters,
+  `limit` excluded), so two installations never share a feed id — serve the feed from
+  one stable hostname; `title` names the filters, `link rel="self"` is the request
+  URL, `updated` = newest entry.
 
 Feed readers (NetNewsWire, Feedly, Thunderbird, Miniflux, …): add the feed URL, for
 example `http://localhost:8000/jobs/feed.atom?q=python&remote=true&min_score=0.7`.
@@ -221,8 +231,8 @@ channel* action.
   feed URLs reveal your search terms. Keep it on localhost or behind an authenticating
   reverse proxy.
 - **Resources.** Exports stream in batches of 500 rows over a dedicated database
-  session, so memory stays flat; `dedupe=true` first loads seven narrow columns of
-  every match to decide what to keep.
+  session, so memory stays flat; `dedupe=true` (and the feed) first loads eight
+  narrow columns of every stored job to resolve posting identities.
 
 ## Comparison to JobSpy
 
