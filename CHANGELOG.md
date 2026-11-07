@@ -753,6 +753,15 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `reasoning_effort: none`.
 
 ### Fixed
+- `LeverAdapter`: on live Lever boards the per-posting Apply button links to the
+  posting URL itself and precedes the title anchor, so URL de-duplication kept it and
+  every job was titled `Apply`; title anchors now win and the title is the
+  `posting-name` heading rather than the whole anchor (which also wraps workplace,
+  commitment and location labels).
+- `GreenhouseAdapter`: current `job-boards.greenhouse.io` boards render
+  `tr.job-post` rows whose anchor holds the title and the location as sibling
+  paragraphs; they were parsed as one title (`Director, Support (Bengaluru) Bangalore,
+  India`) with no location. Both are now split.
 - `cross_source_dedup.normalize_title` / `normalize_company`: letters and digits of
   non-Latin scripts are kept (NFKC + case-folding) instead of being stripped, so
   postings such as `エンジニア` at `トヨタ` and at `ソニー` no longer collapse into one

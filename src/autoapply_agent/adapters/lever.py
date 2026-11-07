@@ -62,7 +62,13 @@ class LeverAdapter(CareerSourceAdapter):
         if max_jobs <= 0:
             return []
         soup = BeautifulSoup(html, "html.parser")
-        anchors = list(soup.select("div.posting a.posting-title, div.posting a"))
+        # Live boards render an Apply button linking to the posting URL itself before
+        # the title anchor, so title anchors must win over the other posting links.
+        anchors = list(soup.select("div.posting a.posting-title")) or [
+            anchor
+            for anchor in soup.select("div.posting a")
+            if "posting-btn-submit" not in (anchor.get("class") or [])
+        ]
         if not anchors:
             fallback_anchors = list(soup.select("a[href]"))
             anchors = []
@@ -75,7 +81,10 @@ class LeverAdapter(CareerSourceAdapter):
         seen_urls: set[str] = set()
         for anchor in anchors:
             href = self._normalize_href(anchor.get("href"))
-            title = anchor.get_text(" ", strip=True)
+            # The title anchor also wraps the categories (workplace, commitment,
+            # location); the posting name alone is the title.
+            title_node = anchor.select_one('[data-qa="posting-name"], h5')
+            title = (title_node or anchor).get_text(" ", strip=True)
             if not href or not title:
                 continue
             absolute_url = urljoin(base_url, href)
