@@ -54,10 +54,25 @@ OPENAI_API_KEY=your_key_here
 
 - Runtime bootstraps tables via SQLAlchemy `create_all` for local simplicity.
 - Alembic scaffold lives under `alembic/` for incremental schema control.
+- Alembic reads `sqlalchemy.url` from `alembic.ini` (default `sqlite:///./autoapply_agent.db`),
+  not `DATABASE_URL`: point it at the database to migrate, using the sync driver
+  (`sqlite:///…` for `sqlite+aiosqlite:///…`).
 - Apply migrations with:
 
 ```bash
 uv run alembic upgrade head
+```
+
+### Upgrading an existing database
+
+A database created by the app's startup `create_all` has no `alembic_version` table, so
+`upgrade head` would try to recreate its tables (`table source_configs already exists`).
+Stamp the initial revision once, then upgrade:
+
+```bash
+uv run alembic current             # no revision listed: the schema was created by the app
+uv run alembic stamp 87de9ef55524  # record the initial schema as applied
+uv run alembic upgrade head        # adds the job ordering indexes (c41f2a7d9e60)
 ```
 
 ## Operational notes

@@ -239,7 +239,7 @@ channel* action.
   flat and a slow client never holds a database cursor that would block SQLite
   writers. `dedupe=true` (and the feed) first loads eight narrow columns of every
   stored job to resolve posting identities.
-- **Indexes.** `ix_jobs_created_at_id` and `ix_jobs_score_created_at_id` let every page and export batch seek instead of rescanning and sorting `jobs`; new databases get them at startup, existing ones via `uv run alembic upgrade head` (revision `c41f2a7d9e60`, see [DEPLOYMENT.md](../DEPLOYMENT.md)).
+- **Indexes.** `ix_jobs_created_at_id` and `ix_jobs_score_created_at_id` let every page and export batch seek instead of rescanning and sorting `jobs`; new databases get them at startup, existing ones from Alembic revision `c41f2a7d9e60` (stamp the baseline first if the app created the schema — see [Upgrading an existing database](../DEPLOYMENT.md#upgrading-an-existing-database)).
 
 ## Comparison to JobSpy
 

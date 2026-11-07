@@ -84,6 +84,29 @@ def test_alembic_head_matches_models_and_downgrades(tmp_path: Path) -> None:
     assert "ix_jobs_run_id" in downgraded
 
 
+@pytest.mark.parametrize("created_before_indexes", [True, False])
+async def test_app_created_database_upgrades_after_stamping_the_baseline(
+    tmp_path: Path, created_before_indexes: bool
+) -> None:
+    """The documented upgrade path works for databases created by app startup."""
+
+    db_path = tmp_path / "app.db"
+    engine = create_engine(f"sqlite+aiosqlite:///{db_path}")
+    async with engine.begin() as connection:
+        await connection.run_sync(Base.metadata.create_all)
+        if created_before_indexes:
+            for name in ORDERING_INDEXES:
+                await connection.exec_driver_sql(f"DROP INDEX {name}")
+    await engine.dispose()
+    config = _alembic_config(f"sqlite:///{db_path}")
+
+    command.stamp(config, "87de9ef55524")
+    command.upgrade(config, "head")
+
+    indexes = _job_indexes(f"sqlite:///{db_path}")
+    assert {name: indexes.get(name) for name in ORDERING_INDEXES} == ORDERING_INDEXES
+
+
 @pytest.mark.parametrize(
     ("sort", "index_name"),
     [

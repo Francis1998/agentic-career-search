@@ -17,16 +17,26 @@ depends_on = None
 
 
 def upgrade() -> None:
-    """Index the job search orderings used by list, export and feed queries."""
+    """Index the job search orderings used by list, export and feed queries.
 
-    op.create_index("ix_jobs_created_at_id", "jobs", ["created_at", "id"], unique=False)
+    Idempotent: databases created by the app's ``create_all`` (then stamped at the
+    initial revision) may already have these indexes.
+    """
+
     op.create_index(
-        "ix_jobs_score_created_at_id", "jobs", ["score", "created_at", "id"], unique=False
+        "ix_jobs_created_at_id", "jobs", ["created_at", "id"], unique=False, if_not_exists=True
+    )
+    op.create_index(
+        "ix_jobs_score_created_at_id",
+        "jobs",
+        ["score", "created_at", "id"],
+        unique=False,
+        if_not_exists=True,
     )
 
 
 def downgrade() -> None:
     """Drop the job ordering indexes."""
 
-    op.drop_index("ix_jobs_score_created_at_id", table_name="jobs")
-    op.drop_index("ix_jobs_created_at_id", table_name="jobs")
+    op.drop_index("ix_jobs_score_created_at_id", table_name="jobs", if_exists=True)
+    op.drop_index("ix_jobs_created_at_id", table_name="jobs", if_exists=True)
