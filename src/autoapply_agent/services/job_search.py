@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from collections.abc import AsyncIterator, Sequence
 from dataclasses import dataclass, field
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from enum import StrEnum
 from typing import Any
 
@@ -109,6 +109,31 @@ def as_utc(value: datetime) -> datetime:
     if value.tzinfo is None:
         return value.replace(tzinfo=UTC)
     return value.astimezone(UTC)
+
+
+def capture_window_start(
+    created_after: datetime | None, hours_old: int | None, *, now: datetime
+) -> datetime | None:
+    """Combine the ``created_after`` and ``hours_old`` filters into one UTC lower bound.
+
+    Args:
+        created_after: Aware or naive (UTC) instant, possibly missing.
+        hours_old: Maximum capture age in hours, possibly missing.
+        now: Current time, the reference for ``hours_old``.
+
+    Returns:
+        The later of the two bounds, or None when neither is set.
+
+    Raises:
+        OverflowError: If ``created_after`` falls outside the supported UTC range.
+    """
+
+    bounds: list[datetime] = []
+    if created_after is not None:
+        bounds.append(as_utc(created_after))
+    if hours_old is not None:
+        bounds.append(now - timedelta(hours=hours_old))
+    return max(bounds) if bounds else None
 
 
 def is_remote_location(location: str | None) -> bool:

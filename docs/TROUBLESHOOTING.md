@@ -19,6 +19,16 @@ Common issues when running `agentic-career-search`.
 | Run stuck in `running` | Slow upstream source | Lower `HTTP_TIMEOUT_SECONDS` or cancel via `POST /runs/{id}/cancel` |
 | Duplicate jobs skipped | Same URL already persisted for run | Expected behavior via `uq_jobs_run_url` constraint |
 
+## MCP server
+
+| Issue | Likely cause | Fix |
+|---|---|---|
+| `error: database file not found` on start | Relative SQLite path resolved against the MCP host's working directory | Pass an absolute `--database-url` (four slashes) or launch with `uv --directory /abs/path/agentic-career-search run career-search-mcp` |
+| Tools return "The job database could not be read" | Database file without the app schema | Start the API once against it, or apply the Alembic migrations |
+| Host lists no tools | Host not restarted, or server failed to start | Restart the host and read its MCP log (server diagnostics go to STDERR; try `--log-level INFO`) |
+
+More in the [MCP Server Guide](guides/MCP_SERVER_GUIDE.md#troubleshooting).
+
 ## LLM enrichment
 
 | Issue | Likely cause | Fix |

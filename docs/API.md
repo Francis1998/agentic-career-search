@@ -60,6 +60,25 @@ Shared filters: `q` (each term in title/company/location), `company`, `location`
 
 Job payloads include deterministic `agent_decision` traces and optional `llm_enrichment` when provider enrichment is enabled.
 
+## MCP (stdio)
+
+The same data is available read-only to AI assistants through the Model Context Protocol:
+`career-search-mcp` (or `python -m autoapply_agent.mcp`) speaks newline-delimited JSON-RPC
+2.0 on stdio, protocol `2026-07-28` plus the `2025-11-25` / `2025-06-18` `initialize`
+handshake.
+
+| Tool | HTTP equivalent |
+|---|---|
+| `search_jobs` | `GET /jobs` (same filters, `sort`, `dedupe`, `limit` ≤ 50 / `offset`, total in the result) |
+| `get_job` | `GET /jobs/{job_id}`, with the decision trace unpacked |
+| `explain_job_score` | — (score breakdown recomputed by the deterministic scorer) |
+| `list_runs` | — (runs newest first, with job counts) |
+| `get_run` | `GET /runs/{run_id}` + the most recent `GET /runs/{run_id}/events` |
+| `list_sources` | `GET /source-configs`, with job counts |
+
+There are no MCP tools for `POST`/`PATCH` routes. Reference, client configuration and
+privacy notes: [MCP Server Guide](guides/MCP_SERVER_GUIDE.md).
+
 ## Example flow
 
 ```bash

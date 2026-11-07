@@ -88,7 +88,28 @@ GEMINI_API_KEY=your_key_here
 
 When enabled, run events include `agent.llm_enrichment`, and job payloads contain `llm_enrichment`.
 
-## 8) Local quality checks
+## 8) Optional: ask your AI assistant (MCP)
+
+`career-search-mcp` serves the same database read-only to MCP hosts over stdio. Try it on
+an offline demo database built by the real worker pipeline:
+
+```bash
+export DATABASE_URL=sqlite+aiosqlite:///./mcp-demo.db
+uv run python scripts/seed_mcp_demo.py
+uv run python scripts/mcp_demo_session.py      # a scripted MCP client session
+```
+
+Then register it in your host with an absolute database path, for example in Claude Code:
+
+```bash
+claude mcp add --transport stdio career-search -- \
+  "$PWD/.venv/bin/career-search-mcp" --database-url "sqlite+aiosqlite:///$PWD/mcp-demo.db"
+```
+
+See [docs/guides/MCP_SERVER_GUIDE.md](docs/guides/MCP_SERVER_GUIDE.md) for Claude Desktop,
+VS Code and Cursor configuration examples.
+
+## 9) Local quality checks
 
 ```bash
 uv run ruff check .

@@ -5,7 +5,13 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from autoapply_agent.adapters.base import JobCandidate
-from autoapply_agent.services.scoring import DeterministicScoringService
+from autoapply_agent.services.scoring import (
+    BASE_SCORE,
+    KEYWORD_BONUS_CAP,
+    KEYWORD_BONUS_PER_TERM,
+    STABILITY_BONUS_MAX,
+    DeterministicScoringService,
+)
 
 if TYPE_CHECKING:
     from _pytest.capture import CaptureFixture
@@ -123,3 +129,53 @@ def test_match_terms_splits_compound_query_tokens() -> None:
     matched_terms = scoring_service.match_terms(candidate, "data-engineer")
 
     assert matched_terms == ["data", "engineer"]
+
+
+def test_breakdown_components_add_up_to_the_score() -> None:
+    """The breakdown exposes the exact parts ``score`` sums, capped and rounded."""
+
+    scoring_service = DeterministicScoringService()
+    candidate = JobCandidate(
+        external_id="bd-1",
+        title="Senior Python Backend Engineer",
+        location="Remote - US",
+        company="Acme Robotics",
+        url="https://boards.greenhouse.io/acme/jobs/4101",
+        raw=None,
+    )
+
+    breakdown = scoring_service.breakdown(candidate, "Python, backend remote golang")
+
+    assert breakdown.query_terms == ("backend", "golang", "python", "remote")
+    assert breakdown.matched_terms == ("backend", "python", "remote")
+    assert breakdown.base == BASE_SCORE
+    assert breakdown.keyword_bonus == 3 * KEYWORD_BONUS_PER_TERM
+    assert 0 <= breakdown.stability_bonus <= STABILITY_BONUS_MAX
+    assert breakdown.capped is False
+    assert breakdown.score == scoring_service.score(candidate, "Python, backend remote golang")
+    assert breakdown.score == round(
+        breakdown.base + breakdown.keyword_bonus + breakdown.stability_bonus, 4
+    )
+
+
+def test_breakdown_caps_the_keyword_bonus_and_handles_missing_queries() -> None:
+    """Five matched terms still earn the capped bonus; no query earns none."""
+
+    scoring_service = DeterministicScoringService()
+    candidate = JobCandidate(
+        external_id="bd-2",
+        title="Senior Staff Python Backend Platform Engineer",
+        location=None,
+        company=None,
+        url="https://example.com/jobs/bd-2",
+        raw=None,
+    )
+
+    capped = scoring_service.breakdown(candidate, "senior staff python backend platform")
+    no_query = scoring_service.breakdown(candidate, None)
+
+    assert len(capped.matched_terms) == 5
+    assert capped.keyword_bonus == KEYWORD_BONUS_CAP
+    assert no_query.query_terms == no_query.matched_terms == ()
+    assert no_query.keyword_bonus == 0
+    assert no_query.score == scoring_service.score(candidate, None)

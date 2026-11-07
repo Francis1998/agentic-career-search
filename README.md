@@ -22,6 +22,8 @@ Job-search automation usually fails in practice because it:
   state machine with cooperative cancellation and an ordered event log;
 - **leaves results in a terminal** → JobSpy-style search, CSV/JSONL export and an Atom
   feed for Slack, Teams or any feed reader;
+- **can't be asked about** → a read-only MCP server lets Claude Desktop, Claude Code,
+  VS Code or Cursor search your feed and explain any score;
 - **depends on one LLM** → enrichment is optional and works with the current OpenAI,
   Anthropic, Google and Kimi models, while the deterministic core runs offline.
 
@@ -38,6 +40,7 @@ flowchart LR
     LLM -.-> DT
     DT --> DB[("Jobs + run events")]
     DB --> API["Search · export · Atom feed<br/>GET /jobs …"]
+    DB --> MCP["Read-only MCP server<br/>career-search-mcp (stdio)"]
 ```
 
 Every step is observable through `GET /runs/{run_id}/events`, and every stored job carries
@@ -81,6 +84,24 @@ curl -s -X POST localhost:8000/runs -H 'content-type: application/json' \
 [PORTFOLIO_WALKTHROUGH.md](docs/guides/PORTFOLIO_WALKTHROUGH.md) follows one real search
 end to end, and [QUICKSTART.md](QUICKSTART.md) covers setup details.
 
+## Ask your AI assistant (MCP)
+
+`career-search-mcp` is a read-only [Model Context Protocol](https://modelcontextprotocol.io)
+server (stdio; protocol 2026-07-28 plus the 2025-11-25 / 2025-06-18 handshake). Assistants
+get six tools — `search_jobs`, `get_job`, `explain_job_score`, `list_runs`, `get_run`,
+`list_sources` — over the jobs your runs already captured, scored and deduplicated, so
+*"show me this week's best-fit remote roles and why the top one ranks first"* needs no
+scraping, keys or writes. For example, in Claude Code:
+
+```bash
+claude mcp add --transport stdio career-search -- \
+  /abs/path/agentic-career-search/.venv/bin/career-search-mcp \
+  --database-url sqlite+aiosqlite:////abs/path/agentic-career-search/autoapply_agent.db
+```
+
+[MCP_SERVER_GUIDE.md](docs/guides/MCP_SERVER_GUIDE.md) covers Claude Desktop, VS Code and
+Cursor configuration examples, every tool, the audit log and a recorded session.
+
 ## Feature map
 
 | Area | What you get | Docs |
@@ -89,6 +110,7 @@ end to end, and [QUICKSTART.md](QUICKSTART.md) covers setup details.
 | Runs | Queue, worker, cooperative cancel, ordered run events | [ARCHITECTURE.md](ARCHITECTURE.md) |
 | Decisions | Deterministic score, priority tier, matched terms, rationale, plan steps per job | [ARCHITECTURE.md](ARCHITECTURE.md) |
 | Search & export | Filters, `X-Total-Count` paging, cross-board dedupe, OWASP-safe CSV, JSON Lines, Atom 1.0 | [Search & export guide](docs/guides/JOB_SEARCH_EXPORT_GUIDE.md) |
+| AI assistants (MCP) | Read-only stdio MCP server: search, decision traces, plain-language score explanations, runs and events; audit log with hashed arguments | [MCP server guide](docs/guides/MCP_SERVER_GUIDE.md) |
 | LLM enrichment | Optional summaries from GPT-6, Claude 5.5, Gemini 3.8 or Kimi K3.1 | [CONFIGURATION.md](CONFIGURATION.md) |
 | Alerts | Fail-soft webhook for high-priority jobs (Slack, Discord, custom) | [CONFIGURATION.md](CONFIGURATION.md) |
 | Career toolkit | 175+ offline, human-in-the-loop helpers (fit, salary bands, interview prep, offer and benefit gap advisors) | [Use-case catalog](docs/USE_CASE_CATALOG.md) |
@@ -134,6 +156,9 @@ Then set matching API keys in `.env` (see `CONFIGURATION.md`).
 - `GET /jobs/feed.atom` subscribe to new matches (Atom 1.0)
 - `GET /health/live` and `GET /health/ready`
 
+MCP (stdio, read-only): `career-search-mcp` / `python -m autoapply_agent.mcp` — see the
+[MCP server guide](docs/guides/MCP_SERVER_GUIDE.md).
+
 ## Documentation
 
 | Document | What it covers |
@@ -141,6 +166,7 @@ Then set matching API keys in `.env` (see `CONFIGURATION.md`).
 | [QUICKSTART.md](QUICKSTART.md) | Local setup and a first run |
 | [docs/guides/PORTFOLIO_WALKTHROUGH.md](docs/guides/PORTFOLIO_WALKTHROUGH.md) | One real job search, end to end |
 | [docs/guides/JOB_SEARCH_EXPORT_GUIDE.md](docs/guides/JOB_SEARCH_EXPORT_GUIDE.md) | Filters, CSV/JSONL export, Atom feed |
+| [docs/guides/MCP_SERVER_GUIDE.md](docs/guides/MCP_SERVER_GUIDE.md) | Read-only MCP server for AI assistants: client setup, tools, privacy |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Components, run lifecycle, events |
 | [docs/API.md](docs/API.md) | HTTP API reference |
 | [CONFIGURATION.md](CONFIGURATION.md) | Environment variables and provider profiles |

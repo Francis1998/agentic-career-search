@@ -3,7 +3,7 @@
 import uuid
 from collections.abc import AsyncIterator
 from dataclasses import replace
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Annotated, Literal
 from urllib.parse import urlencode
 
@@ -21,7 +21,7 @@ from autoapply_agent.services.job_export import iter_csv, iter_jsonl, render_ato
 from autoapply_agent.services.job_search import (
     JobSearchFilters,
     JobSort,
-    as_utc,
+    capture_window_start,
     iter_jobs,
     search_jobs,
 )
@@ -102,23 +102,20 @@ def get_job_search_filters(
         RequestValidationError: If ``created_after`` falls outside the UTC range.
     """
 
-    bounds: list[datetime] = []
-    if created_after is not None:
-        try:
-            bounds.append(as_utc(created_after))
-        except OverflowError as exc:
-            raise RequestValidationError(
-                [
-                    {
-                        "type": "datetime_utc_range",
-                        "loc": ("query", "created_after"),
-                        "msg": "Datetime is outside the supported UTC range",
-                        "input": created_after.isoformat(),
-                    }
-                ]
-            ) from exc
-    if hours_old is not None:
-        bounds.append(utc_now() - timedelta(hours=hours_old))
+    try:
+        window_start = capture_window_start(created_after, hours_old, now=utc_now())
+    except OverflowError as exc:
+        # Only ``created_after`` can overflow: ``hours_old`` is bounded to one year.
+        raise RequestValidationError(
+            [
+                {
+                    "type": "datetime_utc_range",
+                    "loc": ("query", "created_after"),
+                    "msg": "Datetime is outside the supported UTC range",
+                    "input": created_after.isoformat() if created_after else None,
+                }
+            ]
+        ) from exc
     return JobSearchFilters(
         q=q,
         company=company,
@@ -127,7 +124,7 @@ def get_job_search_filters(
         min_score=min_score,
         source_config_id=source_config_id,
         run_id=run_id,
-        created_after=max(bounds) if bounds else None,
+        created_after=window_start,
     )
 
 

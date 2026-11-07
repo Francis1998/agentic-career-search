@@ -8,6 +8,28 @@ from autoapply_agent.adapters.base import JobCandidate
 from autoapply_agent.services.planning import DeterministicPlanningService
 from autoapply_agent.services.scoring import DeterministicScoringService
 
+HIGH_PRIORITY_MIN_SCORE = 0.8
+"""Lowest score in the ``high`` priority tier."""
+MEDIUM_PRIORITY_MIN_SCORE = 0.65
+"""Lowest score in the ``medium`` priority tier."""
+
+
+def priority_tier_for_score(score: float) -> str:
+    """Convert a numeric score to its execution priority tier.
+
+    Args:
+        score: Relevance score in range [0.0, 1.0].
+
+    Returns:
+        ``high``, ``medium`` or ``low``.
+    """
+
+    if score >= HIGH_PRIORITY_MIN_SCORE:
+        return "high"
+    if score >= MEDIUM_PRIORITY_MIN_SCORE:
+        return "medium"
+    return "low"
+
 
 @dataclass(slots=True, frozen=True)
 class AgentDecision:
@@ -77,11 +99,7 @@ class AgentDecisionEngine:
             Priority tier string.
         """
 
-        if score >= 0.8:
-            return "high"
-        if score >= 0.65:
-            return "medium"
-        return "low"
+        return priority_tier_for_score(score)
 
     @staticmethod
     def _build_rationale(

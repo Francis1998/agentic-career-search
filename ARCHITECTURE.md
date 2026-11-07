@@ -10,12 +10,15 @@ flowchart TD
     ENGINE --> STORE[RunEvent + Job persistence]
     LLM --> STORE
     STORE --> API
+    STORE --> MCP[Read-only MCP server]
 ```
 
 ## Components
 
 - **API Layer** (`autoapply_agent.api`): FastAPI routes for health, source config, run lifecycle, and jobs search/detail/export/Atom feed.
 - **Job Search & Export** (`autoapply_agent.services.job_search`, `job_export`): shared filter/sort/dedupe query builder plus streamed CSV (formula-injection safe), JSON Lines and Atom 1.0 renderers.
+- **MCP Server** (`autoapply_agent.mcp`, console script `career-search-mcp`): read-only, stdlib-only Model Context Protocol server over stdio (2026-07-28 stateless + 2025-11-25/2025-06-18 handshake). Its six tools reuse `job_search`, `DeterministicScoringService.breakdown()`, `priority_tier_for_score()` and `read_queries`; SQLite connections run `PRAGMA query_only`. See [docs/guides/MCP_SERVER_GUIDE.md](docs/guides/MCP_SERVER_GUIDE.md).
+- **Read queries** (`autoapply_agent.services.read_queries`): run, run-event and source-config listings shared by the HTTP routes and the MCP server.
 - **Worker** (`autoapply_agent.services.worker`): in-process async polling loop that claims queued runs.
 - **Adapters** (`autoapply_agent.adapters`): Greenhouse and Lever HTML parsers plus a vendor-neutral `schema.org/JobPosting` JSON-LD parser (`jsonld`).
 - **Agent Decision Engine** (`autoapply_agent.services.agent_decision`): deterministic scoring + rationale + priority + planning synthesis.

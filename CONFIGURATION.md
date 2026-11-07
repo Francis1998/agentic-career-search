@@ -5,7 +5,7 @@ Configuration is environment-variable driven via `pydantic-settings`.
 | Variable | Default | Description |
 |---|---|---|
 | `APP_NAME` | `Agentic Career Search` | Service display name |
-| `DATABASE_URL` | `sqlite+aiosqlite:///./autoapply_agent.db` | SQLAlchemy async DB URL |
+| `DATABASE_URL` | `sqlite+aiosqlite:///./autoapply_agent.db` | SQLAlchemy async DB URL (also the default database of `career-search-mcp`) |
 | `WORKER_POLL_INTERVAL_SECONDS` | `0.5` | Queue polling interval |
 | `HTTP_TIMEOUT_SECONDS` | `12.0` | Adapter HTTP timeout |
 | `MAX_JOBS_PER_SOURCE` | `50` | Per-source job cap |
@@ -90,6 +90,19 @@ OPENAI_MODEL=gpt-6-luna
 OPENAI_REASONING_EFFORT=none
 OPENAI_BASE_URL=https://api.openai.com/v1
 ```
+
+## MCP server (`career-search-mcp`)
+
+The read-only MCP server adds no environment variables: it reads the same `DATABASE_URL`
+(environment or `.env` in its working directory) unless `--database-url` is given.
+
+| Option | Default | Description |
+|---|---|---|
+| `--database-url` | `DATABASE_URL` | Job database to read; use an absolute SQLite path (`sqlite+aiosqlite:////abs/path/autoapply_agent.db`) because MCP hosts start servers in their own working directory |
+| `--audit-log` | off | JSONL file with one record per tool call: tool, HMAC of the arguments, result count, duration (never arguments or results) |
+| `--log-level` | `WARNING` | STDERR log level; STDOUT carries protocol messages only |
+
+Client configuration examples: [docs/guides/MCP_SERVER_GUIDE.md](docs/guides/MCP_SERVER_GUIDE.md).
 
 ## Notes
 
