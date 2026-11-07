@@ -8,6 +8,8 @@ AI-agent backend for autonomous job discovery, explainable decisions, and produc
 
 ![Core Agent Loop](assets/demo/agentic-career-search-demo.gif)
 
+![Job Search, Export & Atom Feed](assets/demo/job-search-export-feed.gif)
+
 ![LLM Provider Flow](assets/demo/llm-provider-flow.gif)
 
 ![Ops Reliability Loop](assets/demo/ops-reliability-loop.gif)
@@ -71,6 +73,7 @@ This project solves those issues with explicit agent engineering primitives:
 - tool/adapters abstraction for external integrations,
 - safety controls (timeouts, bounded scope, cancellation),
 - optional LLM enrichment via multiple providers,
+- JobSpy-style job search API (text/company/location/remote/score/time filters, paging with `X-Total-Count`, cross-board dedupe), OWASP-safe CSV + JSON Lines export, and an Atom feed for Slack/Teams/feed readers — see `docs/guides/JOB_SEARCH_EXPORT_GUIDE.md`,
 - skills-profile fit scoring (`fit_score` 0–1 + matched/missing) — see `docs/guides/SKILLS_PROFILE_FIT_GUIDE.md`,
 - assistive USD salary-band estimates from title/location heuristics — see `docs/guides/SALARY_BAND_ESTIMATOR_GUIDE.md`,
 - HITL application drafts (resume bullets + cover notes) with no auto-submit — see `docs/guides/APPLICATION_DRAFT_SERVICE_GUIDE.md`,
@@ -355,7 +358,10 @@ This repository follows the requested standards:
 - `GET /runs/{run_id}` inspect run state
 - `GET /runs/{run_id}/events` inspect event timeline
 - `POST /runs/{run_id}/cancel` request cancellation
-- `GET /jobs` inspect normalized, scored, and enriched outputs
+- `GET /jobs` search normalized, scored, and enriched outputs (`q`, `company`, `location`, `remote`, `min_score`, `source_config_id`, `run_id`, `created_after`, `hours_old`, `sort`, `dedupe`, `limit`/`offset`)
+- `GET /jobs/{job_id}` inspect one job
+- `GET /jobs/export?format=csv|jsonl` stream filtered results as a download
+- `GET /jobs/feed.atom` subscribe to new matches (Atom 1.0)
 - `GET /health/live` and `GET /health/ready`
 
 ## Supported job sources
@@ -524,6 +530,8 @@ uv run uvicorn autoapply_agent.main:app --reload
 | [CONFIGURATION.md](CONFIGURATION.md) | Runtime and provider configuration |
 | [QUICKSTART.md](QUICKSTART.md) | Fast local setup and verification |
 | [SAFETY.md](SAFETY.md) | Scope boundaries and operational guardrails |
+| [docs/API.md](docs/API.md) | HTTP API reference |
+| [docs/guides/JOB_SEARCH_EXPORT_GUIDE.md](docs/guides/JOB_SEARCH_EXPORT_GUIDE.md) | Job search filters, CSV/JSONL export, Atom feed |
 | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Deployment guidance |
 | [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) | Common failure recovery paths |
 | [CHANGELOG.md](CHANGELOG.md) | Release history |

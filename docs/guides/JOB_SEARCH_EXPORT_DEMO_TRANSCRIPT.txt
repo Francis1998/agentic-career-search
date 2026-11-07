@@ -1,0 +1,25 @@
+$ DATABASE_URL=sqlite+aiosqlite:///./demo.db uv run python scripts/seed_demo_jobs.py
+seeded 8 jobs (run 0e4a8f11-7d7e-4b36-b9d2-049bf632c341) into sqlite+aiosqlite:///./demo.db
+$ DATABASE_URL=sqlite+aiosqlite:///./demo.db ENABLE_WORKER=false uv run uvicorn autoapply_agent.main:app --port 8000 --log-level warning &
+$ curl -s 'localhost:8000/jobs?q=python&remote=true&sort=score' | jq -c '.[] | [.id, .company, .score]'
+[1,"Acme Robotics",0.92]
+[2,"Acme Robotics, Inc.",0.9]
+[3,"Globex",0.88]
+$ curl -s 'localhost:8000/jobs?q=python&remote=true&sort=score&dedupe=true' | jq -c '.[] | [.id, .company, .score]'
+[1,"Acme Robotics",0.92]
+[3,"Globex",0.88]
+$ curl -s -D - -o /dev/null 'localhost:8000/jobs?dedupe=true&limit=2' | grep -i x-total-count
+x-total-count: 7
+$ curl -s -w ' %{http_code}\n' localhost:8000/jobs/999
+{"detail":"job not found"} 404
+$ curl -s 'localhost:8000/jobs/export?format=csv' | grep -E '^"id"|Injected' | cut -c1-94
+"id","title","company","location","remote","score","priority_tier","source","url","source_conf
+"8","'=HYPERLINK(""https://evil.example"",""Apply here"")","Injected Co","'-1+1","false","0.31
+$ curl -s 'localhost:8000/jobs/export?format=jsonl&min_score=0.9' | jq -c '{id, title, score}'
+{"id":2,"title":"Senior Python Engineer","score":0.9}
+{"id":1,"title":"Senior Python Engineer","score":0.92}
+$ curl -s 'localhost:8000/jobs/feed.atom?remote=true&limit=1' | xmllint --format - | grep -E '<(title|summary)|alternate'
+  <title>Agentic Career Search jobs (remote=true)</title>
+    <title>Senior Python Engineer at Acme Robotics</title>
+    <link rel="alternate" type="text/html" href="https://boards.greenhouse.io/acme/jobs/4101"/>
+    <summary>Company: Acme Robotics | Location: Remote - US | Remote: yes | Score: 0.92 | Priority: high</summary>

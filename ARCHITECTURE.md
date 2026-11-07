@@ -14,7 +14,8 @@ flowchart TD
 
 ## Components
 
-- **API Layer** (`autoapply_agent.api`): FastAPI routes for health, source config, run lifecycle, and jobs listing.
+- **API Layer** (`autoapply_agent.api`): FastAPI routes for health, source config, run lifecycle, and jobs search/detail/export/Atom feed.
+- **Job Search & Export** (`autoapply_agent.services.job_search`, `job_export`): shared filter/sort/dedupe query builder plus streamed CSV (formula-injection safe), JSON Lines and Atom 1.0 renderers.
 - **Worker** (`autoapply_agent.services.worker`): in-process async polling loop that claims queued runs.
 - **Adapters** (`autoapply_agent.adapters`): Greenhouse and Lever HTML parsers plus a vendor-neutral `schema.org/JobPosting` JSON-LD parser (`jsonld`).
 - **Agent Decision Engine** (`autoapply_agent.services.agent_decision`): deterministic scoring + rationale + priority + planning synthesis.

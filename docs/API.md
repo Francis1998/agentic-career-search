@@ -39,7 +39,12 @@ Run statuses: `queued`, `running`, `completed`, `failed`, `cancel_requested`, `c
 
 | Method | Path | Description |
 |---|---|---|
-| `GET` | `/jobs` | List normalized jobs (optional `run_id` query filter) |
+| `GET` | `/jobs` | Search jobs with filters, `sort`, `dedupe` and `limit`/`offset`; total matches in the `X-Total-Count` header |
+| `GET` | `/jobs/{job_id}` | Fetch one job (`404 {"detail": "job not found"}` when missing) |
+| `GET` | `/jobs/export` | Stream every match as `format=csv` (default, OWASP CSV-injection safe) or `format=jsonl` |
+| `GET` | `/jobs/feed.atom` | Atom 1.0 feed of the newest distinct matches (stable entry ids) |
+
+Shared filters: `q` (each term in title/company/location), `company`, `location`, `remote`, `min_score`, `source_config_id`, `run_id`, `created_after` (ISO-8601), `hours_old`. `/jobs` and `/jobs/export` also take `sort=newest|score` and `dedupe=true|false`; the feed is always deduplicated. Without parameters `GET /jobs` still returns the 50 newest jobs. Semantics, recipes and security notes: [Job Search, Export & Atom Feed Guide](guides/JOB_SEARCH_EXPORT_GUIDE.md).
 
 Job payloads include deterministic `agent_decision` traces and optional `llm_enrichment` when provider enrichment is enabled.
 
@@ -56,4 +61,7 @@ RUN_ID=$(curl -s -X POST "http://127.0.0.1:8000/runs" \
 
 curl -s "http://127.0.0.1:8000/runs/$RUN_ID/events"
 curl -s "http://127.0.0.1:8000/jobs?run_id=$RUN_ID"
+curl -s "http://127.0.0.1:8000/jobs?run_id=$RUN_ID&remote=true&sort=score&limit=10"
+curl -s -OJ "http://127.0.0.1:8000/jobs/export?format=csv&run_id=$RUN_ID"
+curl -s "http://127.0.0.1:8000/jobs/feed.atom?q=python&min_score=0.7"
 ```
