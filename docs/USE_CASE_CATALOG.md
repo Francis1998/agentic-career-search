@@ -474,6 +474,8 @@ This repository follows the requested standards:
 ![QsehraAllowanceGapAdvisor](../assets/demo/qsehra-allowance-gap-advisor.gif)
 | Rippling/Workday/BambooHR miscarriage / pregnancy-loss leave planners bury related math in closed UIs | Workers lack a local `offered_days` vs `needed_days` band | `MiscarriageLeaveGapAdvisor` bands offline `offered_days` vs `needed_days` for HITL review and never auto-approves |
 ![MiscarriageLeaveGapAdvisor](../assets/demo/miscarriage-leave-gap-advisor.gif)
+| Rippling/Workday/Lattice neonatal-ICU parental leave planners bury related math in closed UIs | Workers lack a local `offered_days` vs `needed_days` band | `NeonatalIcuLeaveGapAdvisor` bands offline `offered_days` vs `needed_days` for HITL review and never auto-approves |
+![NeonatalIcuLeaveGapAdvisor](../assets/demo/neonatal-icu-leave-gap-advisor.gif)
 | VSP/EyeMed/Davis Vision buy-up allowance planners bury related math in closed UIs | Workers lack a local `offered_usd` vs `needed_usd` band | `VisionInsuranceBuyupGapAdvisor` bands offline `offered_usd` vs `needed_usd` for HITL review and never auto-approves |
 ![VisionInsuranceBuyupGapAdvisor](../assets/demo/vision-insurance-buyup-gap-advisor.gif)
 | Unum/Aflac/MetLife critical-illness insurance planners bury related math in closed UIs | Workers lack a local `offered_usd` vs `needed_usd` band | `CriticalIllnessInsuranceGapAdvisor` bands offline `offered_usd` vs `needed_usd` for HITL review and never auto-approves |
