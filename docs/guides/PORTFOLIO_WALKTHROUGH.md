@@ -61,17 +61,24 @@ curl -s -X POST localhost:8000/source-configs -H 'content-type: application/json
 ```bash
 curl -s -X POST localhost:8000/runs -H 'content-type: application/json' \
   -d '{"query":"backend engineer python remote"}' | jq -r .id | tee run_id.txt
-# poll until the status is terminal (a few seconds)
-curl -s localhost:8000/runs/$(cat run_id.txt) | jq -c '{status, started_at, finished_at}'
+# Poll for up to 60 s until the run reaches a terminal state
+for _ in $(seq 120); do
+  state=$(curl -s localhost:8000/runs/$(cat run_id.txt) | jq -r .status)
+  case "$state" in completed|failed|cancelled) break ;; esac
+  sleep 0.5
+done
+curl -s localhost:8000/runs/$(cat run_id.txt) | jq -c '{status, started_at, finished_at, error_message}'
 ```
 
 ```text
-b7101a0e-e17e-45b2-a9a6-d10f7bd6feda
-{"status":"completed","started_at":"2026-11-07T08:26:52.983128","finished_at":"2026-11-07T08:26:53.788312"}
+f26996a3-ce5e-4230-ac1f-65b150c108c0
+{"status":"completed","started_at":"2026-11-07T08:53:53.594746","finished_at":"2026-11-07T08:53:54.200458","error_message":null}
 ```
 
 The run moved `queued → running → completed`. With the default
-`MAX_JOBS_PER_SOURCE=50`, each board contributed up to 50 postings.
+`MAX_JOBS_PER_SOURCE=50`, each board contributed up to 50 postings. Continue only once
+the status is `completed`. `failed` comes with an `error_message`. A run still `queued`
+or `running` after the loop is just slow, so poll again.
 
 ## 4. See what the agent did
 
@@ -160,18 +167,31 @@ query.
 ## 8. Export the shortlist for spreadsheet triage
 
 ```bash
-curl -s -OJ 'localhost:8000/jobs/export?format=csv&min_score=0.8&sort=score' && ls jobs-*.csv
-python3 -c 'import csv, glob; rows = list(csv.DictReader(open(glob.glob("jobs-*.csv")[0])));
-print(len(rows), "rows"); [print(r["score"], r["company"], r["title"], r["remote"], sep=" | ") for r in rows[:3]]'
+csv_file=$(curl -s -OJ -w '%{filename_effective}' \
+  'localhost:8000/jobs/export?format=csv&min_score=0.8&sort=score')
+echo "$csv_file"
+python3 - "$csv_file" <<'EOF'
+import csv, sys
+
+with open(sys.argv[1], newline="", encoding="utf-8") as handle:
+    rows = list(csv.DictReader(handle))
+print(len(rows), "rows")
+for row in rows[:3]:
+    print(row["score"], row["company"], row["title"], row["remote"], sep=" | ")
+EOF
 ```
 
 ```text
-jobs-20261107T082653Z.csv
+jobs-20261107T085354Z.csv
 6 rows
 0.9204 | gitlab | Backend Engineer (Python),AI Engineering: Agent Foundations | true
 0.8418 | gitlab | Backend Engineer, Source Code: Repository Services (Ruby) | true
 0.8282 | gitlab | Senior Backend Engineer, AI Engineering: Chat | true
 ```
+
+`curl -OJ` saves the file under the server's timestamped name, and
+`-w '%{filename_effective}'` reports that name, so the script reads exactly this export
+and never an older `jobs-*.csv` in the same directory.
 
 The CSV is safe to open in Excel or Google Sheets: cells that start with formula
 characters are neutralized, and only http(s) links are emitted.
@@ -187,11 +207,11 @@ curl -s 'localhost:8000/jobs/feed.atom?remote=true&q=engineer&limit=2' \
 
 ```text
   <title>Agentic Career Search jobs (q=engineer, remote=true)</title>
-  <updated>2026-11-07T08:26:53Z</updated>
+  <updated>2026-11-07T08:53:53Z</updated>
     <title>Intermediate Fullstack Engineer (Ruby/Vue.js), Growth at gitlab</title>
-    <updated>2026-11-07T08:26:53Z</updated>
+    <updated>2026-11-07T08:53:53Z</updated>
     <title>Senior Backend Engineer, Core DevOps at gitlab</title>
-    <updated>2026-11-07T08:26:53Z</updated>
+    <updated>2026-11-07T08:53:53Z</updated>
 ```
 
 `limit=2` only keeps the preview short. To subscribe, Maya drops it and uses the
@@ -221,12 +241,19 @@ posting:
 ```bash
 curl -s -X POST localhost:8000/runs -H 'content-type: application/json' \
   -d '{"query":"backend engineer python remote"}' | jq -r .id > run2_id.txt
-# ...once it has completed:
+# Same bounded wait as in step 3, for the new run
+for _ in $(seq 120); do
+  state=$(curl -s localhost:8000/runs/$(cat run2_id.txt) | jq -r .status)
+  case "$state" in completed|failed|cancelled) break ;; esac
+  sleep 0.5
+done
+echo "$state"
 curl -s -D - -o /dev/null 'localhost:8000/jobs?remote=true&q=engineer' | grep -i x-total-count
 curl -s -D - -o /dev/null 'localhost:8000/jobs?remote=true&q=engineer&dedupe=true' | grep -i x-total-count
 ```
 
 ```text
+completed
 x-total-count: 58
 x-total-count: 29
 ```
