@@ -303,9 +303,11 @@ to the deterministic trace.
 
 ## Reproduce
 
-Run the commands above from the repository root, then clean up:
+Run the commands above from the repository root, then clean up only the files this
+walkthrough created:
 
 ```bash
 kill %1                                  # stop the API started in step 1
-rm -f walkthrough.db jobs-*.csv run_id.txt run2_id.txt
+rm -f walkthrough.db run_id.txt run2_id.txt
+rm -f -- "$csv_file"                     # the step 8 export; other jobs-*.csv files are kept
 ```
