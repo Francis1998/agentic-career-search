@@ -2,12 +2,33 @@
 
 from __future__ import annotations
 
+import re
+from collections.abc import Mapping
 from dataclasses import dataclass
 
 import httpx
 
 from autoapply_agent.adapters.base import JobCandidate
 from autoapply_agent.core.config import Settings
+
+# Current models think before answering and count those tokens against the output
+# limit, so the cap leaves room for low-effort reasoning plus a 1-2 sentence reply.
+_MAX_OUTPUT_TOKENS = 1024
+_GEMINI_GENERATION = re.compile(r"^gemini-(\d+)")
+
+
+def _gemini_supports_thinking_level(model: str) -> bool:
+    """Return True for Gemini 3+ models, which accept ``thinkingLevel``.
+
+    Args:
+        model: Gemini model id.
+
+    Returns:
+        Whether ``generationConfig.thinkingConfig.thinkingLevel`` may be sent.
+    """
+
+    match = _GEMINI_GENERATION.match(model)
+    return match is not None and int(match.group(1)) >= 3
 
 
 @dataclass(frozen=True, slots=True)
@@ -94,9 +115,13 @@ class LLMEnrichmentService:
         endpoint = (
             f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
         )
+        generation_config: dict[str, object] = {"maxOutputTokens": _MAX_OUTPUT_TOKENS}
+        if _gemini_supports_thinking_level(model):
+            # Gemini 3.6+ ignores custom sampling values; steer cost via thinking.
+            generation_config["thinkingConfig"] = {"thinkingLevel": "LOW"}
         payload: dict[str, object] = {
             "contents": [{"parts": [{"text": prompt}]}],
-            "generationConfig": {"temperature": 0.2, "maxOutputTokens": 180},
+            "generationConfig": generation_config,
         }
         timeout = httpx.Timeout(self._settings.llm_timeout_seconds)
         async with httpx.AsyncClient(timeout=timeout) as client:
@@ -111,25 +136,49 @@ class LLMEnrichmentService:
         return LLMEnrichmentResult(provider="gemini", model=model, summary=summary)
 
     async def _call_kimi(self, prompt: str) -> LLMEnrichmentResult | None:
-        """Call Kimi (Moonshot) OpenAI-compatible chat completions API."""
+        """Call Kimi (Moonshot) OpenAI-compatible chat completions API.
 
+        Current Kimi models fix ``temperature``/``top_p`` server-side and reject other
+        values, so no sampling parameters are sent. K3-series models always reason;
+        a low ``reasoning_effort`` keeps short summaries fast and cheap.
+        """
+
+        model = self._settings.kimi_model
+        options: dict[str, object]
+        if model.startswith("kimi-k3"):
+            options = {"reasoning_effort": "low", "max_completion_tokens": _MAX_OUTPUT_TOKENS}
+        else:
+            options = {"max_tokens": _MAX_OUTPUT_TOKENS}
         return await self._call_openai_compatible(
             provider="kimi",
             api_key=self._settings.kimi_api_key,
-            model=self._settings.kimi_model,
+            model=model,
             base_url=self._settings.kimi_base_url,
             prompt=prompt,
+            options=options,
         )
 
     async def _call_gpt(self, prompt: str) -> LLMEnrichmentResult | None:
-        """Call GPT through an OpenAI-compatible chat completions API."""
+        """Call GPT through an OpenAI-compatible chat completions API.
 
+        ``OPENAI_REASONING_EFFORT`` is sent as ``reasoning_effort`` when set;
+        ``temperature`` is only sent with ``none``, as OpenAI rejects sampling
+        parameters while reasoning is on.
+        """
+
+        effort = self._settings.openai_reasoning_effort.strip()
+        options: dict[str, object] = {"max_completion_tokens": _MAX_OUTPUT_TOKENS}
+        if effort:
+            options["reasoning_effort"] = effort
+        if effort == "none":
+            options["temperature"] = 0.2
         return await self._call_openai_compatible(
             provider="gpt",
             api_key=self._settings.openai_api_key,
             model=self._settings.openai_model,
             base_url=self._settings.openai_base_url,
             prompt=prompt,
+            options=options,
         )
 
     async def _call_openai_compatible(
@@ -140,20 +189,32 @@ class LLMEnrichmentService:
         model: str,
         base_url: str,
         prompt: str,
+        options: Mapping[str, object],
     ) -> LLMEnrichmentResult | None:
-        """Call an OpenAI-compatible chat completions endpoint."""
+        """Call an OpenAI-compatible chat completions endpoint.
+
+        Args:
+            provider: Provider label for the result.
+            api_key: Bearer token; the call is skipped when missing.
+            model: Model id.
+            base_url: API base URL.
+            prompt: User prompt.
+            options: Provider-specific request fields (token cap, reasoning, sampling).
+
+        Returns:
+            Normalized enrichment result, or None without a usable reply.
+        """
 
         if not api_key:
             return None
         endpoint = f"{base_url.rstrip('/')}/chat/completions"
         payload: dict[str, object] = {
             "model": model,
-            "temperature": 0.2,
-            "max_tokens": 180,
             "messages": [
                 {"role": "system", "content": "You produce concise role-fit summaries."},
                 {"role": "user", "content": prompt},
             ],
+            **options,
         }
         headers = {"Authorization": f"Bearer {api_key}"}
         timeout = httpx.Timeout(self._settings.llm_timeout_seconds)
@@ -175,12 +236,16 @@ class LLMEnrichmentService:
             return None
         model = self._settings.claude_model
         endpoint = "https://api.anthropic.com/v1/messages"
+        # Claude 5.5 models return 400 for any non-default sampling value, and their
+        # (default-on) thinking counts toward max_tokens; effort steers the cost.
         payload: dict[str, object] = {
             "model": model,
-            "max_tokens": 180,
-            "temperature": 0.2,
+            "max_tokens": _MAX_OUTPUT_TOKENS,
             "messages": [{"role": "user", "content": prompt}],
         }
+        effort = self._settings.claude_effort.strip()
+        if effort:
+            payload["output_config"] = {"effort": effort}
         headers = {
             "x-api-key": api_key,
             "anthropic-version": "2023-06-01",

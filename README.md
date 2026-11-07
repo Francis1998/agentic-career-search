@@ -321,11 +321,20 @@ This project solves those issues with explicit agent engineering primitives:
 
 ## LLM API integration (consumes model outputs)
 
-Provider integration is built into the code path:
-- Gemini API
-- Kimi (Moonshot, OpenAI-compatible)
-- Claude (Anthropic Messages API)
-- GPT-compatible APIs through OpenAI-style endpoint patterns
+Provider integration is built into the code path and is optional: deterministic scoring
+and decision traces work without any key. Defaults track the current model line-ups
+(verified 2026-11-06):
+
+| Provider | `LLM_PROVIDER` | Default model | Request shape |
+|---|---|---|---|
+| [OpenAI](https://developers.openai.com/api/docs/guides/latest-model) | `gpt` | `gpt-6-luna` | Chat Completions; `reasoning_effort` from `OPENAI_REASONING_EFFORT` (`none`, so `temperature` is allowed); `gpt-6.1-sol` / `gpt-6-astra` need `low` or higher |
+| [Anthropic](https://platform.claude.com/docs/en/models/overview) | `claude` | `claude-haiku-5-5` | Messages API; `output_config.effort` from `CLAUDE_EFFORT` (`low`); no sampling parameters (Claude 5.5 returns 400 for them) |
+| [Google](https://aistudio.google.com/docs/models) | `gemini` | `gemini-3.8-flash` | `generateContent`; `thinkingLevel: LOW` on Gemini 3+; no sampling parameters |
+| [Moonshot Kimi](https://platform.kimi.ai/docs/api/models-overview.md) | `kimi` | `kimi-k3.1-pro` | OpenAI-compatible; `reasoning_effort: low`; `temperature` is fixed at 1.0 by K3 and never sent |
+
+Larger options: `gpt-6.1-sol` / `gpt-6-astra`, `claude-sonnet-5-5` / `claude-opus-5-5`,
+`gemini-4-argon`, `kimi-k3.1-pro-highspeed`. Kimi K2 models are being retired. See each
+provider's page for pricing.
 
 Enable provider enrichment:
 

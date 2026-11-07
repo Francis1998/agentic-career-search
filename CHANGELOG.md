@@ -742,6 +742,16 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   step, and navigation links are ignored and the id is captured as the
   `external_id`. See ADR-086.
 
+### Changed
+- LLM enrichment defaults move to the current model line-ups: `gpt-6-luna`
+  (`OPENAI_REASONING_EFFORT=none`), `claude-haiku-5-5` (`CLAUDE_EFFORT=low`),
+  `gemini-3.8-flash` and `kimi-k3.1-pro` on `https://api.moonshot.ai/v1`. Requests
+  allow 1,024 output tokens because reasoning tokens count toward the cap, and only send
+  sampling parameters where the provider accepts them: Kimi K3 rejects any
+  `temperature` other than 1.0, Claude 5.5 returns 400 for custom sampling values,
+  Gemini 3.6+ ignores them, and OpenAI accepts `temperature` only with
+  `reasoning_effort: none`.
+
 ### Fixed
 - `cross_source_dedup.normalize_title` / `normalize_company`: letters and digits of
   non-Latin scripts are kept (NFKC + case-folding) instead of being stripped, so

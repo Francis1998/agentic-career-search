@@ -21,7 +21,8 @@ This page captures deployment-specific guidance that complements the root variab
 LLM_ENABLE_ENRICHMENT=true
 LLM_PROVIDER=gpt
 OPENAI_API_KEY=your_key_here
-OPENAI_MODEL=gpt-5.5
+OPENAI_MODEL=gpt-6-luna
+OPENAI_REASONING_EFFORT=none   # empty for gateways that do not accept reasoning_effort
 OPENAI_BASE_URL=https://api.openai.com/v1
 ```
 
