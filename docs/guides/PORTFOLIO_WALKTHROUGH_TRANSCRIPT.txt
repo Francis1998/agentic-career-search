@@ -1,0 +1,99 @@
+$ DATABASE_URL=sqlite+aiosqlite:///./walkthrough.db \
+  uv run uvicorn autoapply_agent.main:app --port 8000 --log-level warning &
+$ # Wait up to 10 s for the server to accept connections
+for _ in $(seq 50); do curl -sf localhost:8000/health/live >/dev/null && break; sleep 0.2; done
+$ curl -s localhost:8000/health/ready
+{"status":"ready"}
+$ curl -s -X POST localhost:8000/source-configs -H 'content-type: application/json' \
+  -d '{"name":"gitlab","source_type":"greenhouse","base_url":"https://boards.greenhouse.io/gitlab"}' \
+  | jq -c '{id, name, source_type}'
+{"id":1,"name":"gitlab","source_type":"greenhouse"}
+$ curl -s -X POST localhost:8000/source-configs -H 'content-type: application/json' \
+  -d '{"name":"palantir","source_type":"lever","base_url":"https://jobs.lever.co/palantir"}' \
+  | jq -c '{id, name, source_type}'
+{"id":2,"name":"palantir","source_type":"lever"}
+$ curl -s -X POST localhost:8000/runs -H 'content-type: application/json' \
+  -d '{"query":"backend engineer python remote"}' | jq -r .id | tee run_id.txt
+f26996a3-ce5e-4230-ac1f-65b150c108c0
+$ # Poll for up to 60 s until the run reaches a terminal state
+for _ in $(seq 120); do
+  state=$(curl -s localhost:8000/runs/$(cat run_id.txt) | jq -r .status)
+  case "$state" in completed|failed|cancelled) break ;; esac
+  sleep 0.5
+done
+curl -s localhost:8000/runs/$(cat run_id.txt) | jq -c '{status, started_at, finished_at, error_message}'
+{"status":"completed","started_at":"2026-11-07T08:53:53.594746","finished_at":"2026-11-07T08:53:54.200458","error_message":null}
+$ curl -s localhost:8000/runs/$(cat run_id.txt)/events | jq -r '.[].event_type' | sort | uniq -c
+ 100 agent.decision
+   1 run.completed
+   1 run.created
+   1 run.started
+   2 source.completed
+   2 source.started
+$ curl -s 'localhost:8000/jobs?sort=score&limit=3' | jq -c '.[] | {title, company, location, score,
+  tier: .raw.agent_decision.priority_tier, matched: .raw.agent_decision.matched_query_terms}'
+{"title":"Backend Engineer (Python),AI Engineering: Agent Foundations","company":"gitlab","location":"Remote, Canada; Remote, Poland; Remote, United Kingdom","score":0.9204,"tier":"high","matched":["backend","engineer","python","remote"]}
+{"title":"Backend Engineer, Source Code: Repository Services (Ruby)","company":"gitlab","location":"Remote, United Kingdom","score":0.8418,"tier":"high","matched":["backend","engineer","remote"]}
+{"title":"Senior Backend Engineer, AI Engineering: Chat","company":"gitlab","location":"Remote, United Kingdom","score":0.8282,"tier":"high","matched":["backend","engineer","remote"]}
+$ curl -s 'localhost:8000/jobs?limit=1&sort=score' | jq -r '.[0].raw.agent_decision.rationale[]'
+Priority tier set to high from deterministic score.
+Role title considered: Backend Engineer (Python),AI Engineering: Agent Foundations.
+Matched query terms: backend, engineer, python, remote.
+Location signal observed: Remote, Canada; Remote, Poland; Remote, United Kingdom.
+$ curl -s -D - -o /dev/null 'localhost:8000/jobs?remote=true&q=engineer' | grep -i x-total-count
+x-total-count: 29
+$ curl -s 'localhost:8000/jobs?remote=true&q=engineer&sort=score&limit=5' \
+  | jq -r '.[] | [.score, .company, .title] | @tsv'
+0.9204	gitlab	Backend Engineer (Python),AI Engineering: Agent Foundations
+0.8418	gitlab	Backend Engineer, Source Code: Repository Services (Ruby)
+0.8282	gitlab	Senior Backend Engineer, AI Engineering: Chat
+0.8166	gitlab	Senior Backend Engineer, Core DevOps
+0.8096	gitlab	Backend Engineer, Source Code: Repository Services (Ruby)
+$ curl -s 'localhost:8000/jobs?company=palantir&q=engineer&sort=score&limit=3' \
+  | jq -r '.[] | [.score, .title, .location] | @tsv'
+0.6427	Forward Deployed Infrastructure Engineer, New Grad - US Government	New York, NY
+0.6416	Forward Deployed Infrastructure Engineer - US Government	Washington, D.C.
+0.6378	Forward Deployed Security Engineer - US Government	Washington, D.C.
+$ csv_file=$(curl -s -OJ -w '%{filename_effective}' \
+  'localhost:8000/jobs/export?format=csv&min_score=0.8&sort=score')
+echo "$csv_file"
+python3 - "$csv_file" <<'EOF'
+import csv, sys
+
+with open(sys.argv[1], newline="", encoding="utf-8") as handle:
+    rows = list(csv.DictReader(handle))
+print(len(rows), "rows")
+for row in rows[:3]:
+    print(row["score"], row["company"], row["title"], row["remote"], sep=" | ")
+EOF
+jobs-20261107T085354Z.csv
+6 rows
+0.9204 | gitlab | Backend Engineer (Python),AI Engineering: Agent Foundations | true
+0.8418 | gitlab | Backend Engineer, Source Code: Repository Services (Ruby) | true
+0.8282 | gitlab | Senior Backend Engineer, AI Engineering: Chat | true
+$ curl -s 'localhost:8000/jobs/feed.atom?remote=true&q=engineer&limit=2' \
+  | xmllint --format - | grep -E '<(title|updated)>'
+  <title>Agentic Career Search jobs (q=engineer, remote=true)</title>
+  <updated>2026-11-07T08:53:53Z</updated>
+    <title>Intermediate Fullstack Engineer (Ruby/Vue.js), Growth at gitlab</title>
+    <updated>2026-11-07T08:53:53Z</updated>
+    <title>Senior Backend Engineer, Core DevOps at gitlab</title>
+    <updated>2026-11-07T08:53:53Z</updated>
+$ curl -s -X POST localhost:8000/runs -H 'content-type: application/json' \
+  -d '{"query":"backend engineer python remote"}' | jq -r .id > run2_id.txt
+# Same bounded wait as in step 3, for the new run
+for _ in $(seq 120); do
+  state=$(curl -s localhost:8000/runs/$(cat run2_id.txt) | jq -r .status)
+  case "$state" in completed|failed|cancelled) break ;; esac
+  sleep 0.5
+done
+echo "$state"
+curl -s -D - -o /dev/null 'localhost:8000/jobs?remote=true&q=engineer' | grep -i x-total-count
+curl -s -D - -o /dev/null 'localhost:8000/jobs?remote=true&q=engineer&dedupe=true' | grep -i x-total-count
+completed
+x-total-count: 58
+x-total-count: 29
+$ RUN=$(curl -s -X POST localhost:8000/runs -H 'content-type: application/json' \
+  -d '{"query":"site reliability"}' | jq -r .id)
+curl -s -X POST localhost:8000/runs/$RUN/cancel | jq -c '{status, cancel_requested}'
+{"status":"cancelled","cancel_requested":true}
