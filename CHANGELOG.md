@@ -731,6 +731,13 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `external_id`. See ADR-086.
 
 ### Fixed
+- `InProcessWorker`: `POST /runs/{id}/cancel` now stops a run that is already
+  `running`. The cancellation check re-reads the run row
+  (`populate_existing=True`) instead of trusting the long-lived worker session's
+  identity map, which never saw the API's commit, so the run used to ingest every
+  remaining job/source and finish as `completed`. The source loop now also exits
+  as soon as a source cancels the run, so exactly one `run.cancelled` event is
+  written.
 - `TeamtailorAdapter`: mixed-case / Title-Case optional title slugs in
   `/jobs/{jobId}-{Slug}` posting URLs are now accepted.
 
