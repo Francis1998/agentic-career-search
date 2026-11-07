@@ -25,6 +25,8 @@ LLM enrichment is optional (step 11).
 uv sync --extra dev --frozen
 DATABASE_URL=sqlite+aiosqlite:///./walkthrough.db \
   uv run uvicorn autoapply_agent.main:app --port 8000 --log-level warning &
+# Wait up to 10 s for the server to accept connections
+for _ in $(seq 50); do curl -sf localhost:8000/health/live >/dev/null && break; sleep 0.2; done
 curl -s localhost:8000/health/ready
 ```
 
@@ -32,7 +34,9 @@ curl -s localhost:8000/health/ready
 {"status":"ready"}
 ```
 
-The in-process worker starts with the API and polls for queued runs.
+Continue only once this prints `{"status":"ready"}`. Empty output means the server did not
+start: check the uvicorn output, for example for a port that is already in use. The
+in-process worker starts with the API and polls for queued runs.
 
 ## 2. Register the boards she cares about
 
@@ -174,6 +178,8 @@ characters are neutralized, and only http(s) links are emitted.
 
 ## 9. Subscribe to new matches
 
+First, a short preview of the two newest entries:
+
 ```bash
 curl -s 'localhost:8000/jobs/feed.atom?remote=true&q=engineer&limit=2' \
   | xmllint --format - | grep -E '<(title|updated)>'
@@ -188,9 +194,23 @@ curl -s 'localhost:8000/jobs/feed.atom?remote=true&q=engineer&limit=2' \
     <updated>2026-11-07T08:26:53Z</updated>
 ```
 
-Maya adds this URL to her feed reader, or runs `/feed subscribe <url>` in Slack once the
+`limit=2` only keeps the preview short. To subscribe, Maya drops it and uses the
+default window of 50 entries (`limit` accepts up to 200):
+
+```text
+http://localhost:8000/jobs/feed.atom?remote=true&q=engineer
+```
+
+She adds this URL to her feed reader, or runs `/feed subscribe <url>` in Slack once the
 API sits behind an HTTPS proxy. Entry ids are stable per posting, so she is notified once
 per posting even when later runs capture it again.
+
+A feed only lists its newest `limit` distinct matches. If more new matches arrive between
+two polls, the reader never sees the oldest of them. Pick a window larger than the number
+of new matches you expect per polling interval (feed readers typically poll every 15–60
+minutes). For a gap-free check, page through `GET /jobs?remote=true&q=engineer&dedupe=true`
+instead. It lists postings by when each was first seen, newest first, so stop at the first
+posting you already know.
 
 ## 10. Re-run the next day without duplicates
 

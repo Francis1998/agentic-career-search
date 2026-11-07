@@ -54,11 +54,18 @@ export DATABASE_URL=sqlite+aiosqlite:///./demo.db
 # Offline: seed demo jobs and serve them (no network, no keys)
 uv run python scripts/seed_demo_jobs.py
 ENABLE_WORKER=false uv run uvicorn autoapply_agent.main:app --port 8000 &
+# Wait up to 10 s for the server, then check it: continue once this prints {"status":"ready"}
+for _ in $(seq 50); do curl -sf localhost:8000/health/ready >/dev/null && break; sleep 0.2; done
+curl -sS localhost:8000/health/ready
+```
 
-curl -s 'localhost:8000/jobs?q=python&remote=true&sort=score&dedupe=true' \
+Then search, export and subscribe:
+
+```bash
+curl -sS 'localhost:8000/jobs?q=python&remote=true&sort=score&dedupe=true' \
   | jq -c '.[] | [.title, .company, .score]'
-curl -s -OJ 'localhost:8000/jobs/export?format=csv&min_score=0.7'    # spreadsheet-safe CSV
-curl -s 'localhost:8000/jobs/feed.atom?remote=true' | head -20       # Atom feed
+curl -sS -OJ 'localhost:8000/jobs/export?format=csv&min_score=0.7'    # spreadsheet-safe CSV
+curl -sS 'localhost:8000/jobs/feed.atom?remote=true' | head -20       # Atom feed
 ```
 
 For live data, start the API with the worker enabled (omit `ENABLE_WORKER=false`), then
