@@ -142,7 +142,7 @@ def _suggestions_for(
     elif urgency == "stalled":
         suggestions.append("Prefer a short status-check email over a new full application.")
     elif urgency == "cooling":
-        suggestions.append("Optional LinkedIn view of the hiring manager — still HITL only.")
+        suggestions.append("Optional review of the hiring manager's profile — still HITL only.")
     else:
         suggestions.append("No chase needed yet; keep monitoring locally.")
     return suggestions

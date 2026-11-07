@@ -58,7 +58,7 @@ def test_fuzzy_title_company_clusters_near_duplicates() -> None:
 
     jobs = [
         _Job("Senior Software Engineer", "Acme Inc", "https://indeed.com/a"),
-        _Job("Senior Software Engineer", "Acme", "https://linkedin.com/b"),
+        _Job("Senior Software Engineer", "Acme", "https://glassdoor.com/b"),
         _Job("Data Scientist", "Beta Corp", "https://greenhouse.io/c"),
     ]
     result = CrossSourceJobDeduper(threshold=0.85).dedupe(jobs)

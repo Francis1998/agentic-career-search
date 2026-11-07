@@ -1,6 +1,6 @@
 """HITL referral intro draft service (warm-intro email drafts).
 
-Closes the gap vs LinkedIn InMail auto-templates and Teal/Huntr referral trackers
+Closes the gap vs networking-site auto-templates and Teal/Huntr referral trackers
 that either auto-send or leave intros unstructured. This service only builds
 offline warm-intro drafts for human review — it never sends email, never DMs
 contacts, and never performs network I/O.
@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-_ALLOWED_CHANNELS = frozenset({"email", "linkedin"})
+_ALLOWED_CHANNELS = frozenset({"email", "dm"})
 
 
 @dataclass(slots=True, frozen=True)
@@ -25,7 +25,7 @@ class ReferralIntroDraft:
 
 
 class ReferralIntroDraftService:
-    """Generate offline warm-intro email / LinkedIn drafts for HITL review."""
+    """Generate offline warm-intro email / direct-message (DM) drafts for HITL review."""
 
     def generate(
         self,
@@ -43,7 +43,7 @@ class ReferralIntroDraftService:
             role: Target role title (required for coherent draft).
             connector_name: Person who can introduce you (required).
             mutual_context: Shared context / why they are a fit connector (required).
-            channel: ``email`` or ``linkedin`` (default ``email``).
+            channel: ``email`` or ``dm`` (direct message; default ``email``).
 
         Returns:
             ReferralIntroDraft with ``requires_human_review=True``.
@@ -66,7 +66,7 @@ class ReferralIntroDraftService:
 
         cleaned_channel = (channel or "").strip().lower()
         if cleaned_channel not in _ALLOWED_CHANNELS:
-            raise ValueError("channel must be 'email' or 'linkedin'")
+            raise ValueError("channel must be 'email' or 'dm'")
 
         cleaned_role = (role or "").strip() or "the open role"
 
@@ -93,7 +93,7 @@ class ReferralIntroDraftService:
                 f"— Draft only: human review required; do not auto-send —"
             )
         else:
-            subject = f"LinkedIn DM · intro ask · {cleaned_role} @ {cleaned_company}"
+            subject = f"DM · intro ask · {cleaned_role} @ {cleaned_company}"
             body = (
                 f"Hi {cleaned_connector} — exploring {cleaned_role} at {cleaned_company} "
                 f"and thought of you given {cleaned_context}. Open to a short warm intro "

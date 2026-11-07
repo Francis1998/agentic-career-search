@@ -1,8 +1,8 @@
-"""HITL LinkedIn headline keyword scorer (offline cues; never auto-posts).
+"""HITL profile headline keyword scorer (offline cues; never auto-posts).
 
-Closes the gap vs Careerflow / Taplio / LinkedIn Premium headline graders
-locked in proprietary UIs. This service scores an offline LinkedIn headline
-against target role keywords for HITL edits — it never auto-posts profile
+Closes the gap vs Careerflow / Taplio / premium profile-headline graders
+locked in proprietary UIs. This service scores an offline professional profile
+headline against target role keywords for HITL edits — it never auto-posts profile
 updates and never performs network I/O.
 
 Distinct from ``AtsKeywordCoverageScorer`` (resume vs JD keywords) and
@@ -19,8 +19,8 @@ _TOKEN_RE = re.compile(r"[a-z0-9][a-z0-9+.#/-]*")
 
 
 @dataclass(slots=True, frozen=True)
-class LinkedInHeadlineReport:
-    """Human-reviewable LinkedIn headline keyword coverage report."""
+class ProfileHeadlineReport:
+    """Human-reviewable profile headline keyword coverage report."""
 
     present_keywords: list[str]
     missing_keywords: list[str]
@@ -30,18 +30,18 @@ class LinkedInHeadlineReport:
     auto_post: bool
 
 
-class LinkedInHeadlineKeywordScorer:
-    """Score LinkedIn headline token overlap vs target role keywords (HITL)."""
+class ProfileHeadlineKeywordScorer:
+    """Score profile headline token overlap vs target role keywords (HITL)."""
 
-    def score(self, headline: str, target_keywords: list[str]) -> LinkedInHeadlineReport:
+    def score(self, headline: str, target_keywords: list[str]) -> ProfileHeadlineReport:
         """Score headline coverage against target keywords.
 
         Args:
-            headline: LinkedIn headline text (required).
+            headline: Professional profile headline text (required).
             target_keywords: Non-empty list of role keywords to cover.
 
         Returns:
-            LinkedInHeadlineReport with ``requires_human_review=True`` and
+            ProfileHeadlineReport with ``requires_human_review=True`` and
             ``auto_post=False``.
 
         Raises:
@@ -95,7 +95,7 @@ class LinkedInHeadlineKeywordScorer:
         else:
             guidance.append("Low coverage; rebuild headline around the top 3 role keywords.")
 
-        return LinkedInHeadlineReport(
+        return ProfileHeadlineReport(
             present_keywords=present,
             missing_keywords=missing,
             coverage_score=round(score, 3),

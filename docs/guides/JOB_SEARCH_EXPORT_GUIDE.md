@@ -246,7 +246,7 @@ channel* action.
 | | JobSpy | agentic-career-search |
 |---|---|---|
 | Interface | Python library, CLI, MCP server | HTTP API over a database |
-| Data | Scrapes boards live on every call (LinkedIn, Indeed, Glassdoor, ZipRecruiter, …) | Jobs captured by runs from configured ATS/board sources, kept with their history |
+| Data | Scrapes boards live on every call (Indeed, Glassdoor, ZipRecruiter, …) | Jobs captured by runs from configured ATS/board sources, kept with their history |
 | Filters | `search_term`, `location`, `distance`, `is_remote`, `job_type`, `hours_old`, `easy_apply`, `results_wanted`, `offset` | `q`, `company`, `location`, `remote`, `min_score`, `source_config_id`, `run_id`, `created_after`, `hours_old`, `limit`, `offset` |
 | Ranking | Board order | Deterministic score + decision trace; `sort=score` |
 | Duplicates | Per-board results | `dedupe=true` collapses re-captures and cross-board mirrors |

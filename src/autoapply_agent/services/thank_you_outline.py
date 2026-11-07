@@ -2,8 +2,8 @@
 
 Closes the gap vs Teal/Huntr / Careerflow templates that either stay inside
 closed UIs or encourage one-click sends. This service builds an offline
-thank-you email/LinkedIn outline from interview notes — it never emails
-recruiters, never posts to LinkedIn, and never performs network I/O.
+thank-you email/direct-message outline from interview notes — it never emails
+recruiters, never sends direct messages, and never performs network I/O.
 
 Distinct from ``InterviewFeedbackSynthesizer`` (debrief strengths/gaps) and
 ``RecruiterOutreachDraftService`` (cold outreach). Optional later polish via
@@ -49,7 +49,7 @@ class ThankYouNoteOutlinePlanner:
             role: Role title (required for coherent framing).
             interviewer: Interviewer name or panel label (required).
             highlights: Optional discussion highlights to weave into beats.
-            channel: ``email`` or ``linkedin`` (default email).
+            channel: ``email`` or ``dm`` (direct message; default email).
 
         Returns:
             ThankYouOutline with ``requires_human_review=True`` and
@@ -70,8 +70,8 @@ class ThankYouNoteOutlinePlanner:
             raise ValueError("interviewer must be a non-empty string")
 
         cleaned_channel = (channel or "email").strip().lower()
-        if cleaned_channel not in {"email", "linkedin"}:
-            raise ValueError("channel must be 'email' or 'linkedin'")
+        if cleaned_channel not in {"email", "dm"}:
+            raise ValueError("channel must be 'email' or 'dm'")
 
         cleaned_highlights = [
             item.strip() for item in (highlights or []) if isinstance(item, str) and item.strip()

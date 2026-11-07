@@ -1,6 +1,6 @@
 """HITL visa-sponsorship signal extractor (offline JD cues; never auto-applies).
 
-Closes the gap vs Simplify / Teal / LinkedIn job boards that bury work-auth and
+Closes the gap vs Simplify / Teal / large job boards that bury work-auth and
 visa-sponsorship signals inside proprietary filters. This service scans offline
 JD text for sponsorship, citizenship-only, and visa-transfer cues — it never
 auto-applies, never contacts employers, and never performs network I/O.

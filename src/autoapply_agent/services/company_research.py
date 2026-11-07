@@ -90,7 +90,7 @@ class CompanyResearchBriefService:
         )
 
         talking_points = [
-            f"Confirm what {cleaned} ships (product vs services) via official site / LinkedIn.",
+            f"Confirm what {cleaned} ships (product vs services) via official company pages.",
             "Identify the hiring team's org (engineering, product, GTM) from the JD.",
         ]
         if title:

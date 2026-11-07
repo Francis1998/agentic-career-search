@@ -57,7 +57,7 @@ class ApplicationFollowUpCadencePlanner:
             company: Target company (required).
             role: Role title (required).
             applied_on: ISO date string when the application was sent (required).
-            channels: Preferred channels in order (email/linkedin/portal).
+            channels: Preferred channels in order (email/dm/portal).
             offsets_days: Positive day offsets for follow-ups (default 3/7/14).
 
         Returns:
@@ -107,7 +107,7 @@ class ApplicationFollowUpCadencePlanner:
 
 def _clean_channels(channels: list[str] | None) -> list[str]:
     if not channels:
-        return ["email", "linkedin"]
+        return ["email", "dm"]
     cleaned = [item.strip().lower() for item in channels if item and item.strip()]
     if not cleaned:
         raise ValueError("channels must include at least one non-empty channel")

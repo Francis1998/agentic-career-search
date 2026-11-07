@@ -83,8 +83,8 @@ This project solves those issues with explicit agent engineering primitives:
 - cross-source fuzzy dedup (title+company beyond URL) — see `docs/guides/CROSS_SOURCE_JOB_DEDUP_GUIDE.md`,
 - ATS keyword coverage (resume text ↔ JD keywords) — see `docs/guides/ATS_KEYWORD_COVERAGE_GUIDE.md`,
 - company research briefs (talking points + JD signals, HITL) — see `docs/guides/COMPANY_RESEARCH_BRIEF_GUIDE.md`,
-- HITL recruiter outreach drafts (email + LinkedIn DM, never auto-send) — see `docs/guides/RECRUITER_OUTREACH_DRAFT_GUIDE.md`,
-- HITL referral intro drafts (warm email + LinkedIn, never auto-send) — see `docs/guides/REFERRAL_INTRO_DRAFT_GUIDE.md`,
+- HITL recruiter outreach drafts (email + direct message, never auto-send) — see `docs/guides/RECRUITER_OUTREACH_DRAFT_GUIDE.md`,
+- HITL referral intro drafts (warm email + direct message, never auto-send) — see `docs/guides/REFERRAL_INTRO_DRAFT_GUIDE.md`,
 - negotiation talking points (total-comp counters, HITL) — see `docs/guides/NEGOTIATION_TALKING_POINTS_GUIDE.md`,
 - post-interview debrief briefs (strengths + gaps + follow-ups, HITL) — see `docs/guides/INTERVIEW_FEEDBACK_SYNTH_GUIDE.md`,
 - offer deadline countdowns + HITL reminders (never auto-decline) — see `docs/guides/OFFER_DEADLINE_TRACKER_GUIDE.md`,
@@ -104,33 +104,33 @@ This project solves those issues with explicit agent engineering primitives:
 | Scraped jobs pile up without a pipeline CRM | Candidates lose track of where each role stands | `ApplicationStageTracker` enforces an auditable saved→offer stage machine |
 | Postings omit pay and scrapers leave empty salary fields | Candidates cannot triage roles by compensation | `SalaryBandEstimator` produces an auditable USD band from title/location heuristics |
 | Candidates discover roles but arrive unprepared for interviews | Weak signal conversion after outreach | `InterviewPrepBriefService` builds likely questions, STAR prompts, and focus gaps for human review |
-| Same role appears on Indeed + LinkedIn with different URLs | Duplicate noise in triage and CRM | `CrossSourceJobDeduper` clusters fuzzy title+company near-duplicates after URL pass |
+| Same role appears on Indeed and other large aggregators with different URLs | Duplicate noise in triage and CRM | `CrossSourceJobDeduper` clusters fuzzy title+company near-duplicates after URL pass |
 | Resume free text is not scored against JD keywords | ATS rejection risk is opaque | `AtsKeywordCoverageScorer` reports coverage + present/missing JD keywords |
 | Candidates research companies ad hoc before outreach | Inconsistent talking points and invented facts | `CompanyResearchBriefService` builds offline HITL briefs from JD signals |
 | Multiple offers lack a side-by-side total-comp view | Hard to triage cash vs equity trade-offs offline | `OfferCompareMatrix` ranks offers by cash+equity heuristic without auto-accept |
 | RemoteOK-style location prefs are board-UI-only | Hard to reuse geo/remote filters in agent triage | `LocationRemoteFitScorer` scores candidate prefs vs posting location/policy |
 ![Offer Compare Matrix](../assets/demo/offer-compare-matrix.gif)
-| Outreach templates and Easy Apply auto-send without review | Accidental spam and irreversible messages | `RecruiterOutreachDraftService` builds email/LinkedIn drafts that always require human review |
-| Warm intros are ad-hoc or auto-sent via InMail templates | Burned connectors and irreversible messages | `ReferralIntroDraftService` builds email/LinkedIn intro drafts that always require human review |
+| Outreach templates and one-click apply flows auto-send without review | Accidental spam and irreversible messages | `RecruiterOutreachDraftService` builds email/DM drafts that always require human review |
+| Warm intros are ad-hoc or auto-sent via networking-site templates | Burned connectors and irreversible messages | `ReferralIntroDraftService` builds email/DM intro drafts that always require human review |
 | Counter-offers are improvised from Levels.fyi / Blind threads | Inconsistent anchors and accidental over-ask | `NegotiationTalkingPointsService` builds HITL talking points from current vs target total-comp |
 | Interview notes stay unstructured after loops | Weak conversion and lost signal | `InterviewFeedbackSynthesizer` builds HITL debriefs with strengths/gaps/follow-ups |
 | Offer deadlines are tracked only in Teal/Huntr without local countdown | Missed responses or accidental auto-decline risk | `OfferDeadlineTracker` computes offline urgency + HITL reminders and never auto-declines |
 | Portfolio bullets are hand-aligned to JD themes in Teal/Jobscan UIs | Hard to reuse theme mapping in agentic triage | `PortfolioProjectMatcher` scores offline bullet↔theme token overlap for HITL review |
 | Teal/Huntr calendar sync auto-writes interview events | Accidental double-booking without local HITL review | `InterviewScheduleConflictGuard` detects offline overlaps and never mutates calendars |
-| Teal/Careerflow thank-you templates encourage one-click sends | Accidental recruiter spam after interviews | `ThankYouNoteOutlinePlanner` builds offline email/LinkedIn outlines and never auto-sends |
+| Teal/Careerflow thank-you templates encourage one-click sends | Accidental recruiter spam after interviews | `ThankYouNoteOutlinePlanner` builds offline email/DM outlines and never auto-sends |
 | Teal/Huntr show quiet apps only inside proprietary CRM UIs | Follow-ups are ad-hoc or accidentally auto-sent | `ApplicationGhostingDetector` computes offline stall urgency + HITL suggestions and never auto-nudges |
 | Teal Insights / Huntr analytics keep apply-volume coaching in closed UIs | Burnout from spray-and-pray without local pace bands | `WeeklyApplicationPaceAdvisor` compares planned vs target apps offline and never auto-submits |
 | Teal Insights / Huntr keep rejection analytics in closed dashboards | Candidates repeat the same miss without a local theme map | `RejectionPatternAnalyzer` clusters offline rejection reasons into HITL themes and never auto-rewrites resumes |
-| Teal/LinkedIn bury JD culture cues inside proprietary insight panels | Candidates miss pace/on-call/collab signals before applying | `JdCultureSignalExtractor` extracts offline culture cues for HITL review and never auto-applies |
-| Simplify/Teal/LinkedIn bury visa sponsorship filters behind login walls | Candidates waste cycles on citizenship-only or no-sponsor roles | `VisaSponsorshipSignalExtractor` extracts offline work-auth cues for HITL review and never auto-applies |
+| Teal and large job boards bury JD culture cues inside proprietary insight panels | Candidates miss pace/on-call/collab signals before applying | `JdCultureSignalExtractor` extracts offline culture cues for HITL review and never auto-applies |
+| Simplify/Teal and large job boards bury visa sponsorship filters behind login walls | Candidates waste cycles on citizenship-only or no-sponsor roles | `VisaSponsorshipSignalExtractor` extracts offline work-auth cues for HITL review and never auto-applies |
 ![Visa Sponsorship Signal Extractor](../assets/demo/visa-sponsorship-signal-extractor.gif)
 | Teal Insights / Jobscan / Resume Worded lock bullet-impact scoring in closed UIs | Candidates keep weak adjective-only bullets without a local metric map | `ResumeBulletImpactScorer` scores offline %/$/scale cues for HITL edits and never auto-rewrites |
 ![Resume Bullet Impact Scorer](../assets/demo/resume-bullet-impact-scorer.gif)
 | Teal/Huntr/Superhuman keep recruiter-reply intent labels in proprietary inboxes | Candidates misread scheduling vs rejection tone without a local classifier | `RecruiterReplyIntentClassifier` classifies offline reply intents for HITL responses and never auto-sends |
 | Teal/Rezi/Kickresume lock cover-letter tone matchers in closed UIs | Candidates send mismatched tone vs JD pace/culture | `CoverLetterToneAligner` scores offline tone bands for HITL edits and never auto-sends |
 ![Cover Letter Tone Aligner](../assets/demo/cover-letter-tone-aligner.gif)
-| Careerflow/Taplio/LinkedIn Premium lock headline graders in closed UIs | Candidates publish keyword-weak headlines without a local coverage map | `LinkedInHeadlineKeywordScorer` scores offline headline↔role keywords for HITL edits and never auto-posts |
-![LinkedIn Headline Keyword Scorer](../assets/demo/linkedin-headline-keyword-scorer.gif)
+| Careerflow/Taplio and premium profile tools lock headline graders in closed UIs | Candidates publish keyword-weak headlines without a local coverage map | `ProfileHeadlineKeywordScorer` scores offline headline↔role keywords for HITL edits and never auto-posts |
+![Profile Headline Keyword Scorer](../assets/demo/profile-headline-keyword-scorer.gif)
 | Interviewing.io/Exponent/Teal lock phone-screen agendas in closed UIs | Candidates improvise screens without a local minute map | `PhoneScreenAgendaPlanner` builds offline JD-driven agendas for HITL rehearsal and never auto-books |
 ![Phone Screen Agenda Planner](../assets/demo/phone-screen-agenda-planner.gif)
 | Interviewing.io/Exponent/Teal lock behavioral STAR banks in closed UIs | Candidates improvise stories without a local competency map | `StarBehavioralStoryMatcher` matches offline STAR banks to JD cues for HITL rehearsal and never auto-sends |
@@ -420,7 +420,7 @@ This repository follows the requested standards:
 ![CaregivingLeaveTopUpGapAdvisor](../assets/demo/caregiving-leave-top-up-gap-advisor.gif)
 
 
-| Guild/LinkedIn Learning/Workday professional-development stipend planners bury related math in closed UIs | Workers lack a local `offered_usd` vs `needed_usd` band | `ProfessionalDevelopmentStipendGapAdvisor` bands offline `offered_usd` vs `needed_usd` for HITL review and never auto-approves |
+| Guild/Workday professional-development stipend planners bury related math in closed UIs | Workers lack a local `offered_usd` vs `needed_usd` band | `ProfessionalDevelopmentStipendGapAdvisor` bands offline `offered_usd` vs `needed_usd` for HITL review and never auto-approves |
 ![ProfessionalDevelopmentStipendGapAdvisor](../assets/demo/professional-development-stipend-gap-advisor.gif)
 
 | Remote.com/Deel/Rippling relocation lump-sum tax gross-up planners bury related math in closed UIs | Workers lack a local `offered_usd` vs `needed_usd` band | `RelocationLumpSumTaxGrossUpGapAdvisor` bands offline `offered_usd` vs `needed_usd` for HITL review and never auto-approves |

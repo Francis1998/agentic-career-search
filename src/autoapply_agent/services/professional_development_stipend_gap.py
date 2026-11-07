@@ -3,7 +3,7 @@
 Closes closed-UI planner gaps with coverage bands.
 Never auto-acts and never performs network I/O.
 Distinct from `LearningStipendGapAdvisor` / `TuitionReimbursementCapGapAdvisor`.
-Gap vs Guild/LinkedIn Learning/Workday professional-development stipend planners.
+Gap vs Guild/Workday professional-development stipend planners.
 Optional later polish via frontier LLMs must stay advisory.
 """
 

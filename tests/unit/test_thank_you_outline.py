@@ -79,16 +79,16 @@ def test_email_outline_with_highlights() -> None:
     assert outline.auto_send is False
 
 
-def test_linkedin_outline_without_highlights() -> None:
-    """LinkedIn channel still yields placeholder callback beat."""
+def test_dm_outline_without_highlights() -> None:
+    """DM channel still yields placeholder callback beat."""
 
     outline = ThankYouNoteOutlinePlanner().plan(
         company="Globex",
         role="SRE",
         interviewer="Sam",
-        channel="linkedin",
+        channel="dm",
     )
-    assert outline.channel == "linkedin"
+    assert outline.channel == "dm"
     assert any("callback" in beat.lower() for beat in outline.beats)
     assert outline.auto_send is False
 

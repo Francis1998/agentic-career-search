@@ -1,7 +1,7 @@
 """Cross-source fuzzy job deduplication.
 
-URL-only dedup misses the same role mirrored across Indeed, LinkedIn, and
-Greenhouse with different URLs. This module clusters near-duplicate
+URL-only dedup misses the same role mirrored across Indeed, Greenhouse, and
+other large aggregators with different URLs. This module clusters near-duplicate
 title+company pairs with ``difflib`` after an exact-URL pass — inspired by
 JobSpy / Teal triage gaps without pulling in heavy fuzzy libraries.
 """

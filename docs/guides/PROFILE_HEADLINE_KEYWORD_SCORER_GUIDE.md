@@ -1,10 +1,10 @@
-# LinkedIn Headline Keyword Scorer Guide
+# Profile Headline Keyword Scorer Guide
 
-![LinkedIn headline keyword scorer HITL flow](../../assets/demo/linkedin-headline-keyword-scorer.gif)
+![Profile headline keyword scorer HITL flow](../../assets/demo/profile-headline-keyword-scorer.gif)
 
-Score an offline LinkedIn headline against target role keywords. Never
-auto-posts profile updates. Closes the Careerflow / Taplio / LinkedIn Premium
-headline-grader gap.
+Score an offline professional profile headline against target role keywords.
+Never auto-posts profile updates. Closes the Careerflow / Taplio / premium
+profile-headline grader gap.
 
 Optional later polish via **GPT-6 Astra / Claude Opus 5.5 / Gemini 4 Argon / Kimi K3.1 Pro**.
 
@@ -13,9 +13,9 @@ Distinct from `AtsKeywordCoverageScorer` and `SkillsProfileFitScorer`.
 ## Usage
 
 ```python
-from autoapply_agent.services.linkedin_headline import LinkedInHeadlineKeywordScorer
+from autoapply_agent.services.profile_headline import ProfileHeadlineKeywordScorer
 
-report = LinkedInHeadlineKeywordScorer().score(
+report = ProfileHeadlineKeywordScorer().score(
     "Senior Python Engineer | FastAPI | Distributed Systems",
     ["python", "fastapi", "kubernetes", "distributed systems"],
 )

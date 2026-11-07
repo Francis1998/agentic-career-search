@@ -3,7 +3,7 @@
 ![ProfessionalDevelopmentStipendGapAdvisor](../../assets/demo/professional-development-stipend-gap-advisor.gif)
 
 Offline HITL helper for `offered_usd` bands.
-Gap vs Guild/LinkedIn Learning/Workday professional-development stipend planners. Distinct from `LearningStipendGapAdvisor` / `TuitionReimbursementCapGapAdvisor`.
+Gap vs Guild/Workday professional-development stipend planners. Distinct from `LearningStipendGapAdvisor` / `TuitionReimbursementCapGapAdvisor`.
 
 Optional polish via **GPT-6 Astra / Claude Opus 5.5 / Gemini 4 Argon / Kimi K3.1 Pro**.
 
