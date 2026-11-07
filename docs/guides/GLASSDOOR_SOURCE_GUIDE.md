@@ -19,10 +19,12 @@ curl -X POST localhost:8000/source-configs \
   -d '{
     "name": "glassdoor-jobs",
     "source_type": "glassdoor",
-    "base_url": "https://www.glassdoor.com/Job/jobs.htm",
-    "max_jobs": 50
+    "base_url": "https://www.glassdoor.com/Job/jobs.htm"
   }'
 ```
+
+The per-source job cap is the global `MAX_JOBS_PER_SOURCE` setting (default `50`);
+source configs have no `max_jobs` field.
 
 ## Recognised URL shapes
 
