@@ -8,7 +8,7 @@ auto-applies, and never performs network I/O.
 Distinct from ``AtsKeywordCoverageScorer`` (resume free text ↔ JD keywords) and
 ``SkillsProfileFitScorer`` (skills list ↔ job tokens).
 
-Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2
+Optional later polish via GPT-6 Astra / Claude Opus 5.5 / Gemini 4 Argon / Kimi K3.1 Pro
 must stay advisory.
 """
 

@@ -6,7 +6,7 @@ Measure how many distinctive job-description keywords appear in free-form
 resume text. This is the classic ATS keyword-coverage loop (Teal / Jobscan
 style) as a library API — **not** the skills-list fit scorer.
 
-Optional later polish via **GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2**.
+Optional later polish via **GPT-6 Astra / Claude Opus 5.5 / Gemini 4 Argon / Kimi K3.1 Pro**.
 The scorer itself stays deterministic.
 
 ## Why this exists

@@ -4,7 +4,7 @@
 
 Use this guide when wiring a public Jobspresso careers board into
 **agentic-career-search**. Discovery is deterministic HTML URL-shape matching;
-enrichment with GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2 is optional
+enrichment with GPT-6 Astra / Claude Opus 5.5 / Gemini 4 Argon / Kimi K3.1 Pro is optional
 and runs after candidates are collected.
 
 ## Why Jobspresso

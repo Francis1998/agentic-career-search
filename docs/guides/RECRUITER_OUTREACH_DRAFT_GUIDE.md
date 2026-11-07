@@ -6,7 +6,7 @@ Generate deterministic, offline **email** and **LinkedIn DM** outreach drafts
 for human review. Never auto-sends. Closes the gap vs Teal/Huntr templates and
 LinkedIn Easy Apply flows that fire messages without a HITL gate.
 
-Optional later polish via **GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2**.
+Optional later polish via **GPT-6 Astra / Claude Opus 5.5 / Gemini 4 Argon / Kimi K3.1 Pro**.
 The draft itself stays deterministic.
 
 ## Why this exists

@@ -6,8 +6,8 @@ Score how well a candidate's skill list matches a job posting. The helper is a
 **pure function** (no database) that returns `fit_score` in `[0.0, 1.0]` plus
 matched / missing skills. Matching is case-insensitive.
 
-Optional LLM skill extraction/normalization can later use GPT-5.5 /
-Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. The scorer itself stays deterministic.
+Optional LLM skill extraction/normalization can later use GPT-6 Astra /
+Claude Opus 5.5 / Gemini 4 Argon / Kimi K3.1 Pro. The scorer itself stays deterministic.
 
 ## Why this exists
 

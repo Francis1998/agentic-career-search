@@ -5,8 +5,8 @@ in closed UIs. Given offered target bonus % of base and market target %, emits
 gap bands — never auto-accepts and never performs network I/O.
 
 Distinct from ``SalaryBandAdvisor`` (base salary) and
-``FourOhOneKMatchGapAdvisor`` (401k). Optional later polish via GPT-5.5 /
-Claude Sonnet 4.6 / Gemini 3.x / Kimi K2 must stay advisory.
+``FourOhOneKMatchGapAdvisor`` (401k). Optional later polish via GPT-6 Astra /
+Claude Opus 5.5 / Gemini 4 Argon / Kimi K3.1 Pro must stay advisory.
 """
 
 from __future__ import annotations

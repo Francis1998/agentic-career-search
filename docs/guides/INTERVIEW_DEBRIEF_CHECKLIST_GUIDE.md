@@ -7,7 +7,7 @@ structured what-went-well / gaps / follow-ups. Never auto-sends notes. Closes
 the gap vs Teal/Huntr interview trackers that bury reflection prompts inside
 proprietary UIs.
 
-Optional later polish via **GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2**.
+Optional later polish via **GPT-6 Astra / Claude Opus 5.5 / Gemini 4 Argon / Kimi K3.1 Pro**.
 The checklist assembly itself stays deterministic.
 
 Distinct from `ThankYouNoteOutlinePlanner` (outbound thank-you outlines),

@@ -5,7 +5,7 @@ countdowns and urgency reminders. This service only computes offline
 urgency and human-review reminders — it never declines offers, never
 emails recruiters, and never performs network I/O.
 
-Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2
+Optional later polish via GPT-6 Astra / Claude Opus 5.5 / Gemini 4 Argon / Kimi K3.1 Pro
 must stay advisory.
 """
 
@@ -118,7 +118,7 @@ def _reminders_for(
         f"Review the {role} offer from {company} before responding "
         "(human review required; never auto-decline).",
         "Confirm deadline timezone and written terms with a human before any reply.",
-        "Optional polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2 "
+        "Optional polish via GPT-6 Astra / Claude Opus 5.5 / Gemini 4 Argon / Kimi K3.1 Pro "
         "must stay advisory.",
     ]
     if urgency == "overdue":

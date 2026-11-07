@@ -5,7 +5,7 @@
 Validate resume / cover letter / optional portfolio before human submit.
 Never auto-submits. Closes the Teal / Huntr / Simplify packet-checklist gap.
 
-Optional later polish via **GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2**.
+Optional later polish via **GPT-6 Astra / Claude Opus 5.5 / Gemini 4 Argon / Kimi K3.1 Pro**.
 
 Distinct from `ApplicationDraftService` and `AtsKeywordCoverageScorer`.
 

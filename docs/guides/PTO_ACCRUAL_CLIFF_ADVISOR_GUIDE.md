@@ -4,7 +4,7 @@
 
 Offline HITL advisor. Never auto-acts. Closes closed-UI gaps vs Rippling/Gusto/Levels.fyi PTO accrual-cliff planners (distinct from PTO cash-out value).
 
-Optional later polish via **GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2**.
+Optional later polish via **GPT-6 Astra / Claude Opus 5.5 / Gemini 4 Argon / Kimi K3.1 Pro**.
 
 Distinct from `PtoCashOutValueAdvisor` and `SabbaticalEligibilityAdvisor`.
 

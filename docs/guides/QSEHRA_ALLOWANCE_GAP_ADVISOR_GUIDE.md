@@ -5,7 +5,7 @@
 Offline helper.
 Gap vs Take Command/PeopleKeep/WiserAdvise QSEHRA allowance planners. Distinct from `HsaEmployerSeedGapAdvisor` / `HsaContributionGapAdvisor`.
 
-Stack: **GPT-6.1 / Claude Sonnet 5.5 / Gemini 3.x / Kimi K3**.
+Stack: **GPT-6 Astra / Claude Opus 5.5 / Gemini 4 Argon / Kimi K3.1 Pro**.
 
 ## Usage
 

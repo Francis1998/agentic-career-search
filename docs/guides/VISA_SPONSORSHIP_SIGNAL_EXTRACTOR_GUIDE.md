@@ -6,7 +6,7 @@ Extract deterministic, offline **visa / work-authorization cues** from job
 descriptions for HITL review. Never auto-applies. Closes the gap vs Simplify /
 Teal / LinkedEasyApply filters that hide sponsorship signals behind login walls.
 
-Optional later polish via **GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2**.
+Optional later polish via **GPT-6 Astra / Claude Opus 5.5 / Gemini 4 Argon / Kimi K3.1 Pro**.
 Extraction itself stays deterministic.
 
 Distinct from `JdCultureSignalExtractor` (culture/pace cues) and

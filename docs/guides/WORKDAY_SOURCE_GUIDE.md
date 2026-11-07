@@ -3,8 +3,8 @@
 ![Workday CXS discovery flow](../../assets/demo/agentic-career-search-demo.gif)
 
 Use this guide when wiring a public Workday careers board into
-**agentic-career-search**. The agent routes discovery through GPT-5.5 /
-Claude Sonnet 4.6 / Gemini 3.x / Kimi K2 enrichment when enabled, but the
+**agentic-career-search**. The agent routes discovery through GPT-6 Astra /
+Claude Opus 5.5 / Gemini 4 Argon / Kimi K3.1 Pro enrichment when enabled, but the
 Workday adapter itself is deterministic JSON — no LLM required to list openings.
 
 ## Why Workday

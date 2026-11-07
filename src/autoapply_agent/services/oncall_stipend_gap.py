@@ -6,7 +6,7 @@ monthly stipend, and expected page burden, emits value bands — never
 auto-accepts and never performs network I/O.
 
 Distinct from ``CommuteCostTradeoffAdvisor`` and ``PtoCashOutValueAdvisor``.
-Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2
+Optional later polish via GPT-6 Astra / Claude Opus 5.5 / Gemini 4 Argon / Kimi K3.1 Pro
 must stay advisory.
 """
 
