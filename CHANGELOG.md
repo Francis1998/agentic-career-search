@@ -743,6 +743,13 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `external_id`. See ADR-086.
 
 ### Changed
+- README restructured into a focused product page: pitch, hero demo, why, architecture
+  diagram, 60-second quickstart (offline seed and live boards), feature map, current
+  model stack, API overview and docs map. The demo gallery, use-case/advisor tables and
+  engineering notes moved verbatim to `docs/USE_CASE_CATALOG.md`, and the source-adapter
+  table to `docs/SUPPORTED_SOURCES.md`; CONTRIBUTING now routes new advisor entries to
+  the catalog. Added `docs/guides/PORTFOLIO_WALKTHROUGH.md`, an end-to-end search
+  recorded live against public Greenhouse and Lever boards.
 - LLM enrichment defaults move to the current model line-ups: `gpt-6-luna`
   (`OPENAI_REASONING_EFFORT=none`), `claude-haiku-5-5` (`CLAUDE_EFFORT=low`),
   `gemini-3.8-flash` and `kimi-k3.1-pro` on `https://api.moonshot.ai/v1`. Requests

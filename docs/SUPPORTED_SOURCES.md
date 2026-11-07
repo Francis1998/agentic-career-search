@@ -1,0 +1,150 @@
+# Source adapters
+
+> Moved verbatim from the README on 2026-11-07 to keep the README focused; only
+> relative link targets were rebased from the repository root to `docs/`.
+
+## Supported job sources
+
+Each `SourceConfig` selects a source adapter by `source_type`:
+
+| `catsone` | `CatsoneAdapter` | Recognises CATS careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/postings/{id}` URL shapes | CATS (`*.catsone.com`) careers boards |
+| `adp` | `AdpAdapter` | Recognises ADP Recruiting posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/requisitions/{id}` URL shapes | ADP (`*.adp.com`) recruiting boards |
+| `jibe` | `JibeAdapter` | Recognises Jibe posting anchors by `/jobs/{id}`, `/job/{id}`, `/position/{id}`, `/positions/{id}`, or `/requisition/{id}` URL shapes | Jibe (`*.jibe.com`) recruiting boards |
+| `hirevue` | `HireVueAdapter` | Recognises HireVue posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/requisition/{id}` URL shapes | HireVue public careers boards |
+| `paycom` | `PaycomAdapter` | Recognises Paycom posting anchors by `/jobs/{id}`, `/job/{id}`, `/posting/{id}`, `/postings/{id}`, or `/opportunity/{id}` URL shapes | Paycom public careers boards |
+| `yello` | `YelloAdapter` | Recognises Yello posting anchors by `/jobs/{id}`, `/job/{id}`, `/position/{id}`, `/positions/{id}`, or `/opening/{id}` URL shapes | Yello public careers boards |
+| `wellfound` | `WellfoundAdapter` | Recognises Wellfound posting anchors by `/jobs/{id}`, `/job/{id}`, `/role/{id}`, `/roles/{id}`, `/startup-jobs/{id}` URL shapes | Wellfound (wellfound.com / angel.co) careers boards |
+| `otta` | `OttaAdapter` | Recognises Otta posting anchors by `/jobs/{id}`, `/job/{id}`, `/roles/{id}`, `/role/{id}`, `/openings/{id}` URL shapes | Otta (otta.com) careers boards |
+| `builtin` | `BuiltinAdapter` | Recognises Built In posting anchors by `/job/{id}`, `/jobs/{id}`, `/company-jobs/{id}`, `/careers/job/{id}`, `/role/{id}` URL shapes | Built In (builtin.com / builtinnyc.com / builtinchicago.com) careers boards |
+| `remoteok` | `RemoteokAdapter` | Recognises RemoteOK posting anchors by `/remote-jobs/{id}`, `/remote-job/{id}`, `/jobs/{id}`, `/job/{id}` URL shapes | RemoteOK (remoteok.com) careers boards |
+| `weworkremotely` | `WeworkremotelyAdapter` | Recognises WeWorkRemotely posting anchors by `/remote-jobs/{id}`, `/jobs/{id}`, `/job/{id}`, `/listings/{id}`, `/listing/{id}` URL shapes | WeWorkRemotely (weworkremotely.com) careers boards |
+| `welcometothejungle` | `WelcometothejungleAdapter` | Recognises Welcome to the Jungle posting anchors by `/jobs/{id}`, `/job/{id}`, `/companies/{slug}/jobs/{id}`, `/offers/{id}`, `/offer/{id}` URL shapes | Welcome to the Jungle (welcometothejungle.com) careers boards |
+| `remotive` | `RemotiveAdapter` | Recognises Remotive posting anchors by `/remote-jobs/{id}`, `/remote-job/{id}`, `/jobs/{id}`, `/job/{id}`, `/positions/{id}` URL shapes | Remotive (remotive.com) careers boards |
+| `himalayas` | `HimalayasAdapter` | Recognises Himalayas posting anchors by `/jobs/{id}`, `/job/{id}`, `/companies/{slug}/jobs/{id}`, `/remote-jobs/{id}`, `/roles/{id}` URL shapes | Himalayas (himalayas.app) careers boards |
+| `workingnomads` | `WorkingnomadsAdapter` | Recognises Working Nomads posting anchors by `/jobs/{id}`, `/job/{id}`, `/remote-jobs/{id}`, `/positions/{id}`, `/position/{id}` URL shapes | Working Nomads careers boards |
+| `justremote` | `JustremoteAdapter` | Recognises JustRemote posting anchors by /remote-jobs/{id}, /jobs/{id}, /job/{id}, /listings/{id}, /listing/{id} URL shapes | JustRemote (justremote.co) careers boards |
+| `nodesk` | `NodeskAdapter` | Recognises NoDesk posting anchors by /jobs/{id}, /job/{id}, /remote/{id}, /positions/{id}, /careers/{id} URL shapes | NoDesk (nodesk.co) careers boards |
+| `jobspresso` | `JobspressoAdapter` | Recognises Jobspresso posting anchors by /jobs/{id}, /job/{id}, /remote-jobs/{id}, /postings/{id}, /openings/{id} URL shapes | Jobspresso (jobspresso.co) careers boards |
+| `remoteco` | `RemotecoAdapter` | Recognises Remote.co posting anchors by /remote-jobs/{id}, /jobs/{id}, /job/{id}, /positions/{id}, /careers/{id} URL shapes | Remote.co (remote.co) careers boards |
+| `dynamitejobs` | `DynamitejobsAdapter` | Recognises Dynamite Jobs posting anchors by /jobs/{id}, /job/{id}, /remote-jobs/{id}, /positions/{id}, /listings/{id} URL shapes | Dynamite Jobs (dynamitejobs.com) careers boards |
+| `arcdev` | `ArcdevAdapter` | Recognises Arc.dev posting anchors by /jobs/{id}, /job/{id}, /roles/{id}, /positions/{id}, /openings/{id} URL shapes | Arc.dev (arc.dev) careers boards |
+| `flexjobs` | `FlexjobsAdapter` | Recognises FlexJobs posting anchors by /search/{id}, /flex-jobs/{id}, /remote-job/{id}, /jobs/{id}, /job/{id} URL shapes | FlexJobs (flexjobs.com) careers boards |
+| `radancy` | `RadancyAdapter` | Recognises Radancy posting anchors by `/jobs/{id}`, `/job/{id}`, `/search/job/{id}`, `/careers/{id}`, or `/careers/job/{id}` URL shapes | Radancy (`*.radancy.com`, `*.jobs.net`) recruiting boards |
+| `silkroad` | `SilkRoadAdapter` | Recognises SilkRoad posting anchors by `/jobs/{id}`, `/job/{id}`, `/posting/{id}`, `/postings/{id}`, or `/opportunity/{id}` URL shapes | SilkRoad (`*.silkroad.com`) recruiting boards |
+| `paradox` | `ParadoxAdapter` | Recognises Paradox careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/opportunities/{id}` URL shapes | Paradox Olivia (`*.paradox.ai`) careers boards |
+| `applicantpro` | `ApplicantProAdapter` | Recognises ApplicantPro careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/openings/{id}` URL shapes | ApplicantPro (`*.applicantpro.com`) careers boards |
+| `brassring` | `BrassringAdapter` | Recognises BrassRing careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/jobdetail/{id}`, `/FgJobDetail/{id}`, or `/careers/{id}` URL shapes | IBM Kenexa BrassRing (`*.brassring.com`) careers boards |
+| `source_type` | Adapter | How it parses | Best for |
+|---|---|---|---|
+| `greenhouse` | `GreenhouseAdapter` | Scrapes `div.opening` anchors on public Greenhouse boards | Greenhouse-hosted boards |
+| `lever` | `LeverAdapter` | Scrapes `div.posting` anchors on public Lever pages | Lever-hosted boards |
+| `ashby` | `AshbyAdapter` | Recognises `jobs.ashbyhq.com/{org}/{uuid}` posting anchors by URL shape | Ashby-hosted boards |
+| `workable` | `WorkableAdapter` | Recognises `apply.workable.com/{company}/j/{shortcode}` posting anchors by URL shape | Workable-hosted boards |
+| `recruitee` | `RecruiteeAdapter` | Recognises `{company}.recruitee.com/o/{slug}` posting anchors by URL shape | Recruitee-hosted careers sites |
+| `smartrecruiters` | `SmartRecruitersAdapter` | Recognises `jobs.smartrecruiters.com/{company}/{jobId}-{slug}` posting anchors by URL shape | SmartRecruiters-hosted careers sites |
+| `teamtailor` | `TeamtailorAdapter` | Recognises `{company}.teamtailor.com/jobs/{jobId}-{slug}` posting anchors by URL shape | Teamtailor-hosted careers sites |
+| `personio` | `PersonioAdapter` | Recognises `{tenant}.jobs.personio.de`/`.com/job/{jobId}` posting anchors by URL shape | Personio-hosted careers sites (DACH/EU) |
+| `bamboohr` | `BambooHrAdapter` | Reads the public `{tenant}.bamboohr.com/careers/list` **JSON** board and maps each opening to `/careers/{id}` | BambooHR-hosted careers sites (SMB tech/healthcare/services) |
+| `jobvite` | `JobviteAdapter` | Recognises `jobs.jobvite.com/{company}/job/{jobId}` posting anchors by URL shape (terminal singular `job`, alphanumeric id) | Jobvite-hosted careers sites |
+| `icims` | `IcimsAdapter` | Recognises `careers-{tenant}.icims.com/jobs/{jobId}/{slug}/job` posting anchors by URL shape (terminal literal `job`, numeric id; slug optional) | iCIMS-hosted careers portals (enterprise) and vanity-domain proxies |
+| `workday` | `WorkdayAdapter` | POSTs the public `{tenant}.wd{N}.myworkdayjobs.com/wday/cxs/{tenant}/{site}/jobs` **JSON** CXS board (page size 20) and maps each posting to `{origin}/{locale}/{site}{externalPath}` | Workday-hosted enterprise careers sites |
+| `oracle_taleo` | `OracleTaleoAdapter` | Recognises Taleo/Oracle Cloud posting anchors via `job=` query ids or terminal `/job/{id}` / `/jobs/{id}` path shapes | Oracle Taleo (`*.taleo.net`) and Oracle Cloud HCM careers portals |
+| `successfactors` | `SuccessFactorsAdapter` | Recognises SuccessFactors posting anchors via `jobId` / `career_job_req_id` query ids or terminal `/job/{id}` / `/jobs/{id}` path shapes | SAP SuccessFactors (`*.successfactors.com` / `*.successfactors.eu`) careers portals |
+| `zoho_recruit` | `ZohoRecruitAdapter` | Recognises Zoho Recruit posting anchors via `jobId` / `jid` / `job_id` query ids or terminal `/job/{id}` / `/jobs/{id}` / `/careers/{id}` path shapes | Zoho Recruit (`*.zohorecruit.com`) careers portals and vanity-domain proxies |
+| `jazzhr` | `JazzHrAdapter` | Recognises JazzHR posting anchors via `/apply/{jobId}` or `/apply/{jobId}/{slug}` path shapes | JazzHR (`*.applytojob.com/apply`) careers portals and vanity-domain proxies |
+| `breezyhr` | `BreezyHrAdapter` | Recognises `{company}.breezy.hr/p/{positionId}` posting anchors by URL shape (terminal `p`, alphanumeric id; slug optional) | Breezy HR-hosted careers sites (startup/SMB) |
+| `freshteam` | `FreshteamAdapter` | Recognises Freshteam careers posting anchors by job URL shape | Freshworks Freshteam-hosted careers boards |
+| `phenom` | `PhenomPeopleAdapter` | Recognises Phenom posting anchors via `/job/{jobId}/{slug}` or `/jobs/{jobId}` path shapes, rejecting list/index/login/apply-step links | Phenom People-hosted enterprise and branded careers sites |
+| `rippling` | `RipplingAdapter` | Recognises Rippling posting anchors via terminal `/jobs/{uuid}` paths on `*.rippling.com` domains | Rippling-hosted public careers boards |
+| `pinpoint` | `PinpointAdapter` | Recognises Pinpoint HR careers posting anchors by `/postings/{uuid}` or `/jobs/{id}` URL shape | Pinpoint (`*.pinpointhq.com`) careers boards |
+| `comeet` | `ComeetAdapter` | Recognises Comeet careers posting anchors by `/jobs/{company}/{companyId}/{jobSlug}/{jobId}` URL shape | Comeet (`www.comeet.co` / `www.comeet.com`) careers boards |
+| `fountain` | `FountainAdapter` | Recognises Fountain careers posting anchors by `/apply/{company}/{positionId}`, `/apply/{slug}`, `/jobs/{id}`, `/openings/{id}`, or `/positions/{id}` URL shape | Fountain (`*.fountain.com`, `web.fountain.com`) careers boards |
+| `gem` | `GemAdapter` | Recognises Gem careers posting anchors by `jobs.gem.com/{company}/{jobId}`, `/jobs/{jobId}`, `/openings/{id}`, or `{company}.gem.com/careers/...` URL shapes | Gem (`jobs.gem.com` / `*.gem.com`) careers boards |
+| `avature` | `AvatureAdapter` | Recognises Avature careers posting anchors by `/JobDetail/{id}`, `/JobDetail.aspx?JobId={id}`, `/careers/{id}`, `/careers/job/{id}`, `/careers/VacancyDetail/{id}`, `/Vacancy/{id}`, or `/vacancies/{id}` URL shapes | Avature-hosted public careers portals |
+| `eightfold` | `EightfoldAdapter` | Recognises Eightfold careers posting anchors by `/careers/job/{id}`, `/careers/job/{id}/{slug}`, `/career_detail/{id}`, `/position/{id}`, or `/jobs/{id}` URL shapes | Eightfold (`*.eightfold.ai`) careers boards |
+| `jobscore` | `JobScoreAdapter` | Recognises JobScore careers posting anchors by `/careers/{company}/jobs/{slug}-{id}`, `/careers/{company}/jobs/{id}`, `/jobs/{id}`, `/jobs/{slug}/{id}`, or `/position(s)/{id}` URL shapes | JobScore (`careers.jobscore.com` / `*.jobscore.com`) careers boards |
+| `hireology` | `HireologyAdapter` | Recognises Hireology careers posting anchors by `/jobs/{id}`, `/careers/job/{id}`, or `/job/{id}/{slug}` URL shapes | Hireology (`careers.hireology.com`) careers boards |
+| `dayforce` | `DayforceAdapter` | Recognises Dayforce careers posting anchors by `/JobDetail/{id}`, `/careers/job/{id}`, `/MyCareer/JobDetail?jobId={id}`, or `/positions/{id}` URL shapes | Dayforce (`*.dayforcehcm.com`) careers boards |
+| `homerun` | `HomerunAdapter` | Recognises Homerun careers posting anchors by `/jobs/{id}-{slug}`, `/o/{id}`, or `/vacancies/{id}` URL shapes | Homerun (`*.homerun.co`) careers boards |
+| `clearcompany` | `ClearCompanyAdapter` | Recognises ClearCompany careers posting anchors by `/careers/job/{id}`, `/careers/{id}`, `/jobs/{id}`, `/job/{id}-{slug}`, or `/position/{id}` URL shapes | ClearCompany (`*.clearcompany.com`) careers boards |
+| `applied` | `AppliedAdapter` | Recognises Applied careers posting anchors by `/jobs/{id}`, `/j/{id}`, `/role/{id}`, `/roles/{id}`, or `/job/{id}` URL shapes | Applied (`*.applied.co`) careers boards || `jsonld` | `JsonLdAdapter` | Reads embedded `schema.org/JobPosting` JSON-LD | **Any** board emitting Google-Jobs structured data (SmartRecruiters, custom career sites, ...) |
+| `recruiterflow` | `RecruiterflowAdapter` | Recognises Recruiterflow careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/job/{id}`, `/openings/{id}`, or `/opening/{id}` URL shapes | Recruiterflow (`*.recruiterflow.com`) careers boards |
+| `manatal` | `ManatalAdapter` | Recognises Manatal careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/openings/{id}` URL shapes | Manatal (`*.manatal.com`) careers boards |
+| `join` | `JoinAdapter` | Recognises Join careers posting anchors by `/companies/{slug}/jobs/{id}`, `/jobs/{id}`, `/job/{id}`, or `/positions/{id}` URL shapes | Join (`join.com`) careers boards |
+| `softgarden` | `SoftgardenAdapter` | Recognises Softgarden careers posting anchors by `/job/{id}`, `/jobs/{id}`, `/vacancies/{id}`, `/vacancy/{id}`, or `/position/{id}` URL shapes | Softgarden (`*.softgarden.io`) careers boards |
+| `factorial` | `FactorialAdapter` | Recognises Factorial HR careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/open-positions/{id}` URL shapes | Factorial (`*.factorialhr.com`) careers boards |
+| `ukg` | `UkgAdapter` | Recognises UKG/UltiPro careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/opportunities/{id}`, `/opportunity/{id}`, or `/careers/job/{id}` URL shapes | UKG (`*.ultipro.com` / `*.ukg.net`) careers boards |
+| `bullhorn` | `BullhornAdapter` | Recognises Bullhorn careers posting anchors by `/jobs/{id}`, `/Job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/position/{id}` URL shapes | Bullhorn (`*.bullhornstaffing.com`) careers boards |
+| `paylocity` | `PaylocityAdapter` | Recognises Paylocity careers posting anchors by `/jobs/{id}`, `/JobDetails/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/openings/{id}` URL shapes | Paylocity (`*.paylocity.com`) careers boards |
+| `polymer` | `PolymerAdapter` | Recognises Polymer careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/positions/{id}` URL shapes | Polymer (`*.polymer.co`) careers boards |
+| `jobadder` | `JobAdderAdapter` | Recognises JobAdder careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/position/{id}` URL shapes | JobAdder (`*.jobadder.com`) careers boards |
+| `jobylon` | `JobylonAdapter` | Recognises Jobylon careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, `/positions/{id}`, or `/vacancies/{id}` URL shapes | Jobylon (`jobs.jobylon.com`) careers boards |
+| `ceipal` | `CeipalAdapter` | Recognises Ceipal careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/requisitions/{id}` URL shapes | Ceipal (`*.ceipal.com / jobs.ceipal.com`) careers boards |
+| `pageup` | `PageUpAdapter` | Recognises PageUp careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/opportunities/{id}` URL shapes | PageUp (`*.pageuppeople.com / careers.pageuppeople.com`) careers boards |
+| `talentlyft` | `TalentLyftAdapter` | Recognises TalentLyft careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/openings/{id}` URL shapes | TalentLyft (`*.talentlyft.com / apply.talentlyft.com`) careers boards |
+| `applicantstack` | `ApplicantStackAdapter` | Recognises ApplicantStack careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/postings/{id}` URL shapes | ApplicantStack (`*.applicantstack.com`) careers boards |
+| `dover` | `DoverAdapter` | Recognises Dover careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/openings/{id}` URL shapes | Dover (`app.dover.com`) careers boards |
+| `loxo` | `LoxoAdapter` | Recognises Loxo careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/positions/{id}`, `/careers/{id}`, or `/careers/job/{id}` URL shapes | Loxo (`*.loxo.co`) careers boards |
+| `jsonld` | `JsonLdAdapter` | Reads embedded `schema.org/JobPosting` JSON-LD | **Any** board emitting Google-Jobs structured data (SmartRecruiters, custom career sites, ...) |
+| `hibob` | `HibobAdapter` | Recognises HiBob careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/positions/{id}` URL shapes | HiBob (`*.hibob.com`) / Bob careers boards |
+| `trackerrms` | `TrackerRmsAdapter` | Recognises TrackerRMS careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/vacancies/{id}` URL shapes | TrackerRMS (`*.tracker-rms.com` and branded) careers boards |
+| `careerplug` | `CareerPlugAdapter` | Recognises CareerPlug careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/listings/{id}` URL shapes | CareerPlug (`*.careerplug.com`) careers boards |
+| `recruitcrm` | `RecruitCrmAdapter` | Recognises RecruitCRM careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/opening/{id}` URL shapes | RecruitCRM (`*.recruitcrm.io`) careers boards |
+| `vincere` | `VincereAdapter` | Recognises Vincere careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/job-detail/{id}` URL shapes | Vincere (`*.vincere.io`) careers boards |
+| `tribepad` | `TribepadAdapter` | Recognises Tribepad careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/vacancy/{id}` URL shapes | Tribepad (`*.tribepad.com`) careers boards |
+| `crelate` | `CrelateAdapter` | Recognises Crelate careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/opportunity/{id}` URL shapes | Crelate (`*.crelate.com`) careers boards |
+| `jobdiva` | `JobDivaAdapter` | Recognises JobDiva careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/jd/{id}` URL shapes | JobDiva (`*.jobdiva.com`) careers boards |
+| `pcrecruiter` | `PCRecruiterAdapter` | Recognises PCRecruiter careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/requisition/{id}` URL shapes | PCRecruiter (`*.pcrecruiter.com`) careers boards |
+| `cornerstone` | `CornerstoneAdapter` | Recognises Cornerstone careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/opening/{id}` URL shapes | Cornerstone OnDemand (`*.csod.com`) careers boards |
+| `eploy` | `EployAdapter` | Recognises Eploy careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/role/{id}` URL shapes | Eploy (`*.eploy.net`) careers boards |
+| `beamery` | `BeameryAdapter` | Recognises Beamery careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/campaign/{id}` URL shapes | Beamery (`*.beamery.com`) careers boards |
+| `hireez` | `HireezAdapter` | Recognises HireEZ careers posting anchors by `/jobs/{id}`, `/job/{id}`, `/careers/{id}`, `/careers/job/{id}`, or `/positions/{id}` URL shapes | HireEZ / Hiretual (`*.hireez.com`) careers boards |
+| `authenticjobs` | `AuthenticjobsAdapter` | Recognises Authentic Jobs posting anchors by /postings/{id}, /listing/{id}, /opportunities/{id}, /jobs/{id}, /job/{id} URL shapes | Authentic Jobs (authenticjobs.com) careers boards |
+| `eurotechjobs` | `EurotechjobsAdapter` | Recognises EuroTechJobs posting anchors by /vacancies/{id}, /offers/{id}, /tech-jobs/{id}, /jobs/{id}, /job/{id} URL shapes | EuroTechJobs (eurotechjobs.com) careers boards |
+| `jobgether` | `JobgetherAdapter` | Recognises Jobgether posting anchors by /roles/{id}, /openings/{id}, /positions/{id}, /jobs/{id}, /job/{id} URL shapes | Jobgether (jobgether.com) careers boards |
+| `pangian` | `PangianAdapter` | Recognises Pangian posting anchors by /remote-jobs/{id}, /listings/{id}, /positions/{id}, /jobs/{id}, /job/{id} URL shapes | Pangian (pangian.com) careers boards |
+| `remoteleaf` | `RemoteleafAdapter` | Recognises RemoteLeaf posting anchors by /remote/{id}, /leaf-jobs/{id}, /positions/{id}, /jobs/{id}, /job/{id} URL shapes | RemoteLeaf (remoteleaf.com) careers boards |
+| `fourdayweek` | `FourdayweekAdapter` | Recognises 4 Day Week posting anchors by /four-day/{id}, /listings/{id}, /positions/{id}, /jobs/{id}, /job/{id} URL shapes | 4 Day Week (4dayweek.io) careers boards |
+| `aijobs` | `AijobsAdapter` | Recognises AI Jobs posting anchors by /ai-jobs/{id}, /roles/{id}, /openings/{id}, /jobs/{id}, /job/{id} URL shapes | AI Jobs (ai-jobs.net) careers boards |
+| `powertofly` | `PowertoflyAdapter` | Recognises PowerToFly posting anchors by /opportunities/{id}, /women-tech/{id}, /positions/{id}, /jobs/{id}, /job/{id} URL shapes | PowerToFly (powertofly.com) careers boards |
+| `nofluffjobs` | `NofluffjobsAdapter` | Recognises No Fluff Jobs posting anchors by /pl/{id}, /job/{id}, /offers/{id}, /positions/{id}, /jobs/{id} URL shapes | No Fluff Jobs (nofluffjobs.com) careers boards |
+| `cryptojobs` | `CryptojobsAdapter` | Recognises Crypto Jobs posting anchors by /crypto-jobs/{id}, /web3/{id}, /positions/{id}, /jobs/{id}, /job/{id} URL shapes | Crypto Jobs (cryptojobslist.com) careers boards |
+| `workatastartup` | `WorkatastartupAdapter` | Recognises Work at a Startup posting anchors by /companies/{id}, /startups/{id}, /roles/{id}, /jobs/{id}, /job/{id} URL shapes | Work at a Startup (workatastartup.com (YC)) careers boards |
+| `levelsfyi` | `LevelsfyiAdapter` | Recognises Levels.fyi posting anchors by /jobs/{id}, /job/{id}, /roles/{id}, /openings/{id}, /levels/{id} URL shapes | Levels.fyi (levels.fyi) careers boards |
+| `dice` | `DiceAdapter` | Recognises Dice posting anchors by /positions/{id}, /jobs/{id}, /job/{id}, /listings/{id}, /tech-jobs/{id} URL shapes | Dice (dice.com) tech careers boards |
+| `pythonjobs` | `PythonjobsAdapter` | Recognises Python Jobs posting anchors by /python-jobs/{id}, /listings/{id}, /positions/{id}, /jobs/{id}, /job/{id} URL shapes | Python Jobs (python.org/jobs) careers boards |
+| `jooble` | `JoobleAdapter` | Recognises Jooble posting anchors by /jobs/{id}, /job/{id}, /vacancy/{id}, /vacancies/{id}, /listings/{id} URL shapes | Jooble (jooble.org) careers boards |
+| `simplyhired` | `SimplyhiredAdapter` | Recognises SimplyHired posting anchors by /job/{id}, /jobs/{id}, /listings/{id}, /positions/{id}, /openings/{id} URL shapes | SimplyHired (simplyhired.com) careers boards |
+| `ziprecruiter` | `ZiprecruiterAdapter` | Recognises ZipRecruiter posting anchors by /jobs/{id}, /job/{id}, /listings/{id}, /openings/{id}, /positions/{id} URL shapes | ZipRecruiter (www.ziprecruiter.com) careers boards |
+| `reed` | `ReedAdapter` | Recognises Reed posting anchors by /jobs/{id}, /job/{id}, /details/{id}, /vacancies/{id}, /listings/{id} URL shapes | Reed (www.reed.co.uk) careers boards |
+| `themuse` | `ThemuseAdapter` | Recognises TheMuse posting anchors by /jobs/{id}, /job/{id}, /positions/{id}, /openings/{id}, /roles/{id} URL shapes | TheMuse (www.themuse.com) careers boards |
+| `glassdoor` | `GlassdoorAdapter` | Recognises Glassdoor posting anchors by /reviews/{id}, /jobs/{id}, /job-listing/{id}, /positions/{id}, /openings/{id} URL shapes | Glassdoor (www.glassdoor.com) careers boards |
+| `angellist` | `AngellistAdapter` | Recognises AngelList posting anchors by /jobs/{id}, /startups/{id}, /startup-jobs/{id}, /roles/{id}, /positions/{id} URL shapes | AngelList (angel.co) careers boards |
+| `indeed` | `IndeedAdapter` | Recognises Indeed posting anchors by /viewjob/{id}, /jobs/{id}, /job/{id}, /rc/clk/{id}, /m/jobs/{id} URL shapes | Indeed (www.indeed.com) careers boards |
+| `careerbuilder` | `CareerbuilderAdapter` | Recognises CareerBuilder posting anchors by /job/{id}, /jobs/{id}, /jobseeker/jobs/{id}, /share/job/{id}, /career-jobs/{id} URL shapes | CareerBuilder (www.careerbuilder.com) careers boards |
+| `handshake` | `HandshakeAdapter` | Recognises Handshake posting anchors by /jobs/{id}, /job-search/{id}, /postings/{id}, /edu/jobs/{id}, /internship/{id} URL shapes | Handshake (joinhandshake.com) careers boards |
+| `seek` | `SeekAdapter` | Recognises Seek posting anchors by /job/{id}, /jobs/{id}, /listed-job/{id}, /jobsearch/{id}, /au/job/{id} URL shapes | Seek (www.seek.com.au) careers boards |
+| `totaljobs` | `TotaljobsAdapter` | Recognises Totaljobs posting anchors by /job/{id}, /jobs/{id}, /job-vacancy/{id}, /details/{id}, /uk/job/{id} URL shapes | Totaljobs (www.totaljobs.com) careers boards |
+| `naukri` | `NaukriAdapter` | Recognises Naukri posting anchors by /job-listings/{id}, /jobdetail/{id}, /jobs/{id}, /job-description/{id}, /recruiters/job/{id} URL shapes | Naukri (www.naukri.com) careers boards |
+| `monster` | `MonsterAdapter` | Recognises Monster posting anchors by /jobs/job/{id}, /job-openings/{id}, /jobs/{id}, /career/{id}, /m/job/{id} URL shapes | Monster (www.monster.com) careers boards |
+| `workintheopen` | `WorkintheopenAdapter` | Recognises Work in the Open posting anchors by /jobs/{id}, /job/{id}, /roles/{id}, /openings/{id}, /positions/{id} URL shapes | Work in the Open careers boards |
+
+Unlike the HTML-scraping adapters, `bamboohr` and `workday` are structured-JSON
+sources: BambooHR and Workday careers pages are client-rendered apps, so those
+adapters read the tenant's public JSON listing endpoints directly (stable titles,
+locations, and ids) instead of parsing rendered markup. Workday uses the public
+CXS POST API — see [`docs/guides/WORKDAY_SOURCE_GUIDE.md`](guides/WORKDAY_SOURCE_GUIDE.md).
+
+The `jsonld` adapter is vendor-neutral: modern ATS platforms publish
+`<script type="application/ld+json">` `JobPosting` payloads so their roles appear
+in Google Jobs, so a single adapter covers boards that would otherwise each need
+a bespoke scraper. It understands bare objects, arrays, `@graph`/`ItemList`
+containers, `TELECOMMUTE` remote roles, and `PropertyValue` identifiers, and it
+skips malformed blocks instead of failing the whole page.
+
+```bash
+# Register a JSON-LD source
+curl -X POST localhost:8000/source-configs \
+  -H 'content-type: application/json' \
+  -d '{"name":"acme-careers","source_type":"jsonld","base_url":"https://acme.example.com/careers"}'
+```
