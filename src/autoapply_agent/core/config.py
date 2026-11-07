@@ -30,17 +30,19 @@ class Settings(BaseSettings):
     llm_timeout_seconds: float = Field(default=12.0, alias="LLM_TIMEOUT_SECONDS")
 
     gemini_api_key: str | None = Field(default=None, alias="GEMINI_API_KEY")
-    gemini_model: str = Field(default="gemini-3.5-flash", alias="GEMINI_MODEL")
+    gemini_model: str = Field(default="gemini-3.8-flash", alias="GEMINI_MODEL")
 
     kimi_api_key: str | None = Field(default=None, alias="KIMI_API_KEY")
-    kimi_model: str = Field(default="kimi-k2", alias="KIMI_MODEL")
-    kimi_base_url: str = Field(default="https://api.moonshot.cn/v1", alias="KIMI_BASE_URL")
+    kimi_model: str = Field(default="kimi-k3.1-pro", alias="KIMI_MODEL")
+    kimi_base_url: str = Field(default="https://api.moonshot.ai/v1", alias="KIMI_BASE_URL")
 
     claude_api_key: str | None = Field(default=None, alias="CLAUDE_API_KEY")
-    claude_model: str = Field(default="claude-sonnet-4-6", alias="CLAUDE_MODEL")
+    claude_model: str = Field(default="claude-haiku-5-5", alias="CLAUDE_MODEL")
+    claude_effort: str = Field(default="low", alias="CLAUDE_EFFORT")
 
     openai_api_key: str | None = Field(default=None, alias="OPENAI_API_KEY")
-    openai_model: str = Field(default="gpt-5.5", alias="OPENAI_MODEL")
+    openai_model: str = Field(default="gpt-6-luna", alias="OPENAI_MODEL")
+    openai_reasoning_effort: str = Field(default="none", alias="OPENAI_REASONING_EFFORT")
     openai_base_url: str = Field(default="https://api.openai.com/v1", alias="OPENAI_BASE_URL")
 
     priority_alert_webhook_enabled: bool = Field(

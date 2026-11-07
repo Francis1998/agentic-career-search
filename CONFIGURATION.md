@@ -15,14 +15,16 @@ Configuration is environment-variable driven via `pydantic-settings`.
 | `LLM_PROVIDER` | `gemini` | Active LLM provider: `gemini`, `kimi`, `claude`, `gpt` |
 | `LLM_TIMEOUT_SECONDS` | `12.0` | LLM API timeout in seconds |
 | `GEMINI_API_KEY` | _empty_ | Gemini API key |
-| `GEMINI_MODEL` | `gemini-3.5-flash` | Gemini model |
+| `GEMINI_MODEL` | `gemini-3.8-flash` | Gemini model; Gemini 3+ models get `thinkingLevel: LOW` |
 | `KIMI_API_KEY` | _empty_ | Kimi (Moonshot) API key |
-| `KIMI_MODEL` | `kimi-k2` | Kimi model |
-| `KIMI_BASE_URL` | `https://api.moonshot.cn/v1` | Kimi base URL |
+| `KIMI_MODEL` | `kimi-k3.1-pro` | Kimi model; K3 models get `reasoning_effort: low` |
+| `KIMI_BASE_URL` | `https://api.moonshot.ai/v1` | Kimi base URL (`https://api.moonshot.cn/v1` for mainland-China accounts) |
 | `CLAUDE_API_KEY` | _empty_ | Anthropic Claude API key |
-| `CLAUDE_MODEL` | `claude-sonnet-4-6` | Claude model |
+| `CLAUDE_MODEL` | `claude-haiku-5-5` | Claude model |
+| `CLAUDE_EFFORT` | `low` | Claude `output_config.effort` (`low`…`max`); empty omits it |
 | `OPENAI_API_KEY` | _empty_ | GPT / OpenAI-compatible API key |
-| `OPENAI_MODEL` | `gpt-5.5` | GPT model name |
+| `OPENAI_MODEL` | `gpt-6-luna` | GPT model name |
+| `OPENAI_REASONING_EFFORT` | `none` | `reasoning_effort` (`none`, `low`…`max`); `temperature` is only sent with `none`; empty omits both |
 | `OPENAI_BASE_URL` | `https://api.openai.com/v1` | OpenAI-compatible base URL |
 | `PRIORITY_ALERT_WEBHOOK_ENABLED` | `false` | POST alerts when `priority_tier` is `high` |
 | `PRIORITY_ALERT_WEBHOOK_URL` | _empty_ | Slack/Discord/custom webhook URL |
@@ -55,7 +57,7 @@ ENABLE_WORKER=true
 LLM_ENABLE_ENRICHMENT=true
 LLM_PROVIDER=gemini
 GEMINI_API_KEY=your_key_here
-GEMINI_MODEL=gemini-3.5-flash
+GEMINI_MODEL=gemini-3.8-flash
 ```
 
 ### LLM enrichment enabled (Kimi example)
@@ -64,8 +66,8 @@ GEMINI_MODEL=gemini-3.5-flash
 LLM_ENABLE_ENRICHMENT=true
 LLM_PROVIDER=kimi
 KIMI_API_KEY=your_key_here
-KIMI_MODEL=kimi-k2
-KIMI_BASE_URL=https://api.moonshot.cn/v1
+KIMI_MODEL=kimi-k3.1-pro
+KIMI_BASE_URL=https://api.moonshot.ai/v1
 ```
 
 ### LLM enrichment enabled (Claude example)
@@ -74,7 +76,8 @@ KIMI_BASE_URL=https://api.moonshot.cn/v1
 LLM_ENABLE_ENRICHMENT=true
 LLM_PROVIDER=claude
 CLAUDE_API_KEY=your_key_here
-CLAUDE_MODEL=claude-sonnet-4-6
+CLAUDE_MODEL=claude-haiku-5-5
+CLAUDE_EFFORT=low
 ```
 
 ### LLM enrichment enabled (GPT example)
@@ -83,7 +86,8 @@ CLAUDE_MODEL=claude-sonnet-4-6
 LLM_ENABLE_ENRICHMENT=true
 LLM_PROVIDER=gpt
 OPENAI_API_KEY=your_key_here
-OPENAI_MODEL=gpt-5.5
+OPENAI_MODEL=gpt-6-luna
+OPENAI_REASONING_EFFORT=none
 OPENAI_BASE_URL=https://api.openai.com/v1
 ```
 
@@ -94,3 +98,8 @@ OPENAI_BASE_URL=https://api.openai.com/v1
 - `DATABASE_URL` can point to a file path for easy portability.
 - Keep `HTTP_USER_AGENT` explicit and consistent across environments for easier request attribution.
 - When LLM enrichment is enabled, provider failures degrade gracefully to deterministic-only output.
+- Current models reason before answering and count those tokens against the output cap,
+  so each call allows 1,024 output tokens at low effort. Sampling parameters are only
+  sent where the provider accepts them: Kimi K3 fixes `temperature` at `1.0`, Claude 5.5
+  and Gemini 3.6+ reject or ignore custom values, and OpenAI accepts `temperature` only
+  with `reasoning_effort: none`.

@@ -12,7 +12,8 @@ Hard requirements:
 2. Prioritize AI-agent engineering design and portfolio quality:
    - explicit Observe -> Decide -> Act loop
    - deterministic decision engine with rationale traces
-   - optional LLM enrichment layer that consumes Gemini, Kimi, or Claude API responses
+   - optional LLM enrichment layer that consumes Gemini, Kimi, Claude, or GPT (OpenAI) API responses
+     from current models (for example gemini-3.8-flash, kimi-k3.1-pro, claude-haiku-5-5, gpt-6-luna)
    - state-machine run lifecycle and durable event log
    - tool/adapters abstraction for external integrations
    - safety controls (timeouts, bounded scope, cancellation)
