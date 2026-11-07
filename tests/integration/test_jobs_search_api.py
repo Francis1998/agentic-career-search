@@ -6,10 +6,12 @@ import asyncio
 import csv
 import io
 import json
+import sqlite3
 import xml.etree.ElementTree as ET
 from collections.abc import Iterator
 from dataclasses import dataclass
 from datetime import timedelta, timezone
+from pathlib import Path
 from typing import Any
 
 import pytest
@@ -23,6 +25,7 @@ from autoapply_agent.db.session import create_engine, create_session_factory
 from autoapply_agent.main import create_app
 from autoapply_agent.schemas.jobs import JobRead
 from autoapply_agent.services.job_export import CSV_COLUMNS
+from autoapply_agent.services.job_search import JobSearchFilters, JobSort, iter_jobs
 
 ATOM = "{http://www.w3.org/2005/Atom}"
 # Half-hour offset keeps ``hours_old`` boundaries far from the hourly seed rows.
@@ -535,6 +538,30 @@ def test_atom_feed_id_includes_the_installation_url(client: TestClient) -> None:
     assert here != elsewhere
 
 
+def test_atom_feed_id_uses_effective_filter_values(client: TestClient) -> None:
+    """The last duplicate value is the one searched for, so it must drive the feed id."""
+
+    def feed_id(query: str) -> str | None:
+        return ET.fromstring(client.get(f"/jobs/feed.atom?{query}").content).findtext(f"{ATOM}id")
+
+    python_last = _feed(client, {"q": ["cobol", "python"]})
+
+    assert feed_id("q=python&q=cobol") != feed_id("q=cobol&q=python")
+    assert python_last.findtext(f"{ATOM}id") == feed_id("q=python")
+    assert python_last.findtext(f"{ATOM}title") == "Job Search Test jobs (q=python)"
+    assert feed_id("q=python&utm_source=newsletter") == feed_id("q=python")
+
+
+@pytest.mark.parametrize("instant", ["0001-01-01T00:00:00+01:00", "9999-12-31T23:59:59-01:00"])
+def test_created_after_outside_the_utc_range_is_rejected(client: TestClient, instant: str) -> None:
+    """Offsets that push the instant outside datetime's range are a 422, not a 500."""
+
+    for path in ("/jobs", "/jobs/export", "/jobs/feed.atom"):
+        response = client.get(path, params={"created_after": instant})
+        assert response.status_code == 422, (path, response.text)
+        assert response.json()["detail"][0]["loc"] == ["query", "created_after"]
+
+
 def test_atom_feed_without_matches_is_still_valid(client: TestClient) -> None:
     """An empty feed keeps id, title and updated."""
 
@@ -726,3 +753,59 @@ def test_atom_feed_escapes_hostile_titles_and_falls_back_for_unsafe_links(
     job_id = hostile_client.get("/jobs", params={"q": "HYPERLINK"}).json()[0]["id"]
     assert formula_link.get("href") == f"http://testserver/jobs/{job_id}"
     assert b"javascript:" not in response.content
+
+
+async def _seed_many(database_url: str, count: int) -> None:
+    """Insert ``count`` jobs in one transaction (bulk export fixture)."""
+
+    engine = create_engine(database_url)
+    async with engine.begin() as connection:
+        await connection.run_sync(Base.metadata.create_all)
+    async with create_session_factory(engine)() as session:
+        session.add(Run(id="run-bulk", status=RunStatus.COMPLETED.value, query="bulk"))
+        session.add_all(
+            Job(
+                run_id="run-bulk",
+                title=f"Engineer {index}",
+                company="Bulkco",
+                location="Remote",
+                url=f"https://jobs.example.com/bulk/{index}",
+                score=0.5,
+                plan_steps=[],
+                created_at=BASE_TIME + timedelta(seconds=index),
+            )
+            for index in range(count)
+        )
+        await session.commit()
+    await engine.dispose()
+
+
+@pytest.mark.parametrize("sort", [JobSort.NEWEST, JobSort.SCORE])
+async def test_streamed_export_does_not_block_concurrent_sqlite_writes(
+    tmp_path: Path, sort: JobSort
+) -> None:
+    """A slow export consumer must not hold SQLite locks that make worker commits fail."""
+
+    db_path = tmp_path / "export.db"
+    database_url = f"sqlite+aiosqlite:///{db_path}"
+    await _seed_many(database_url, 1_234)
+    engine = create_engine(database_url)
+    try:
+        async with create_session_factory(engine)() as session:
+            jobs = iter_jobs(session, JobSearchFilters(sort=sort))
+            first = await anext(jobs)
+            writer = sqlite3.connect(db_path, timeout=0.2)
+            try:
+                writer.execute("UPDATE runs SET status = 'failed' WHERE id = 'run-bulk'")
+                writer.commit()
+            finally:
+                writer.close()
+            rest = [job async for job in jobs]
+    finally:
+        await engine.dispose()
+
+    exported = [first, *rest]
+    assert len(exported) == 1_234
+    assert len({job.id for job in exported}) == 1_234
+    assert exported[0].title == "Engineer 1233"
+    assert exported[-1].title == "Engineer 0"

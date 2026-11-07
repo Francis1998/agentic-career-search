@@ -201,6 +201,18 @@ def _order_by(sort: JobSort) -> tuple[ColumnElement[Any], ...]:
     return (Job.created_at.desc(), Job.id.desc())
 
 
+def _after(job: Job, sort: JobSort) -> ColumnElement[bool]:
+    """Keyset condition selecting the rows that sort after ``job``."""
+
+    newer = or_(
+        Job.created_at < job.created_at,
+        and_(Job.created_at == job.created_at, Job.id < job.id),
+    )
+    if sort == JobSort.SCORE:
+        return or_(Job.score < job.score, and_(Job.score == job.score, newer))
+    return newer
+
+
 async def _distinct_postings(
     session: AsyncSession, filters: JobSearchFilters
 ) -> list[tuple[int, PostingIdentity]]:
@@ -328,7 +340,7 @@ async def iter_jobs(
         limit: Optional maximum number of jobs.
 
     Yields:
-        Matching jobs, fetched in batches.
+        Matching jobs, fetched in keyset batches of 500.
     """
 
     if filters.dedupe:
@@ -340,9 +352,21 @@ async def iter_jobs(
                 yield job
         return
 
-    statement = select(Job).where(*build_conditions(filters)).order_by(*_order_by(filters.sort))
-    if limit is not None:
-        statement = statement.limit(limit)
-    result = await session.stream_scalars(statement.execution_options(yield_per=_BATCH_SIZE))
-    async for job in result:
-        yield job
+    # Keyset batches, each fully fetched before its rows are yielded: no cursor stays
+    # open while a slow client consumes the export, so SQLite writers are not blocked.
+    conditions = build_conditions(filters)
+    remaining = limit
+    last: Job | None = None
+    while remaining is None or remaining > 0:
+        batch_size = _BATCH_SIZE if remaining is None else min(_BATCH_SIZE, remaining)
+        statement = select(Job).where(*conditions).order_by(*_order_by(filters.sort))
+        if last is not None:
+            statement = statement.where(_after(last, filters.sort))
+        batch = list(await session.scalars(statement.limit(batch_size)))
+        for job in batch:
+            yield job
+        if len(batch) < batch_size:
+            return
+        last = batch[-1]
+        if remaining is not None:
+            remaining -= len(batch)

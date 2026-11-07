@@ -8,6 +8,7 @@ from typing import Literal
 from urllib.parse import urlencode
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response, status
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
@@ -29,6 +30,17 @@ router = APIRouter(prefix="/jobs", tags=["jobs"])
 
 ATOM_MEDIA_TYPE = "application/atom+xml; charset=utf-8"
 EXPORT_MEDIA_TYPES: dict[str, str] = {"csv": "text/csv", "jsonl": "application/x-ndjson"}
+FEED_FILTER_PARAMS: tuple[str, ...] = (
+    "q",
+    "company",
+    "location",
+    "remote",
+    "min_score",
+    "source_config_id",
+    "run_id",
+    "created_after",
+    "hours_old",
+)
 
 
 def get_job_search_filters(
@@ -82,9 +94,26 @@ def get_job_search_filters(
 
     Returns:
         Filters; ``created_after`` and ``hours_old`` combine into the later bound.
+
+    Raises:
+        RequestValidationError: If ``created_after`` falls outside the UTC range.
     """
 
-    bounds = [as_utc(created_after)] if created_after is not None else []
+    bounds: list[datetime] = []
+    if created_after is not None:
+        try:
+            bounds.append(as_utc(created_after))
+        except OverflowError as exc:
+            raise RequestValidationError(
+                [
+                    {
+                        "type": "datetime_utc_range",
+                        "loc": ("query", "created_after"),
+                        "msg": "Datetime is outside the supported UTC range",
+                        "input": created_after.isoformat(),
+                    }
+                ]
+            ) from exc
     if hours_old is not None:
         bounds.append(utc_now() - timedelta(hours=hours_old))
     return JobSearchFilters(
@@ -232,11 +261,15 @@ async def jobs_feed(
     """
 
     page = await search_jobs(session, replace(filters, dedupe=True), limit=limit)
-    criteria = sorted(
-        (key, value) for key, value in request.query_params.multi_items() if key != "limit"
-    )
+    # Effective (last) value of each filter, like the parsed parameters; other query
+    # parameters (limit, tracking tags) do not change the feed's identity.
+    criteria = [
+        (name, request.query_params[name])
+        for name in sorted(FEED_FILTER_PARAMS)
+        if name in request.query_params
+    ]
     summary = ", ".join(f"{key}={value}" for key, value in criteria)
-    # The canonical feed URL (installation + filters, without limit) keeps ids global.
+    # The canonical feed URL (installation + filters) keeps feed ids globally unique.
     canonical_url = str(request.url.replace(query=urlencode(criteria), fragment=""))
 
     def fallback_link(job: Job) -> str:

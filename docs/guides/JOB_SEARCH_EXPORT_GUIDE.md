@@ -100,7 +100,9 @@ are literal characters; SQLite only case-folds ASCII).
 | `limit` | `/jobs`: 1–500 (50) · export: 1–100000 (all) · feed: 1–200 (50) | Page size / row cap / entry count | `results_wanted` |
 | `offset` | int ≥ 0 (0), `/jobs` only | Matches to skip | `offset` |
 
-Out-of-range values return `422` with the standard FastAPI validation body. Encode a
+Out-of-range values (including a `created_after` whose UTC equivalent falls outside
+the supported date range) return `422` with the standard FastAPI validation body.
+Repeated parameters follow FastAPI: the last value wins. Encode a
 `+` UTC offset as `%2B` in URLs, or use `Z`:
 `created_after=2026-11-06T09:00:00-08:00` and `created_after=2026-11-06T17:00:00Z`
 are the same instant.
@@ -194,8 +196,9 @@ two formats without extra dependencies.
   `<title> at <company>`, `link rel="alternate"` = the posting URL, `summary` =
   `Company: … | Location: … | Remote: yes/no | Score: 0.88 | Priority: high`, all
   taken from the first capture that matches the filters;
-- feed `id` = UUIDv5 of the canonical feed URL (scheme, host, path and sorted filters,
-  `limit` excluded), so two installations never share a feed id — serve the feed from
+- feed `id` = UUIDv5 of the canonical feed URL (scheme, host, path and the effective
+  value of each filter parameter; `limit` and unknown parameters such as tracking
+  tags are ignored), so two installations never share a feed id — serve the feed from
   one stable hostname; `title` names the filters, `link rel="self"` is the request
   URL, `updated` = newest entry.
 
@@ -231,9 +234,11 @@ channel* action.
 - **Exposure.** Like the rest of this API there is no built-in authentication, and
   feed URLs reveal your search terms. Keep it on localhost or behind an authenticating
   reverse proxy.
-- **Resources.** Exports stream in batches of 500 rows over a dedicated database
-  session, so memory stays flat; `dedupe=true` (and the feed) first loads eight
-  narrow columns of every stored job to resolve posting identities.
+- **Resources.** Exports stream in keyset batches of 500 rows over a dedicated
+  database session; each batch is read completely before it is sent, so memory stays
+  flat and a slow client never holds a database cursor that would block SQLite
+  writers. `dedupe=true` (and the feed) first loads eight narrow columns of every
+  stored job to resolve posting identities.
 
 ## Comparison to JobSpy
 
