@@ -40,6 +40,13 @@ Supported `source_type` values: `greenhouse`, `lever`.
 
 Run statuses: `queued`, `running`, `completed`, `failed`, `cancel_requested`, `cancelled`.
 
+`POST /runs/{run_id}/cancel` cancels a `queued` run immediately (`cancelled`) and moves a
+`running` run to `cancel_requested` until the worker stops it (`cancelled`). A run that
+has already finished keeps its final status and gets a `run.cancel_ignored` event; this
+includes a run that finishes while the cancel request waits for the worker's database
+write (on SQLite, a cancel sent while the last source is being ingested). Such a run
+used to be switched from `completed` to `cancel_requested`, which it never left.
+
 ## Jobs
 
 | Method | Path | Description |

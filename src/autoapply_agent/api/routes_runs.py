@@ -3,7 +3,7 @@
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from autoapply_agent.api.deps import get_session
@@ -86,6 +86,13 @@ async def get_run_events(
 async def cancel_run(run_id: str, session: AsyncSession = Depends(get_session)) -> Run:
     """Request cancellation for queued or running run.
 
+    The worker may claim, finish or cancel the run while this request waits for the
+    database (on SQLite, for the worker's write transaction), so the run is flagged
+    with one conditional ``UPDATE`` that only matches a cancellable run, and the
+    outcome is decided on the row as re-read after it. Deciding on the status read
+    before the write turned a run that completed meanwhile into ``cancel_requested``,
+    a status the finished worker never leaves.
+
     Args:
         run_id: Run identifier.
         session: Request-scoped async session.
@@ -98,8 +105,20 @@ async def cancel_run(run_id: str, session: AsyncSession = Depends(get_session)) 
     if run is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="run not found")
 
-    terminal_states = {RunStatus.COMPLETED.value, RunStatus.CANCELLED.value, RunStatus.FAILED.value}
-    if run.status in terminal_states:
+    cancellable_states = (
+        RunStatus.QUEUED.value,
+        RunStatus.RUNNING.value,
+        RunStatus.CANCEL_REQUESTED.value,
+    )
+    flagged_run_id = await session.scalar(
+        update(Run)
+        .where(Run.id == run_id, Run.status.in_(cancellable_states))
+        .values(cancel_requested=True)
+        .returning(Run.id)
+        .execution_options(synchronize_session=False)
+    )
+    await session.refresh(run)
+    if flagged_run_id is None:
         await append_run_event(
             session,
             run.id,
@@ -110,7 +129,6 @@ async def cancel_run(run_id: str, session: AsyncSession = Depends(get_session)) 
         await session.refresh(run)
         return run
 
-    run.cancel_requested = True
     if run.status == RunStatus.QUEUED.value:
         run.status = RunStatus.CANCELLED.value
         run.finished_at = utc_now()
