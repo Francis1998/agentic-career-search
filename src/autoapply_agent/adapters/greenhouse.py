@@ -93,7 +93,7 @@ class GreenhouseAdapter(CareerSourceAdapter):
                     external_id=self._extract_external_id(absolute_url),
                     title=title,
                     location=location_text,
-                    company=company_from_url(base_url),
+                    company=self._company(base_url),
                     url=absolute_url,
                     raw={"source": "greenhouse"},
                 )
@@ -102,6 +102,31 @@ class GreenhouseAdapter(CareerSourceAdapter):
                 break
 
         return jobs
+
+    @staticmethod
+    def _company(base_url: str) -> str:
+        """Name the employer of a board: its board token on Greenhouse-hosted boards.
+
+        ``boards.greenhouse.io/gitlab``, ``job-boards.greenhouse.io/gitlab`` and the
+        embed form ``boards.greenhouse.io/embed/job_board?for=gitlab`` all belong to
+        ``gitlab``; other (self-hosted) career sites keep the host-based identifier.
+
+        Args:
+            base_url: Source URL.
+
+        Returns:
+            Board token, or the host-based company identifier.
+        """
+
+        parsed = urlparse(base_url)
+        if (parsed.hostname or "").endswith("greenhouse.io"):
+            board = parse_qs(parsed.query).get("for", [""])[0]
+            segments = [part for part in parsed.path.split("/") if part]
+            if not board and segments and segments[0] != "embed":
+                board = segments[0]
+            if board:
+                return board
+        return company_from_url(base_url)
 
     @staticmethod
     def _looks_like_posting_href(href: str) -> bool:

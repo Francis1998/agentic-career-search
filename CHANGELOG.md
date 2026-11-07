@@ -762,6 +762,11 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `tr.job-post` rows whose anchor holds the title and the location as sibling
   paragraphs; they were parsed as one title (`Director, Support (Bengaluru) Bangalore,
   India`) with no location. Both are now split.
+- `GreenhouseAdapter` / `LeverAdapter`: jobs from hosted boards were attributed to
+  the ATS host (`company: boards.greenhouse.io`, `jobs.lever.co`); they now carry the
+  board token (`gitlab` for `boards.greenhouse.io/gitlab`,
+  `job-boards.greenhouse.io/gitlab` or `…/embed/job_board?for=gitlab`; `palantir`
+  for `jobs.lever.co/palantir`). Self-hosted career sites keep the host-based value.
 - `cross_source_dedup.normalize_title` / `normalize_company`: letters and digits of
   non-Latin scripts are kept (NFKC + case-folding) instead of being stripped, so
   postings such as `エンジニア` at `トヨタ` and at `ソニー` no longer collapse into one

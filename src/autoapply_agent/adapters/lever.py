@@ -108,7 +108,7 @@ class LeverAdapter(CareerSourceAdapter):
                     external_id=self._extract_external_id(absolute_url),
                     title=title,
                     location=location_text,
-                    company=company_from_url(base_url),
+                    company=self._company(base_url),
                     url=absolute_url,
                     raw={"source": "lever"},
                 )
@@ -117,6 +117,23 @@ class LeverAdapter(CareerSourceAdapter):
                 break
 
         return jobs
+
+    @staticmethod
+    def _company(base_url: str) -> str:
+        """Name the employer of a board: its token on ``jobs.lever.co/{company}``.
+
+        Args:
+            base_url: Source URL.
+
+        Returns:
+            Board token, or the host-based company identifier elsewhere.
+        """
+
+        parsed = urlparse(base_url)
+        segments = [part for part in parsed.path.split("/") if part]
+        if (parsed.hostname or "").endswith("lever.co") and segments:
+            return segments[0]
+        return company_from_url(base_url)
 
     @classmethod
     def _looks_like_posting_href(cls, href: str) -> bool:

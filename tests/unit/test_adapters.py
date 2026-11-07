@@ -826,3 +826,33 @@ def test_greenhouse_live_board_splits_title_and_location() -> None:
         ("Intermediate Support Engineer (SHIFT)", "Remote, United Kingdom"),
     ]
     assert [job.external_id for job in jobs] == ["8629019002", "8684061002"]
+
+
+def test_hosted_board_jobs_are_attributed_to_the_board_owner() -> None:
+    """Multi-tenant boards name the employer by board token, not by the ATS host."""
+
+    greenhouse = GreenhouseAdapter(user_agent="test-agent")
+    lever = LeverAdapter(user_agent="test-agent")
+
+    cases = [
+        greenhouse._parse_html(
+            "https://boards.greenhouse.io/gitlab", GREENHOUSE_LIVE_BOARD_HTML, max_jobs=1
+        ),
+        greenhouse._parse_html(
+            "https://job-boards.greenhouse.io/gitlab", GREENHOUSE_LIVE_BOARD_HTML, max_jobs=1
+        ),
+        greenhouse._parse_html(
+            "https://boards.greenhouse.io/embed/job_board?for=gitlab",
+            GREENHOUSE_LIVE_BOARD_HTML,
+            max_jobs=1,
+        ),
+        lever._parse_html("https://jobs.lever.co/palantir", LEVER_LIVE_BOARD_HTML, max_jobs=1),
+    ]
+
+    assert [jobs[0].company for jobs in cases] == ["gitlab", "gitlab", "gitlab", "palantir"]
+    assert (
+        greenhouse._parse_html(
+            "https://careers.example.com/jobs", GREENHOUSE_LIVE_BOARD_HTML, max_jobs=1
+        )[0].company
+        == "careers.example.com"
+    )
