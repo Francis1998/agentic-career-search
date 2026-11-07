@@ -3,7 +3,7 @@
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import select, update
+from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from autoapply_agent.api.deps import get_session
@@ -11,6 +11,7 @@ from autoapply_agent.core.time import utc_now
 from autoapply_agent.db.models import Run, RunEvent, RunStatus
 from autoapply_agent.schemas.runs import RunCreate, RunEventRead, RunRead
 from autoapply_agent.services.events import append_run_event
+from autoapply_agent.services.read_queries import run_events
 
 router = APIRouter(prefix="/runs", tags=["runs"])
 
@@ -76,10 +77,7 @@ async def get_run_events(
     if run is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="run not found")
 
-    events = await session.scalars(
-        select(RunEvent).where(RunEvent.run_id == run_id).order_by(RunEvent.sequence.asc())
-    )
-    return list(events)
+    return await run_events(session, run_id)
 
 
 @router.post("/{run_id}/cancel", response_model=RunRead)

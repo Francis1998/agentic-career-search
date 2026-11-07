@@ -3,7 +3,6 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Path, status
-from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -14,6 +13,7 @@ from autoapply_agent.schemas.source_configs import (
     SourceConfigRead,
     SourceConfigUpdate,
 )
+from autoapply_agent.services.read_queries import list_source_configs as query_source_configs
 
 router = APIRouter(prefix="/source-configs", tags=["source-configs"])
 
@@ -64,8 +64,7 @@ async def list_source_configs(session: AsyncSession = Depends(get_session)) -> l
         Source config list.
     """
 
-    result = await session.scalars(select(SourceConfig).order_by(SourceConfig.id.asc()))
-    return list(result)
+    return await query_source_configs(session)
 
 
 @router.get("/{source_config_id}", response_model=SourceConfigRead)

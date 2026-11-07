@@ -3,11 +3,49 @@
 from __future__ import annotations
 
 import re
+from dataclasses import dataclass
 from hashlib import sha256
 
 from autoapply_agent.adapters.base import JobCandidate
 
 _WORD_PATTERN = re.compile(r"[a-z0-9]+")
+
+BASE_SCORE = 0.45
+"""Baseline relevance every captured candidate starts from."""
+KEYWORD_BONUS_PER_TERM = 0.1
+"""Bonus per distinct query term matched as a whole word."""
+KEYWORD_BONUS_CAP = 0.4
+"""Upper bound of the keyword bonus."""
+STABILITY_BONUS_MAX = 0.1
+"""Upper bound of the URL-hash tiebreaker."""
+MAX_SCORE = 0.99
+"""Cap applied to the summed score."""
+
+
+@dataclass(slots=True, frozen=True)
+class ScoreBreakdown:
+    """Additive components of one deterministic score.
+
+    Attributes:
+        query_terms: Normalized distinct query terms, sorted.
+        matched_terms: Query terms found as whole words in title, location or company.
+        base: Baseline relevance (:data:`BASE_SCORE`).
+        keyword_bonus: :data:`KEYWORD_BONUS_PER_TERM` per matched term, capped at
+            :data:`KEYWORD_BONUS_CAP`.
+        stability_bonus: Tiebreaker in ``[0, STABILITY_BONUS_MAX]`` derived from a hash
+            of the posting URL; it keeps orderings stable and is not a fit signal.
+        capped: Whether the sum exceeded :data:`MAX_SCORE`.
+        score: The capped sum rounded to 4 decimals, as returned by
+            :meth:`DeterministicScoringService.score`.
+    """
+
+    query_terms: tuple[str, ...]
+    matched_terms: tuple[str, ...]
+    base: float
+    keyword_bonus: float
+    stability_bonus: float
+    capped: bool
+    score: float
 
 
 class DeterministicScoringService:
@@ -24,16 +62,37 @@ class DeterministicScoringService:
             Deterministic score in range [0.0, 1.0].
         """
 
+        return self.breakdown(job_candidate, query).score
+
+    def breakdown(self, job_candidate: JobCandidate, query: str | None) -> ScoreBreakdown:
+        """Score a job candidate and return every component of the score.
+
+        Args:
+            job_candidate: Candidate to score.
+            query: Optional user query text.
+
+        Returns:
+            Score components; ``score`` equals :meth:`score` for the same inputs.
+        """
+
         matched_terms = self.match_terms(job_candidate, query)
-        keyword_bonus = min(len(matched_terms) * 0.1, 0.4)
+        keyword_bonus = min(len(matched_terms) * KEYWORD_BONUS_PER_TERM, KEYWORD_BONUS_CAP)
 
         digest_prefix = sha256(job_candidate.url.encode("utf-8")).hexdigest()[:8]
         digest_component = int(digest_prefix, 16) / 0xFFFFFFFF
-        stability_bonus = 0.1 * digest_component
+        stability_bonus = STABILITY_BONUS_MAX * digest_component
 
-        base_score = 0.45
-        final_score = min(0.99, base_score + keyword_bonus + stability_bonus)
-        return round(final_score, 4)
+        total = BASE_SCORE + keyword_bonus + stability_bonus
+        final_score = min(MAX_SCORE, total)
+        return ScoreBreakdown(
+            query_terms=tuple(self._tokenize(query)),
+            matched_terms=tuple(matched_terms),
+            base=BASE_SCORE,
+            keyword_bonus=keyword_bonus,
+            stability_bonus=stability_bonus,
+            capped=total > MAX_SCORE,
+            score=round(final_score, 4),
+        )
 
     def match_terms(self, job_candidate: JobCandidate, query: str | None) -> list[str]:
         """Return normalized query terms matched in candidate search text.

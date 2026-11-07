@@ -22,6 +22,7 @@ from autoapply_agent.services.job_export import (
 from autoapply_agent.services.job_search import (
     PostingIdentity,
     as_utc,
+    capture_window_start,
     is_remote_location,
     posting_key,
 )
@@ -238,3 +239,21 @@ def test_render_atom_feed_with_and_without_entries() -> None:
     assert entry.findtext(f"{ATOM}summary") == (
         "Company: Acme | Location: Remote - US | Remote: yes | Score: 0.88 | Priority: high"
     )
+
+
+def test_capture_window_start_keeps_the_later_bound() -> None:
+    """``created_after`` and ``hours_old`` combine into the later UTC lower bound."""
+
+    now = datetime(2026, 11, 7, 18, 0, tzinfo=UTC)
+    pacific = timezone(timedelta(hours=-8))
+
+    assert capture_window_start(None, None, now=now) is None
+    assert capture_window_start(None, 6, now=now) == datetime(2026, 11, 7, 12, 0, tzinfo=UTC)
+    assert capture_window_start(datetime(2026, 11, 7, 9, 0), 6, now=now) == datetime(
+        2026, 11, 7, 12, 0, tzinfo=UTC
+    )
+    assert capture_window_start(
+        datetime(2026, 11, 7, 7, 0, tzinfo=pacific), 6, now=now
+    ) == datetime(2026, 11, 7, 15, 0, tzinfo=UTC)
+    with pytest.raises(OverflowError):
+        capture_window_start(datetime(1, 1, 1, tzinfo=timezone(timedelta(hours=1))), None, now=now)

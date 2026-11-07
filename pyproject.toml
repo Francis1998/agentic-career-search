@@ -21,6 +21,9 @@ dependencies = [
   "aiosqlite>=0.20.0",
 ]
 
+[project.scripts]
+career-search-mcp = "autoapply_agent.mcp.server:main"
+
 [project.optional-dependencies]
 dev = [
   "pytest>=8.3.3",
