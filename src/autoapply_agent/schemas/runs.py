@@ -3,17 +3,18 @@
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Annotated
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from autoapply_agent.db.models import RunStatus
+from autoapply_agent.db.models import SQLITE_MAX_INTEGER, RunStatus
 
 
 class RunCreate(BaseModel):
     """Payload used to queue a new run."""
 
     query: str | None = Field(default=None, max_length=256)
-    source_config_ids: list[int] | None = None
+    source_config_ids: list[Annotated[int, Field(ge=1, le=SQLITE_MAX_INTEGER)]] | None = None
 
 
 class RunRead(BaseModel):

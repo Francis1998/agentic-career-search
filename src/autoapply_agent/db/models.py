@@ -22,6 +22,9 @@ from sqlalchemy.orm import Mapped, mapped_column
 from autoapply_agent.core.time import utc_now
 from autoapply_agent.db.base import Base
 
+SQLITE_MAX_INTEGER = 2**63 - 1
+"""Largest SQLite INTEGER (and rowid): binding a bigger int raises ``OverflowError``."""
+
 
 class SourceType(StrEnum):
     """Supported career page source adapter types."""
