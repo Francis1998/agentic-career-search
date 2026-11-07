@@ -58,12 +58,12 @@ def test_builds_default_cadence_steps() -> None:
         company="Acme",
         role="Backend Engineer",
         applied_on="2026-09-14",
-        channels=["email", "linkedin"],
+        channels=["email", "dm"],
     )
     assert plan.company == "Acme"
     assert [step.day_offset for step in plan.steps] == [3, 7, 14]
     assert plan.steps[0].channel == "email"
-    assert plan.steps[1].channel == "linkedin"
+    assert plan.steps[1].channel == "dm"
     assert "check-in" in plan.steps[0].action.lower()
     assert plan.guidance
 

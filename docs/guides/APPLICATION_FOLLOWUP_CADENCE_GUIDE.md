@@ -27,7 +27,7 @@ plan = ApplicationFollowUpCadencePlanner().plan(
     company="Acme",
     role="Backend Engineer",
     applied_on="2026-09-14",
-    channels=["email", "linkedin"],
+    channels=["email", "dm"],
 )
 assert plan.requires_human_review is True
 assert plan.auto_nudge is False

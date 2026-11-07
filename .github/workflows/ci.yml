@@ -10,6 +10,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Platform-neutral wording check
+        # Bracketed letters keep this pattern from matching its own source line.
+        run: |
+          pattern='link[e]d[-_]?(in|easy)|lnk[d][.]in|lic[d]n|inm[a]il'
+          if git grep -n -I -i -E "$pattern"; then
+            echo "::error::Use platform-neutral wording (e.g. 'direct message', 'networking site')."
+            exit 1
+          fi
+          if git ls-files | grep -i -E "$pattern"; then
+            echo "::error::Use platform-neutral file names."
+            exit 1
+          fi
+
       - name: Install uv
         uses: astral-sh/setup-uv@v3
 

@@ -34,7 +34,7 @@ postings from:
 | Shape | Example |
 |---|---|
 | Tenant board detail | `/acme/jobs/5b74a69a-2353-4812-bd7d-ecc8b73c23ee` |
-| Absolute ATS detail | `https://ats.rippling.com/acme/jobs/75804d93-747e-41e4-89fc-26d7c16026bb?jobSite=LinkedIn` |
+| Absolute ATS detail | `https://ats.rippling.com/acme/jobs/75804d93-747e-41e4-89fc-26d7c16026bb?jobSite=CareerPage` |
 | Branded Rippling detail | `https://www.rippling.com/jobs/5b74a69a-2353-4812-bd7d-ecc8b73c23ee` |
 
 The board index (`/jobs`), application subpaths (`/jobs/{uuid}/apply`), generic

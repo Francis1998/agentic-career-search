@@ -83,17 +83,18 @@ def test_draft_always_requires_human_review() -> None:
     assert draft.talking_points
 
 
-def test_linkedin_channel_draft() -> None:
-    """LinkedIn channel produces a DM-style body."""
+def test_dm_channel_draft() -> None:
+    """DM channel produces a direct-message draft with a DM subject."""
 
     draft = ReferralIntroDraftService().generate(
         company="Nimbus",
         role="ML Engineer",
         connector_name="Jordan",
         mutual_context="same ML reading group",
-        channel="linkedin",
+        channel="dm",
     )
-    assert draft.channel == "linkedin"
+    assert draft.channel == "dm"
+    assert draft.subject.startswith("DM ")
     assert "Nimbus" in draft.body
     assert "Jordan" in draft.body
 

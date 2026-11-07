@@ -52,16 +52,17 @@ def test_draft_always_requires_human_review() -> None:
     assert "do not auto-send" in draft.body.lower()
 
 
-def test_linkedin_channel_draft() -> None:
-    """LinkedIn channel produces a DM-style body with linkedin channel."""
+def test_dm_channel_draft() -> None:
+    """DM channel produces a direct-message draft with a DM subject."""
 
     draft = RecruiterOutreachDraftService().generate(
         company="Nimbus",
         role="ML Engineer",
-        channel="linkedin",
+        channel="dm",
         notes="Shipped retrieval ranking in prod",
     )
-    assert draft.channel == "linkedin"
+    assert draft.channel == "dm"
+    assert draft.subject.startswith("DM ")
     assert draft.requires_human_review is True
     assert "Nimbus" in draft.body
     assert any("Shipped retrieval ranking" in point for point in draft.talking_points)

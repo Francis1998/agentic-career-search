@@ -1,6 +1,6 @@
 """HITL JD culture-signal extractor (offline cues; never auto-applies).
 
-Closes the gap vs Teal / LinkedIn job-insight panels that bury culture cues
+Closes the gap vs Teal and large job-board insight panels that bury culture cues
 inside proprietary UIs. This service scans offline JD text for pace,
 collaboration, on-call, and meeting-load signals — it never auto-applies,
 never contacts employers, and never performs network I/O.

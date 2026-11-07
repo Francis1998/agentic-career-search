@@ -2,7 +2,7 @@
 
 Closes the gap vs Teal / Huntr / Superhuman inbox labels that keep recruiter
 reply intent inside proprietary UIs. This service classifies offline recruiter
-email/LinkedIn reply text into interested / scheduling / rejection / nurture
+email/direct-message reply text into interested / scheduling / rejection / nurture
 intents for HITL next actions — it never auto-sends replies and never performs
 network I/O.
 
@@ -96,7 +96,7 @@ class RecruiterReplyIntentClassifier:
         """Classify recruiter reply intent from free text.
 
         Args:
-            reply_text: Recruiter email/LinkedIn reply body (required).
+            reply_text: Recruiter email/direct-message reply body (required).
 
         Returns:
             ReplyIntentReport with ``requires_human_review=True`` and

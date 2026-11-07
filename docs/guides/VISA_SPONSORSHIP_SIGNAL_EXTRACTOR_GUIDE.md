@@ -4,7 +4,7 @@
 
 Extract deterministic, offline **visa / work-authorization cues** from job
 descriptions for HITL review. Never auto-applies. Closes the gap vs Simplify /
-Teal / LinkedEasyApply filters that hide sponsorship signals behind login walls.
+Teal / large job-board filters that hide sponsorship signals behind login walls.
 
 Optional later polish via **GPT-6 Astra / Claude Opus 5.5 / Gemini 4 Argon / Kimi K3.1 Pro**.
 Extraction itself stays deterministic.

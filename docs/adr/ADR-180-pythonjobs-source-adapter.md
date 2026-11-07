@@ -9,7 +9,7 @@
 Python Jobs publishes career boards whose public listings commonly link to
 detail pages under /python-jobs/{id}, /listings/{id}, /positions/{id}, /jobs/{id}, /job/{id}.
 
-Python.org Jobs is a high-signal Python-language board gap vs JobSpy aggregators that focus on Indeed/LinkedIn; this adapter adds deterministic HTML discovery under ADR-077.
+Python.org Jobs is a high-signal Python-language board gap vs JobSpy aggregators that focus on Indeed and other large aggregators; this adapter adds deterministic HTML discovery under ADR-077.
 
 ## Decision
 

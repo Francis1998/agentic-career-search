@@ -1,15 +1,15 @@
-"""HITL recruiter outreach draft generator (email + LinkedIn DM).
+"""HITL recruiter outreach draft generator (email + direct message).
 
-Closes the gap vs Teal/Huntr outreach templates and LinkedIn Easy Apply flows
+Closes the gap vs Teal/Huntr outreach templates and one-click apply flows
 that auto-send messages. This service only builds drafts for human review —
-it never sends email or LinkedIn DMs and never performs network I/O.
+it never sends email or direct messages and never performs network I/O.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass
 
-_ALLOWED_CHANNELS = frozenset({"email", "linkedin"})
+_ALLOWED_CHANNELS = frozenset({"email", "dm"})
 
 
 @dataclass(slots=True, frozen=True)
@@ -24,7 +24,7 @@ class RecruiterOutreachDraft:
 
 
 class RecruiterOutreachDraftService:
-    """Generate offline email / LinkedIn DM drafts for HITL review."""
+    """Generate offline email / direct-message (DM) drafts for HITL review."""
 
     def generate(
         self,
@@ -41,7 +41,7 @@ class RecruiterOutreachDraftService:
             company: Target company name (required).
             role: Target role title (required for a coherent draft).
             recruiter_name: Optional recruiter / hiring-manager name.
-            channel: ``email`` or ``linkedin`` (default ``email``).
+            channel: ``email`` or ``dm`` (direct message; default ``email``).
             notes: Optional candidate notes to weave into talking points.
 
         Returns:
@@ -57,7 +57,7 @@ class RecruiterOutreachDraftService:
 
         cleaned_channel = (channel or "").strip().lower()
         if cleaned_channel not in _ALLOWED_CHANNELS:
-            raise ValueError("channel must be 'email' or 'linkedin'")
+            raise ValueError("channel must be 'email' or 'dm'")
 
         cleaned_role = (role or "").strip() or "the open role"
         greeter = (recruiter_name or "").strip() or "there"
@@ -85,7 +85,7 @@ class RecruiterOutreachDraftService:
                 f"— Draft only: human review required; do not auto-send —"
             )
         else:
-            subject = f"LinkedIn DM · {cleaned_role} @ {cleaned_company}"
+            subject = f"DM · {cleaned_role} @ {cleaned_company}"
             body = (
                 f"Hi {greeter} — I saw the {cleaned_role} opening at {cleaned_company} "
                 f"and would love to connect. Happy to share a concise note on fit "

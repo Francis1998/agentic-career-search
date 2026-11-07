@@ -2,7 +2,7 @@
 
 ![Cross-source job dedup flow](../../assets/demo/cross-source-job-dedup.gif)
 
-Collapse the same role mirrored across Indeed, LinkedIn, Greenhouse, and other
+Collapse the same role mirrored across Indeed, Glassdoor, Greenhouse, and other
 boards when URLs differ but title+company are near-duplicates. Pass 1 is exact
 URL; Pass 2 uses ``difflib`` SequenceMatcher on normalized title+company keys.
 
@@ -32,7 +32,7 @@ class Job:
 
 jobs = [
     Job("Senior SWE", "Acme Inc", "https://indeed.com/a"),
-    Job("Senior SWE", "Acme", "https://linkedin.com/b"),
+    Job("Senior SWE", "Acme", "https://glassdoor.com/b"),
     Job("Data Scientist", "Beta", "https://gh.io/c"),
 ]
 deduper = CrossSourceJobDeduper(threshold=0.85)

@@ -4,7 +4,7 @@
 
 Extract deterministic, offline **culture signals** from JD text (pace, on-call,
 collaboration, meeting load, autonomy, work-life cues). Never auto-applies.
-Closes the gap vs Teal/LinkedIn insight panels locked in proprietary UIs.
+Closes the gap vs Teal and large job-board insight panels locked in proprietary UIs.
 
 Optional later polish via **GPT-6 Astra / Claude Opus 5.5 / Gemini 4 Argon / Kimi K3.1 Pro**.
 Extraction itself stays deterministic.

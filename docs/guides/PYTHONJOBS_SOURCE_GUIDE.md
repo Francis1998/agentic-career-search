@@ -9,7 +9,7 @@ and runs after candidates are collected.
 
 ## Why Python Jobs
 
-Python.org Jobs is a high-signal Python-language board gap vs JobSpy aggregators that focus on Indeed/LinkedIn; this adapter adds deterministic HTML discovery under ADR-077.
+Python.org Jobs is a high-signal Python-language board gap vs JobSpy aggregators that focus on Indeed and other large aggregators; this adapter adds deterministic HTML discovery under ADR-077.
 
 ## Usage
 

@@ -3,8 +3,8 @@
 ![Thank-you note outline planner HITL flow](../../assets/demo/thank-you-note-outline-planner.gif)
 
 Build deterministic, offline **post-interview thank-you note outlines** for
-email or LinkedIn. Never auto-sends. Closes the gap vs Teal/Huntr / Careerflow
-templates that encourage one-click outreach from closed UIs.
+email or direct message (DM). Never auto-sends. Closes the gap vs Teal/Huntr /
+Careerflow templates that encourage one-click outreach from closed UIs.
 
 Optional later polish via **GPT-6 Astra / Claude Opus 5.5 / Gemini 4 Argon / Kimi K3.1 Pro**.
 The outline structure itself stays deterministic.
@@ -34,7 +34,7 @@ print(outline.subject)
 print(outline.beats)
 ```
 
-Channels: `email`, `linkedin`.
+Channels: `email`, `dm` (direct message).
 
 ## Safety
 

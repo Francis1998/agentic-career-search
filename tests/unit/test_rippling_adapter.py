@@ -15,7 +15,7 @@ RIPPLING_SAMPLE_HTML = """
         <span class="job-location">San Francisco, CA</span>
       </article>
       <article class="job">
-        <a href="https://ats.rippling.com/acme/jobs/75804d93-747e-41e4-89fc-26d7c16026bb?jobSite=LinkedIn">
+        <a href="https://ats.rippling.com/acme/jobs/75804d93-747e-41e4-89fc-26d7c16026bb?jobSite=CareerPage">
           Product Manager
         </a>
         <span class="job-location">Remote (US)</span>
@@ -49,7 +49,7 @@ def test_rippling_parser_extracts_jobs() -> None:
     assert by_title["Product Manager"].external_id == "75804d93-747e-41e4-89fc-26d7c16026bb"
     assert by_title["Product Manager"].location == "Remote (US)"
     assert by_title["Product Manager"].url.endswith(
-        "/acme/jobs/75804d93-747e-41e4-89fc-26d7c16026bb?jobSite=LinkedIn"
+        "/acme/jobs/75804d93-747e-41e4-89fc-26d7c16026bb?jobSite=CareerPage"
     )
 
 

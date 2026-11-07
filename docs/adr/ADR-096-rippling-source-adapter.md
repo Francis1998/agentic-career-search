@@ -10,7 +10,7 @@ Rippling publishes public job boards and posting detail pages on Rippling-owned
 domains, most commonly `ats.rippling.com/{company}/jobs` with individual roles
 at `/{company}/jobs/{uuid}`. Search results and public examples show posting
 detail URLs with UUID identifiers and optional tracking query parameters such as
-`jobSite=LinkedIn`.
+`jobSite=CareerPage`.
 
 The existing BreezyHR and Freshteam adapters use deterministic HTML URL-shape
 matching instead of brittle CSS-only scraping. Rippling fits that pattern: the
