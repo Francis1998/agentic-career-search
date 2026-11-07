@@ -12,6 +12,7 @@ from autoapply_agent.adapters.recruitee import RecruiteeAdapter
 from autoapply_agent.adapters.smartrecruiters import SmartRecruitersAdapter
 from autoapply_agent.adapters.teamtailor import TeamtailorAdapter
 from autoapply_agent.adapters.workable import WorkableAdapter
+from autoapply_agent.services.job_search import is_remote_location
 
 if TYPE_CHECKING:
     from _pytest.capture import CaptureFixture
@@ -742,6 +743,8 @@ def test_teamtailor_relocation_note_is_not_read_as_location() -> None:
 
 # Trimmed from https://jobs.lever.co/palantir (2026-11-07): the Apply button links to the
 # posting URL itself and precedes the title anchor, whose text includes the categories.
+# The workplace label (``Remote``/``Hybrid``/``On-site``, the postings API's
+# ``workplaceType``) is a sibling of the location; unspecified postings have none.
 LEVER_LIVE_BOARD_HTML = """
 <div class="posting" data-qa-posting-id="6ed76ce8-4156-4b60-b120-403538bd66cd">
   <div class="posting-apply" data-qa="btn-apply">
@@ -772,6 +775,38 @@ LEVER_LIVE_BOARD_HTML = """
     </div>
   </a>
 </div>
+<div class="posting" data-qa-posting-id="0ccbe620-a3ef-41d1-a5c4-68e56b3c91d0">
+  <div class="posting-apply" data-qa="btn-apply">
+    <a class="posting-btn-submit template-btn-submit black"
+       href="https://jobs.lever.co/palantir/0ccbe620-a3ef-41d1-a5c4-68e56b3c91d0">Apply</a>
+  </div>
+  <a class="posting-title"
+     href="https://jobs.lever.co/palantir/0ccbe620-a3ef-41d1-a5c4-68e56b3c91d0">
+    <h5 data-qa="posting-name">American Tech Fellowship</h5>
+    <div class="posting-categories">
+      <span class="display-inline-block small-category-label workplaceTypes"
+        >Remote\u00a0\u2014\u00a0</span>
+      <span class="sort-by-commitment posting-category commitment">Scholarship</span>
+      <span class="sort-by-location posting-category location">North America</span>
+    </div>
+  </a>
+</div>
+<div class="posting" data-qa-posting-id="3d06b4bc-6a7b-4f73-b5c5-4544354e3d0f">
+  <div class="posting-apply" data-qa="btn-apply">
+    <a class="posting-btn-submit template-btn-submit black"
+       href="https://jobs.lever.co/palantir/3d06b4bc-6a7b-4f73-b5c5-4544354e3d0f">Apply</a>
+  </div>
+  <a class="posting-title"
+     href="https://jobs.lever.co/palantir/3d06b4bc-6a7b-4f73-b5c5-4544354e3d0f">
+    <h5 data-qa="posting-name">Edge Infrastructure Engineer</h5>
+    <div class="posting-categories">
+      <span class="display-inline-block small-category-label workplaceTypes"
+        >On-site\u00a0\u2014\u00a0</span>
+      <span class="sort-by-commitment posting-category commitment">Full-time</span>
+      <span class="sort-by-location posting-category location">Warsaw, Poland</span>
+    </div>
+  </a>
+</div>
 """
 
 
@@ -789,9 +824,66 @@ def test_lever_live_board_uses_the_posting_name_not_the_apply_button() -> None:
     assert [(job.title, job.location) for job in jobs] == [
         ("Administrative Business Partner", "Singapore, Singapore"),
         ("Commercial Administrative Business Partner", "New York, NY"),
+        ("American Tech Fellowship", "Remote - North America"),
+        ("Edge Infrastructure Engineer", "Warsaw, Poland"),
     ]
     assert jobs[0].external_id == "6ed76ce8-4156-4b60-b120-403538bd66cd"
     assert jobs[0].url == "https://jobs.lever.co/palantir/6ed76ce8-4156-4b60-b120-403538bd66cd"
+
+
+def test_lever_live_board_reports_remote_workplace_postings_as_remote() -> None:
+    """Live Lever boards: only the ``Remote`` workplace label makes a posting remote.
+
+    The label sits next to the location instead of in it, so a remote posting located
+    ``North America`` failed the remote rule behind ``remote=true``, the CSV ``remote``
+    column and the feed summary. Hybrid and on-site roles need office presence, and
+    unlabeled postings (``unspecified``) carry no signal: none of them is remote.
+    """
+
+    jobs = LeverAdapter(user_agent="test-agent")._parse_html(
+        "https://jobs.lever.co/palantir", LEVER_LIVE_BOARD_HTML, max_jobs=10
+    )
+
+    assert {job.title: is_remote_location(job.location) for job in jobs} == {
+        "Administrative Business Partner": False,
+        "Commercial Administrative Business Partner": False,
+        "American Tech Fellowship": True,
+        "Edge Infrastructure Engineer": False,
+    }
+
+
+def test_lever_remote_workplace_keeps_locations_that_already_say_remote() -> None:
+    """A ``Remote`` label never doubles an existing remote location or drops a blank one."""
+
+    html = """
+    <div class="posting">
+      <a class="posting-title" href="https://jobs.lever.co/acme/a1b2c3d4-0000-4000-8000-000000000001">
+        <h5 data-qa="posting-name">Support Engineer</h5>
+        <div class="posting-categories">
+          <span class="small-category-label workplaceTypes">Remote\u00a0\u2014\u00a0</span>
+          <span class="sort-by-location posting-category location">Remote - US</span>
+        </div>
+      </a>
+    </div>
+    <div class="posting">
+      <a class="posting-title" href="https://jobs.lever.co/acme/a1b2c3d4-0000-4000-8000-000000000002">
+        <h5 data-qa="posting-name">Solutions Engineer</h5>
+        <div class="posting-categories">
+          <span class="small-category-label workplaceTypes">Remote\u00a0\u2014\u00a0</span>
+          <span class="sort-by-location posting-category location"></span>
+        </div>
+      </a>
+    </div>
+    """
+
+    jobs = LeverAdapter(user_agent="test-agent")._parse_html(
+        "https://jobs.lever.co/acme", html, max_jobs=10
+    )
+
+    assert [(job.title, job.location) for job in jobs] == [
+        ("Support Engineer", "Remote - US"),
+        ("Solutions Engineer", "Remote"),
+    ]
 
 
 # Trimmed from https://job-boards.greenhouse.io/gitlab (2026-11-07): title and location

@@ -37,7 +37,7 @@ Each `SourceConfig` selects a source adapter by `source_type`:
 | `source_type` | Adapter | How it parses | Best for |
 |---|---|---|---|
 | `greenhouse` | `GreenhouseAdapter` | Scrapes `div.opening` anchors on public Greenhouse boards | Greenhouse-hosted boards |
-| `lever` | `LeverAdapter` | Scrapes `div.posting` anchors on public Lever pages | Lever-hosted boards |
+| `lever` | `LeverAdapter` | Scrapes `div.posting` anchors on public Lever pages; the `Remote` workplace label (API `workplaceType: remote`) is folded into the location (`Remote - London`), `Hybrid`/`On-site` are not | Lever-hosted boards |
 | `ashby` | `AshbyAdapter` | Recognises `jobs.ashbyhq.com/{org}/{uuid}` posting anchors by URL shape | Ashby-hosted boards |
 | `workable` | `WorkableAdapter` | Recognises `apply.workable.com/{company}/j/{shortcode}` posting anchors by URL shape | Workable-hosted boards |
 | `recruitee` | `RecruiteeAdapter` | Recognises `{company}.recruitee.com/o/{slug}` posting anchors by URL shape | Recruitee-hosted careers sites |

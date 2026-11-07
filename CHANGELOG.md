@@ -764,6 +764,16 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `reasoning_effort: none`.
 
 ### Fixed
+- `LeverAdapter`: remote postings on live Lever boards are now reported as remote.
+  Boards render each posting's workplace type (the postings API's `workplaceType`) as
+  a `Remote —` / `Hybrid —` / `On-site —` label beside the location rather than in it,
+  and the adapter kept only the location, so remote roles such as Spotify's
+  `London / Stockholm` (29 of 85 postings on jobs.lever.co/spotify) failed the remote
+  rule: `GET /jobs?remote=true` and the Atom feed dropped them, `remote=false`
+  returned them, and the CSV `remote` column and the feed summary said they were not
+  remote. A `Remote` label is now folded into the location (`Remote - London /
+  Stockholm`, `Remote` without one; a location that already says remote is kept).
+  `Hybrid` and `On-site` postings stay non-remote and keep their location.
 - `POST /runs/{run_id}/cancel`: a cancel sent while a run was ingesting its last source
   no longer leaves the finished run stuck in `cancel_requested`. On SQLite the cancel's
   write waits for the worker's ingestion transaction, and the worker completes the run

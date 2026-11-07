@@ -114,6 +114,11 @@ class LeverAdapter(CareerSourceAdapter):
                 ) or posting_root.select_one("div.posting-categories")
                 if location_node is not None:
                     location_text = location_node.get_text(" ", strip=True)
+                workplace_node = posting_root.select_one(".workplaceTypes")
+                if workplace_node is not None:
+                    location_text = self._apply_workplace(
+                        location_text, workplace_node.get_text(" ", strip=True)
+                    )
 
             jobs.append(
                 JobCandidate(
@@ -129,6 +134,34 @@ class LeverAdapter(CareerSourceAdapter):
                 break
 
         return jobs
+
+    @staticmethod
+    def _apply_workplace(location: str | None, workplace: str) -> str | None:
+        """Fold Lever's ``Remote`` workplace label into the posting location.
+
+        Live boards render each posting's workplace type (the postings API's
+        ``workplaceType``: ``remote``, ``hybrid``, ``onsite`` or ``unspecified``) as a
+        label such as ``Remote —`` beside the location rather than in it, so a remote
+        posting located ``London`` failed the remote rule behind the ``remote`` filter,
+        the CSV ``remote`` column and the feed summary. Hybrid and on-site roles require
+        office presence and keep their location; ``unspecified`` postings have no label.
+
+        Args:
+            location: Location text, possibly missing.
+            workplace: Text of the posting's ``workplaceTypes`` label.
+
+        Returns:
+            ``Remote - {location}`` (or ``Remote``) for remote postings whose location
+            does not already say remote, else ``location`` unchanged.
+        """
+
+        if workplace.strip(" \u00a0\u2014\u2013-").casefold() != "remote":
+            return location
+        if not location:
+            return "Remote"
+        if "remote" in location.casefold():
+            return location
+        return f"Remote - {location}"
 
     @staticmethod
     def _company(base_url: str) -> str:
