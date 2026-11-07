@@ -470,6 +470,8 @@ This repository follows the requested standards:
 ![FertilityEggFreezingStorageGapAdvisor](../assets/demo/fertility-egg-freezing-storage-gap-advisor.gif)
 | WageWorks/Edenred/CommuterBenefits.com year-end rollover planners bury related math in closed UIs | Workers lack a local `offered_usd` vs `needed_usd` band | `CommuterStipendRolloverGapAdvisor` bands offline `offered_usd` vs `needed_usd` for HITL review and never auto-approves |
 ![CommuterStipendRolloverGapAdvisor](../assets/demo/commuter-stipend-rollover-gap-advisor.gif)
+| Take Command/PeopleKeep/WiserAdvise QSEHRA allowance planners bury related math in closed UIs | Workers lack a local `offered_usd` vs `needed_usd` band | `QsehraAllowanceGapAdvisor` bands offline `offered_usd` vs `needed_usd` for HITL review and never auto-approves |
+![QsehraAllowanceGapAdvisor](../assets/demo/qsehra-allowance-gap-advisor.gif)
 | VSP/EyeMed/Davis Vision buy-up allowance planners bury related math in closed UIs | Workers lack a local `offered_usd` vs `needed_usd` band | `VisionInsuranceBuyupGapAdvisor` bands offline `offered_usd` vs `needed_usd` for HITL review and never auto-approves |
 ![VisionInsuranceBuyupGapAdvisor](../assets/demo/vision-insurance-buyup-gap-advisor.gif)
 | Unum/Aflac/MetLife critical-illness insurance planners bury related math in closed UIs | Workers lack a local `offered_usd` vs `needed_usd` band | `CriticalIllnessInsuranceGapAdvisor` bands offline `offered_usd` vs `needed_usd` for HITL review and never auto-approves |
