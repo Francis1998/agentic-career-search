@@ -4,10 +4,10 @@ import uuid
 from collections.abc import AsyncIterator
 from dataclasses import replace
 from datetime import datetime, timedelta
-from typing import Literal
+from typing import Annotated, Literal
 from urllib.parse import urlencode
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Path, Query, Request, Response, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
@@ -15,7 +15,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from autoapply_agent.api.deps import get_session, get_session_factory, get_settings
 from autoapply_agent.core.config import Settings
 from autoapply_agent.core.time import utc_now
-from autoapply_agent.db.models import Job
+from autoapply_agent.db.models import SQLITE_MAX_INTEGER, Job
 from autoapply_agent.schemas.jobs import JobRead
 from autoapply_agent.services.job_export import iter_csv, iter_jsonl, render_atom_feed
 from autoapply_agent.services.job_search import (
@@ -65,7 +65,10 @@ def get_job_search_filters(
         default=None, ge=0.0, le=1.0, description="Minimum deterministic score (inclusive)."
     ),
     source_config_id: int | None = Query(
-        default=None, ge=1, description="Only jobs captured from this source config."
+        default=None,
+        ge=1,
+        le=SQLITE_MAX_INTEGER,
+        description="Only jobs captured from this source config.",
     ),
     run_id: str | None = Query(default=None, description="Only jobs captured by this run."),
     created_after: datetime | None = Query(
@@ -160,7 +163,7 @@ async def list_jobs(
     response: Response,
     filters: JobSearchFilters = Depends(get_sorted_job_search_filters),
     limit: int = Query(default=50, ge=1, le=500),
-    offset: int = Query(default=0, ge=0),
+    offset: int = Query(default=0, ge=0, le=SQLITE_MAX_INTEGER),
     session: AsyncSession = Depends(get_session),
 ) -> list[Job]:
     """Search normalized jobs with JobSpy-style filters and pagination.
@@ -291,7 +294,10 @@ async def jobs_feed(
     response_model=JobRead,
     responses={404: {"description": "Job not found"}},
 )
-async def get_job(job_id: int, session: AsyncSession = Depends(get_session)) -> Job:
+async def get_job(
+    job_id: Annotated[int, Path(ge=1, le=SQLITE_MAX_INTEGER)],
+    session: AsyncSession = Depends(get_session),
+) -> Job:
     """Get one job by id.
 
     Args:

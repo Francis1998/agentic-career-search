@@ -6,6 +6,11 @@ Base URL (local default): `http://127.0.0.1:8000`
 
 Interactive docs: `http://127.0.0.1:8000/docs`
 
+Integer ids (`source_config_id`, `job_id` and the items of `source_config_ids`) must be
+between `1` and `2^63-1` (`9223372036854775807`), and `offset` between `0` and `2^63-1`:
+the range of a SQLite `INTEGER`. Other values return `422` with the standard FastAPI
+validation body instead of reaching the database.
+
 ## Health
 
 | Method | Path | Description |

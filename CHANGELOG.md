@@ -753,6 +753,13 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `reasoning_effort: none`.
 
 ### Fixed
+- API: integers outside SQLite's signed 64-bit `INTEGER` range no longer crash
+  requests with `OverflowError` (HTTP 500). `GET /jobs` `offset` and
+  `source_config_id` (also on `/jobs/export` and `/jobs/feed.atom`), the `job_id` and
+  `source_config_id` path ids and the `POST /runs` `source_config_ids` items are
+  bounded (ids `1`–`2^63-1`, `offset` `0`–`2^63-1`) and return `422` instead. Such a
+  run was previously accepted with `201` and then failed in the worker. Non-positive
+  ids, which can never exist, now also return `422` instead of `404`.
 - `LeverAdapter`: on live Lever boards the per-posting Apply button links to the
   posting URL itself and precedes the title anchor, so URL de-duplication kept it and
   every job was titled `Apply`; title anchors now win and the title is the

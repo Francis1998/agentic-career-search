@@ -1,12 +1,14 @@
 """Source configuration routes."""
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, HTTPException, Path, status
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from autoapply_agent.api.deps import get_session
-from autoapply_agent.db.models import SourceConfig
+from autoapply_agent.db.models import SQLITE_MAX_INTEGER, SourceConfig
 from autoapply_agent.schemas.source_configs import (
     SourceConfigCreate,
     SourceConfigRead,
@@ -68,7 +70,7 @@ async def list_source_configs(session: AsyncSession = Depends(get_session)) -> l
 
 @router.get("/{source_config_id}", response_model=SourceConfigRead)
 async def get_source_config(
-    source_config_id: int,
+    source_config_id: Annotated[int, Path(ge=1, le=SQLITE_MAX_INTEGER)],
     session: AsyncSession = Depends(get_session),
 ) -> SourceConfig:
     """Get source config by id.
@@ -89,7 +91,7 @@ async def get_source_config(
 
 @router.patch("/{source_config_id}", response_model=SourceConfigRead)
 async def update_source_config(
-    source_config_id: int,
+    source_config_id: Annotated[int, Path(ge=1, le=SQLITE_MAX_INTEGER)],
     payload: SourceConfigUpdate,
     session: AsyncSession = Depends(get_session),
 ) -> SourceConfig:
