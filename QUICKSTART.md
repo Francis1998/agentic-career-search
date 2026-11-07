@@ -59,6 +59,17 @@ curl -s "http://127.0.0.1:8000/runs/$RUN_ID/events"
 curl -s "http://127.0.0.1:8000/jobs?run_id=$RUN_ID"
 ```
 
+Search, export and subscribe across all captured jobs (no network needed to try it:
+`uv run python scripts/seed_demo_jobs.py` seeds demo data):
+
+```bash
+curl -s "http://127.0.0.1:8000/jobs?q=python&remote=true&sort=score&dedupe=true"
+curl -s -OJ "http://127.0.0.1:8000/jobs/export?format=csv&min_score=0.7"
+curl -s "http://127.0.0.1:8000/jobs/feed.atom?q=python&remote=true"
+```
+
+See [docs/guides/JOB_SEARCH_EXPORT_GUIDE.md](docs/guides/JOB_SEARCH_EXPORT_GUIDE.md).
+
 ## 6) Optional: cancel an active run
 
 ```bash

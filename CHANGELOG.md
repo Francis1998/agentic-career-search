@@ -45,6 +45,15 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - `EsppContributionGapAdvisor` (`services/espp_contribution_gap.py`): offline HITL `offered_pct` vs `needed_pct` coverage bands (never auto-approves). Gap vs Carta/Shareworks/E*TRADE ESPP contribution planners. Distinct from `EsppLookbackGapAdvisor` / `RsuSupplementalWithholdingGapAdvisor`. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/ESPP_CONTRIBUTION_GAP_ADVISOR_GUIDE.md`.
 - `StudentLoanForgivenessMatchGapAdvisor` (`services/student_loan_forgiveness_match_gap.py`): offline HITL `offered_usd` vs `needed_usd` coverage bands (never auto-approves). Gap vs Peanut Butter/Goodly/Gradifi student-loan forgiveness match planners. Distinct from `StudentLoanRepaymentGapAdvisor` / `TuitionReimbursementCapGapAdvisor`. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/STUDENT_LOAN_FORGIVENESS_MATCH_GAP_ADVISOR_GUIDE.md`.
 ### Added
+- **Job search, export & feed API** (`api/routes_jobs.py`, `services/job_search.py`,
+  `services/job_export.py`), inspired by JobSpy's unified filters and one-call CSV
+  export: `GET /jobs` gains `q`, `company`, `location`, `remote`, `min_score`,
+  `source_config_id`, `created_after`, `hours_old`, `sort=newest|score`, `dedupe`
+  and `offset` (total in `X-Total-Count`; defaults unchanged), plus
+  `GET /jobs/{job_id}`, streamed `GET /jobs/export?format=csv|jsonl` (OWASP
+  CSV-injection hardening, http(s)-only links) and an RFC 4287
+  `GET /jobs/feed.atom` with stable entry ids. `scripts/seed_demo_jobs.py` seeds
+  demo data. See `docs/guides/JOB_SEARCH_EXPORT_GUIDE.md`.
 - `ProfessionalDevelopmentStipendGapAdvisor` (`services/professional_development_stipend_gap.py`): offline HITL `offered_usd` vs `needed_usd` coverage bands (never auto-approves). Gap vs Guild/LinkedIn Learning/Workday professional-development stipend planners. Distinct from `LearningStipendGapAdvisor` / `TuitionReimbursementCapGapAdvisor`. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/PROFESSIONAL_DEVELOPMENT_STIPEND_GAP_ADVISOR_GUIDE.md`.
 - `CaregivingLeaveTopUpGapAdvisor` (`services/caregiving_leave_top_up_gap.py`): offline HITL `offered_days` vs `needed_days` coverage bands (never auto-approves). Gap vs Wellthy/Cariloop/Torchlight caregiving leave top-up planners. Distinct from `CaregiverBackupCareGapAdvisor` / `CaregiverRespiteGapAdvisor`. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/CAREGIVING_LEAVE_TOP_UP_GAP_ADVISOR_GUIDE.md`.
 - `ClimateResilienceLeaveGapAdvisor` (`services/climate_resilience_leave_gap.py`): offline HITL `offered_days` vs `needed_days` coverage bands (never auto-approves). Gap vs Rippling/Workday/BambooHR climate-resilience leave planners. Distinct from `DisasterReliefLeaveGapAdvisor` / `CaregiverRespiteGapAdvisor`. Optional later polish via GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2. See `docs/guides/CLIMATE_RESILIENCE_LEAVE_GAP_ADVISOR_GUIDE.md`.
