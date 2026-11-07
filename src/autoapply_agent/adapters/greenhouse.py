@@ -7,7 +7,12 @@ from urllib.parse import parse_qs, urljoin, urlparse
 
 from bs4 import BeautifulSoup
 
-from autoapply_agent.adapters.base import CareerSourceAdapter, JobCandidate, company_from_url
+from autoapply_agent.adapters.base import (
+    CareerSourceAdapter,
+    JobCandidate,
+    company_from_url,
+    is_host_or_subdomain,
+)
 
 
 class GreenhouseAdapter(CareerSourceAdapter):
@@ -56,7 +61,7 @@ class GreenhouseAdapter(CareerSourceAdapter):
         if max_jobs <= 0:
             return []
         soup = BeautifulSoup(html, "html.parser")
-        anchors = list(soup.select("div.opening a, section.opening a, a.opening"))
+        anchors = list(soup.select("div.opening a, section.opening a, a.opening, tr.job-post a"))
         if not anchors:
             fallback_anchors = list(soup.select("a[href]"))
             anchors = []
@@ -69,7 +74,10 @@ class GreenhouseAdapter(CareerSourceAdapter):
         seen_urls: set[str] = set()
         for anchor in anchors:
             href = self._normalize_href(anchor.get("href"))
-            title = anchor.get_text(" ", strip=True)
+            # job-boards.greenhouse.io rows put the title and the location in sibling
+            # paragraphs inside the posting anchor.
+            title_node = anchor.select_one("p.body--medium")
+            title = (title_node or anchor).get_text(" ", strip=True)
             if not href or not title:
                 continue
             absolute_url = urljoin(base_url, href)
@@ -77,19 +85,20 @@ class GreenhouseAdapter(CareerSourceAdapter):
                 continue
             seen_urls.add(absolute_url)
 
-            opening_root = anchor.find_parent(class_="opening")
             location_text = None
-            if opening_root is not None:
+            location_node = anchor.select_one("p.body--metadata")
+            opening_root = anchor.find_parent(class_="opening")
+            if location_node is None and opening_root is not None:
                 location_node = opening_root.select_one("span.location")
-                if location_node is not None:
-                    location_text = location_node.get_text(" ", strip=True)
+            if location_node is not None:
+                location_text = location_node.get_text(" ", strip=True) or None
 
             jobs.append(
                 JobCandidate(
                     external_id=self._extract_external_id(absolute_url),
                     title=title,
                     location=location_text,
-                    company=company_from_url(base_url),
+                    company=self._company(base_url),
                     url=absolute_url,
                     raw={"source": "greenhouse"},
                 )
@@ -98,6 +107,31 @@ class GreenhouseAdapter(CareerSourceAdapter):
                 break
 
         return jobs
+
+    @staticmethod
+    def _company(base_url: str) -> str:
+        """Name the employer of a board: its board token on Greenhouse-hosted boards.
+
+        ``boards.greenhouse.io/gitlab``, ``job-boards.greenhouse.io/gitlab`` and the
+        embed form ``boards.greenhouse.io/embed/job_board?for=gitlab`` all belong to
+        ``gitlab``; other (self-hosted) career sites keep the host-based identifier.
+
+        Args:
+            base_url: Source URL.
+
+        Returns:
+            Board token, or the host-based company identifier.
+        """
+
+        parsed = urlparse(base_url)
+        if is_host_or_subdomain(parsed.hostname, "greenhouse.io"):
+            board = parse_qs(parsed.query).get("for", [""])[0]
+            segments = [part for part in parsed.path.split("/") if part]
+            if not board and segments and segments[0] != "embed":
+                board = segments[0]
+            if board:
+                return board
+        return company_from_url(base_url)
 
     @staticmethod
     def _looks_like_posting_href(href: str) -> bool:

@@ -8,7 +8,12 @@ from urllib.parse import urljoin, urlparse
 
 from bs4 import BeautifulSoup
 
-from autoapply_agent.adapters.base import CareerSourceAdapter, JobCandidate, company_from_url
+from autoapply_agent.adapters.base import (
+    CareerSourceAdapter,
+    JobCandidate,
+    company_from_url,
+    is_host_or_subdomain,
+)
 
 _POSTING_ID_PATTERN = re.compile(
     r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
@@ -62,7 +67,20 @@ class LeverAdapter(CareerSourceAdapter):
         if max_jobs <= 0:
             return []
         soup = BeautifulSoup(html, "html.parser")
-        anchors = list(soup.select("div.posting a.posting-title, div.posting a"))
+        # Live boards render an Apply button linking to the posting URL itself before
+        # the title anchor. Title anchors go first so URL de-duplication keeps them;
+        # other non-Apply posting links follow, so postings without one still count.
+        title_anchors = soup.select("div.posting a.posting-title")
+        preferred = {id(anchor) for anchor in title_anchors}
+        anchors = [
+            *title_anchors,
+            *(
+                anchor
+                for anchor in soup.select("div.posting a")
+                if id(anchor) not in preferred
+                and "posting-btn-submit" not in (anchor.get("class") or [])
+            ),
+        ]
         if not anchors:
             fallback_anchors = list(soup.select("a[href]"))
             anchors = []
@@ -75,7 +93,10 @@ class LeverAdapter(CareerSourceAdapter):
         seen_urls: set[str] = set()
         for anchor in anchors:
             href = self._normalize_href(anchor.get("href"))
-            title = anchor.get_text(" ", strip=True)
+            # The title anchor also wraps the categories (workplace, commitment,
+            # location); the posting name alone is the title.
+            title_node = anchor.select_one('[data-qa="posting-name"], h5')
+            title = (title_node or anchor).get_text(" ", strip=True)
             if not href or not title:
                 continue
             absolute_url = urljoin(base_url, href)
@@ -99,7 +120,7 @@ class LeverAdapter(CareerSourceAdapter):
                     external_id=self._extract_external_id(absolute_url),
                     title=title,
                     location=location_text,
-                    company=company_from_url(base_url),
+                    company=self._company(base_url),
                     url=absolute_url,
                     raw={"source": "lever"},
                 )
@@ -108,6 +129,23 @@ class LeverAdapter(CareerSourceAdapter):
                 break
 
         return jobs
+
+    @staticmethod
+    def _company(base_url: str) -> str:
+        """Name the employer of a board: its token on ``jobs.lever.co/{company}``.
+
+        Args:
+            base_url: Source URL.
+
+        Returns:
+            Board token, or the host-based company identifier elsewhere.
+        """
+
+        parsed = urlparse(base_url)
+        segments = [part for part in parsed.path.split("/") if part]
+        if is_host_or_subdomain(parsed.hostname, "lever.co") and segments:
+            return segments[0]
+        return company_from_url(base_url)
 
     @classmethod
     def _looks_like_posting_href(cls, href: str) -> bool:

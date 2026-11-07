@@ -738,3 +738,145 @@ def test_teamtailor_relocation_note_is_not_read_as_location() -> None:
 
     assert len(jobs) == 1
     assert jobs[0].location is None
+
+
+# Trimmed from https://jobs.lever.co/palantir (2026-11-07): the Apply button links to the
+# posting URL itself and precedes the title anchor, whose text includes the categories.
+LEVER_LIVE_BOARD_HTML = """
+<div class="posting" data-qa-posting-id="6ed76ce8-4156-4b60-b120-403538bd66cd">
+  <div class="posting-apply" data-qa="btn-apply">
+    <a class="posting-btn-submit template-btn-submit black"
+       href="https://jobs.lever.co/palantir/6ed76ce8-4156-4b60-b120-403538bd66cd">Apply</a>
+  </div>
+  <a class="posting-title"
+     href="https://jobs.lever.co/palantir/6ed76ce8-4156-4b60-b120-403538bd66cd">
+    <h5 data-qa="posting-name">Administrative Business Partner</h5>
+    <div class="posting-categories">
+      <span class="display-inline-block small-category-label workplaceTypes">Hybrid \u2014 </span>
+      <span class="sort-by-commitment posting-category commitment">Full-time</span>
+      <span class="sort-by-location posting-category location">Singapore, Singapore</span>
+    </div>
+  </a>
+</div>
+<div class="posting" data-qa-posting-id="f163223b-db5d-4c6d-b73f-0a2eaf85583f">
+  <div class="posting-apply" data-qa="btn-apply">
+    <a class="posting-btn-submit template-btn-submit black"
+       href="https://jobs.lever.co/palantir/f163223b-db5d-4c6d-b73f-0a2eaf85583f">Apply</a>
+  </div>
+  <a class="posting-title"
+     href="https://jobs.lever.co/palantir/f163223b-db5d-4c6d-b73f-0a2eaf85583f">
+    <h5 data-qa="posting-name">Commercial Administrative Business Partner</h5>
+    <div class="posting-categories">
+      <span class="sort-by-commitment posting-category commitment">Full-time</span>
+      <span class="sort-by-location posting-category location">New York, NY</span>
+    </div>
+  </a>
+</div>
+"""
+
+
+def test_lever_live_board_uses_the_posting_name_not_the_apply_button() -> None:
+    """Live Lever boards: titles come from ``posting-name``, never the Apply button.
+
+    The Apply button shares the posting URL, so URL de-duplication used to keep it
+    and drop the real title anchor, turning every job title into ``Apply``.
+    """
+
+    jobs = LeverAdapter(user_agent="test-agent")._parse_html(
+        "https://jobs.lever.co/palantir", LEVER_LIVE_BOARD_HTML, max_jobs=10
+    )
+
+    assert [(job.title, job.location) for job in jobs] == [
+        ("Administrative Business Partner", "Singapore, Singapore"),
+        ("Commercial Administrative Business Partner", "New York, NY"),
+    ]
+    assert jobs[0].external_id == "6ed76ce8-4156-4b60-b120-403538bd66cd"
+    assert jobs[0].url == "https://jobs.lever.co/palantir/6ed76ce8-4156-4b60-b120-403538bd66cd"
+
+
+# Trimmed from https://job-boards.greenhouse.io/gitlab (2026-11-07): title and location
+# are sibling paragraphs inside the posting anchor of a ``tr.job-post`` row.
+GREENHOUSE_LIVE_BOARD_HTML = """
+<table><tbody>
+<tr class="job-post"><td class="cell">
+  <a href="https://job-boards.greenhouse.io/gitlab/jobs/8629019002" target="_top">
+    <p class="body body--medium">Director, Support (Bengaluru)</p>
+    <p class="body body__secondary body--metadata">Bangalore, India</p>
+  </a>
+</td></tr>
+<tr class="job-post"><td class="cell">
+  <a href="https://job-boards.greenhouse.io/gitlab/jobs/8684061002" target="_top">
+    <p class="body body--medium">Intermediate Support Engineer (SHIFT) </p>
+    <p class="body body__secondary body--metadata">Remote, United Kingdom</p>
+  </a>
+</td></tr>
+</tbody></table>
+"""
+
+
+def test_greenhouse_live_board_splits_title_and_location() -> None:
+    """Live Greenhouse boards: the location paragraph is not part of the title."""
+
+    jobs = GreenhouseAdapter(user_agent="test-agent")._parse_html(
+        "https://job-boards.greenhouse.io/gitlab", GREENHOUSE_LIVE_BOARD_HTML, max_jobs=10
+    )
+
+    assert [(job.title, job.location) for job in jobs] == [
+        ("Director, Support (Bengaluru)", "Bangalore, India"),
+        ("Intermediate Support Engineer (SHIFT)", "Remote, United Kingdom"),
+    ]
+    assert [job.external_id for job in jobs] == ["8629019002", "8684061002"]
+
+
+def test_hosted_board_jobs_are_attributed_to_the_board_owner() -> None:
+    """Multi-tenant boards name the employer by board token, not by the ATS host."""
+
+    greenhouse = GreenhouseAdapter(user_agent="test-agent")
+    lever = LeverAdapter(user_agent="test-agent")
+
+    cases = [
+        greenhouse._parse_html(
+            "https://boards.greenhouse.io/gitlab", GREENHOUSE_LIVE_BOARD_HTML, max_jobs=1
+        ),
+        greenhouse._parse_html(
+            "https://job-boards.greenhouse.io/gitlab", GREENHOUSE_LIVE_BOARD_HTML, max_jobs=1
+        ),
+        greenhouse._parse_html(
+            "https://boards.greenhouse.io/embed/job_board?for=gitlab",
+            GREENHOUSE_LIVE_BOARD_HTML,
+            max_jobs=1,
+        ),
+        lever._parse_html("https://jobs.lever.co/palantir", LEVER_LIVE_BOARD_HTML, max_jobs=1),
+    ]
+
+    assert [jobs[0].company for jobs in cases] == ["gitlab", "gitlab", "gitlab", "palantir"]
+    self_hosted = [
+        greenhouse._parse_html(url, GREENHOUSE_LIVE_BOARD_HTML, max_jobs=1)[0].company
+        for url in ("https://careers.example.com/jobs", "https://careers.mygreenhouse.io/jobs")
+    ] + [lever._parse_html("https://careers.clever.co/jobs", LEVER_LIVE_BOARD_HTML, 1)[0].company]
+    assert self_hosted == ["careers.example.com", "careers.mygreenhouse.io", "careers.clever.co"]
+
+
+LEVER_MIXED_ANCHORS_HTML = """
+<div class="posting">
+  <div class="posting-apply">
+    <a class="posting-btn-submit" href="https://jobs.lever.co/acme/1111aaaa-0000-4000-8000-000000000001">Apply</a>
+  </div>
+  <a class="posting-title" href="https://jobs.lever.co/acme/1111aaaa-0000-4000-8000-000000000001">
+    <h5 data-qa="posting-name">Backend Engineer</h5>
+  </a>
+</div>
+<div class="posting">
+  <a href="https://jobs.lever.co/acme/2222bbbb-0000-4000-8000-000000000002">Data Engineer</a>
+</div>
+"""
+
+
+def test_lever_keeps_plain_title_anchors_next_to_preferred_ones() -> None:
+    """Preferring ``a.posting-title`` must not drop postings rendered without it."""
+
+    jobs = LeverAdapter(user_agent="test-agent")._parse_html(
+        "https://jobs.lever.co/acme", LEVER_MIXED_ANCHORS_HTML, max_jobs=10
+    )
+
+    assert sorted(job.title for job in jobs) == ["Backend Engineer", "Data Engineer"]
