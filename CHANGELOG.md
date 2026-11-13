@@ -777,6 +777,20 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `reasoning_effort: none`.
 
 ### Fixed
+- `JsonLdAdapter`: schema.org `JobPosting` roles that can be done fully remotely are now
+  reported as remote even when they also list an office. Google's work-from-home markup
+  pairs an office `jobLocation` with `jobLocationType: TELECOMMUTE` ("at the Detroit
+  office or from home in the US") and still accepts the older
+  `jobLocation.additionalProperty` `TELECOMMUTE` flag, but only TELECOMMUTE postings
+  without an office became `Remote`; the rest kept the bare office location, so
+  `GET /jobs?remote=true`, the Atom feed and MCP `search_jobs` dropped them,
+  `remote=false` returned them, and the CSV `remote` column and feed summary said they
+  were on-site. They now become `Remote - <office>`, followed by the remote-eligible
+  regions from `applicantLocationRequirements`
+  (`Remote - Detroit, MI, US / Michigan, USA / Texas, USA`, or `Remote - USA` without
+  an office). Regions alone, with no office and no `jobLocationType` (schema.org's
+  example), also mark a role remote. Postings without `TELECOMMUTE` (on-site, hybrid)
+  keep their office location.
 - Dependencies: bump the transitive `soupsieve` (CSS selectors for `beautifulsoup4`) from 3.0.4 to 4.1 to fix CVE-2026-126190 / GHSA-mmhr-3c5m-f64f, a polynomial-time denial of service in the descendant combinator that affects every release before 4.0.0 and made the `Security Scan` workflow (`pip-audit`) fail on `main`. `[tool.uv] constraint-dependencies` now pins `soupsieve>=4.0` on Python >= 3.11.5 so a future `uv lock` cannot resolve a vulnerable version. soupsieve 4.x requires Python 3.11.5+, so installs on Python 3.11.0-3.11.4 still resolve 2.10 (no fixed release exists there); use Python 3.11.5 or newer. The adapters only run constant `a[href]` selectors, so practical exposure was low.
 - Worker: with LLM enrichment enabled, a run can be cancelled while a provider call is
   in flight. The worker awaited each provider call (up to `LLM_TIMEOUT_SECONDS`) inside
