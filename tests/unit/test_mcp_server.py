@@ -43,6 +43,7 @@ READ_ONLY_TOOLS = [
     "get_run",
     "list_runs",
     "list_sources",
+    "match_resume_to_jobs",
     "search_jobs",
 ]
 

@@ -7,7 +7,9 @@ Every tool reuses the services behind the HTTP API instead of re-implementing qu
 * :class:`~autoapply_agent.services.scoring.DeterministicScoringService` and the
   priority tiers of :mod:`~autoapply_agent.services.agent_decision` to explain scores;
 * :mod:`~autoapply_agent.services.read_queries` for runs, run events and sources;
-* :mod:`~autoapply_agent.services.job_export` for http(s)-only links and timestamps.
+* :mod:`~autoapply_agent.services.job_export` for http(s)-only links and timestamps;
+* :mod:`~autoapply_agent.services.resume_match` to rank jobs against resume text (the
+  ranking of ``POST /jobs/match``).
 
 No tool writes: none can start or cancel runs, edit source configs or apply to jobs.
 Results carry ``structuredContent`` that conforms to each tool's ``outputSchema`` plus a
@@ -48,6 +50,13 @@ from autoapply_agent.services.read_queries import (
     list_runs,
     list_source_configs,
     run_events,
+)
+from autoapply_agent.services.resume_match import (
+    MAX_RESUME_CHARS,
+    MatchSort,
+    RankedJob,
+    ResumeProfile,
+    rank_jobs,
 )
 from autoapply_agent.services.scoring import (
     KEYWORD_BONUS_CAP,
@@ -668,6 +677,118 @@ async def _list_sources(session: AsyncSession, arguments: dict[str, Any]) -> Too
 
 
 # ---------------------------------------------------------------------------
+# match_resume_to_jobs
+# ---------------------------------------------------------------------------
+
+
+def _match_filters(arguments: dict[str, Any]) -> JobSearchFilters:
+    """The search_jobs filters of a match request; dedupe defaults to on."""
+
+    created_after = (
+        _parse_instant(arguments["created_after"]) if "created_after" in arguments else None
+    )
+    try:
+        window_start = capture_window_start(
+            created_after, _optional_int_argument(arguments, "hours_old"), now=utc_now()
+        )
+    except OverflowError as exc:
+        raise ToolError("created_after is outside the supported UTC range") from exc
+    min_score = arguments.get("min_score")
+    return JobSearchFilters(
+        q=arguments.get("q"),
+        company=arguments.get("company"),
+        location=arguments.get("location"),
+        remote=arguments.get("remote"),
+        min_score=None if min_score is None else float(min_score),
+        source_config_id=_optional_int_argument(arguments, "source_config_id"),
+        run_id=arguments.get("run_id"),
+        created_after=window_start,
+        dedupe=bool(arguments.get("dedupe", True)),
+    )
+
+
+def _match_record(item: RankedJob, include_extra_skills: bool) -> dict[str, Any]:
+    """Job record of one ranked job (search fields without ``first_seen_at``)."""
+
+    record = _job_summary(item.job)
+    del record["first_seen_at"]
+    return {
+        **record,
+        "rank": item.rank,
+        "match_score": item.match.match_score,
+        "blend_score": item.blend_score,
+        "matched_skills": list(item.match.matched),
+        "missing_skills": list(item.match.missing),
+        "extra_skills": list(item.match.extra) if include_extra_skills else None,
+        "explanation": item.explanation,
+    }
+
+
+async def _match_resume_to_jobs(session: AsyncSession, arguments: dict[str, Any]) -> ToolOutput:
+    """Rank captured jobs against resume text, like ``POST /jobs/match``."""
+
+    resume_text: str = arguments["resume_text"]
+    if not resume_text.strip():
+        raise ToolError("resume_text must contain the plain text of a resume.")
+    filters = _match_filters(arguments)
+    profile = ResumeProfile.from_text(resume_text)
+    sort = MatchSort(arguments.get("sort", MatchSort.MATCH.value))
+    limit = _int_argument(arguments, "limit", DEFAULT_PAGE_SIZE)
+    min_match = arguments.get("min_match")
+    page = await rank_jobs(
+        session,
+        filters,
+        profile,
+        sort=sort,
+        limit=limit,
+        min_match=None if min_match is None else float(min_match),
+    )
+    include_extra_skills = bool(arguments.get("include_extra_skills", False))
+    structured: dict[str, Any] = {
+        "resume_sha256": profile.sha256,
+        "resume_skills": list(profile.skills),
+        "implied_skills": {skill: list(sources) for skill, sources in profile.implied.items()},
+        "sort": sort.value,
+        "dedupe": filters.dedupe,
+        "captured_since": _timestamp(filters.created_after),
+        "total": page.total,
+        "limit": limit,
+        "jobs": [_match_record(item, include_extra_skills) for item in page.items],
+    }
+    return ToolOutput(structured, _match_summary(structured), len(page.items))
+
+
+def _match_summary(result: dict[str, Any]) -> str:
+    """Render a resume match as text."""
+
+    mode = f"sort={result['sort']}, dedupe={'on' if result['dedupe'] else 'off'}"
+    skills = result["resume_skills"]
+    lines = [
+        f"Resume: {len(skills)} skill{'' if len(skills) == 1 else 's'} recognized"
+        + (f" ({', '.join(skills)})." if skills else ".")
+    ]
+    if not skills:
+        lines.append(
+            "No lexicon skill was recognized in resume_text, so every match score is 0; "
+            "pass the resume as plain text."
+        )
+    jobs = result["jobs"]
+    if not jobs:
+        lines.append(f"No jobs match these filters ({mode}).")
+        return "\n".join(lines)
+    noun = "job" if result["total"] == 1 else "jobs"
+    lines.append(f"{result['total']} {noun} ranked ({mode}); top {len(jobs)}:")
+    for job in jobs:
+        place = " · ".join(part for part in (job["company"], job["location"]) if part)
+        lines.append(
+            f"{job['rank']}. #{job['id']} match {job['match_score']:.4f} {job['title']}"
+            + (f" — {place}" if place else "")
+        )
+        lines.append(f"   {job['explanation']}")
+    return "\n".join(lines)
+
+
+# ---------------------------------------------------------------------------
 # Schemas
 # ---------------------------------------------------------------------------
 
@@ -998,6 +1119,108 @@ _LIST_SOURCES_OUTPUT: dict[str, Any] = _closed_object(
         },
     }
 )
+_MATCH_INPUT: dict[str, Any] = {
+    "type": "object",
+    "properties": {
+        "resume_text": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": MAX_RESUME_CHARS,
+            "description": "Plain text of the user's resume (not a file path or URL). Used in "
+            "memory only: never stored, logged or written to the audit log.",
+        },
+        **{
+            name: _SEARCH_INPUT["properties"][name]
+            for name in (
+                "q",
+                "company",
+                "location",
+                "remote",
+                "min_score",
+                "source_config_id",
+                "run_id",
+                "created_after",
+                "hours_old",
+            )
+        },
+        "dedupe": {
+            "type": "boolean",
+            "default": True,
+            "description": "Rank each posting once (re-captures and cross-board mirrors "
+            "collapsed); on by default.",
+        },
+        "sort": {
+            "type": "string",
+            "enum": [sort.value for sort in MatchSort],
+            "default": MatchSort.MATCH.value,
+            "description": "match: highest match score first (ties: more matched skills, "
+            "higher score, newer); blend: 0.7 * match score + 0.3 * deterministic score.",
+        },
+        "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": MAX_PAGE_SIZE,
+            "default": DEFAULT_PAGE_SIZE,
+            "description": f"Number of top jobs returned (1-{MAX_PAGE_SIZE}).",
+        },
+        "min_match": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Drop jobs whose match score is lower.",
+        },
+        "include_extra_skills": {
+            "type": "boolean",
+            "default": False,
+            "description": "Also list the resume skills each posting does not mention.",
+        },
+    },
+    "required": ["resume_text"],
+    "additionalProperties": False,
+}
+_MATCH_JOB_PROPERTIES: dict[str, Any] = {
+    **{name: value for name, value in _JOB_SUMMARY_PROPERTIES.items() if name != "first_seen_at"},
+    "rank": {"type": "integer", "minimum": 1},
+    "match_score": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 1,
+        "description": "Share of the posting's skills found on the resume.",
+    },
+    "blend_score": {"type": "number", "description": "0.7 * match_score + 0.3 * score."},
+    "matched_skills": {
+        **_STRING_LIST,
+        "description": "Posting skills the resume names or implies, in posting order.",
+    },
+    "missing_skills": {
+        **_STRING_LIST,
+        "description": "Posting skills the resume lacks, in posting order.",
+    },
+    "extra_skills": _nullable(
+        _STRING_LIST, "Resume skills the posting does not mention; null unless requested."
+    ),
+    "explanation": _STRING,
+}
+_MATCH_OUTPUT: dict[str, Any] = _closed_object(
+    {
+        "resume_sha256": {"type": "string", "description": "SHA-256 of the UTF-8 resume text."},
+        "resume_skills": {**_STRING_LIST, "description": "Skills recognized in the resume."},
+        "implied_skills": {
+            "type": "object",
+            "additionalProperties": _STRING_LIST,
+            "description": "Skills the resume demonstrates without naming them, with the "
+            "resume skills that imply them.",
+        },
+        "sort": {"type": "string", "enum": [sort.value for sort in MatchSort]},
+        "dedupe": {"type": "boolean"},
+        "captured_since": _nullable(
+            _STRING, "Effective capture-time lower bound (RFC 3339) from created_after/hours_old."
+        ),
+        "total": {**_COUNT, "description": "Jobs ranked (filters and min_match applied)."},
+        "limit": _COUNT,
+        "jobs": {"type": "array", "items": _closed_object(_MATCH_JOB_PROPERTIES)},
+    }
+)
 
 TOOLS: tuple[ToolSpec, ...] = (
     ToolSpec(
@@ -1059,6 +1282,23 @@ TOOLS: tuple[ToolSpec, ...] = (
         input_schema=_LIST_SOURCES_INPUT,
         output_schema=_LIST_SOURCES_OUTPUT,
         handler=_list_sources,
+    ),
+    ToolSpec(
+        name="match_resume_to_jobs",
+        title="Rank your job feed against a resume",
+        description=(
+            "Rank the jobs your discovery runs captured by how well they fit resume text the "
+            "user provides. Skills are extracted deterministically (curated lexicon with "
+            "aliases such as k8s → kubernetes, postgres → postgresql) from the resume and "
+            "from each posting's title and description; match_score is the share of the "
+            "posting's skills found on the resume, with matched_skills, missing_skills and a "
+            "one-line explanation. sort=match|blend (blend mixes in the stored score); takes "
+            "the search_jobs filters; dedupe is on by default. The resume is used in memory "
+            "only and never stored or logged. Read-only; no LLM."
+        ),
+        input_schema=_MATCH_INPUT,
+        output_schema=_MATCH_OUTPUT,
+        handler=_match_resume_to_jobs,
     ),
     ToolSpec(
         name="search_jobs",
