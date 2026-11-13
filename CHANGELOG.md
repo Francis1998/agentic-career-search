@@ -748,6 +748,17 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `external_id`. See ADR-086.
 
 ### Changed
+- LLM enrichment docs follow the model line-ups verified on 2026-11-12 on the OpenAI,
+  Anthropic, Google and Moonshot model pages. README, `CONFIGURATION.md`,
+  `.env.example` and `docs/TROUBLESHOOTING.md` add `claude-fable-5-2` (Anthropic's new
+  model for demanding reasoning; needs 30-day data retention), `gemini-4-hydrogen`
+  (released 2026-11-12; Google's recommended upgrade from Gemini 3.8 Flash),
+  `gemini-4-carbon`, `gemini-3.5-flash-lite` and `gpt-6.1-terra` as options, and date
+  the Kimi K2 retirement: closed to new users on 2026-10-31, retiring by the end of
+  December 2026. Defaults are unchanged; `gemini-3.8-flash` stays the Gemini default at
+  half the price of `gemini-4-hydrogen` through 2026-12-31. The Claude request test now
+  also covers `claude-fable-5-2`, and the model-stack doc guard flags the superseded
+  Claude Fable 5.1.
 - Guides, the use-case catalog, and module docstrings no longer name the retired "GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x (or 2.5) / Kimi K2" stack for optional LLM enrichment (407 changed lines across 356 files). They now name the provider flagships verified on 2026-11-07: GPT-6 Astra, Claude Opus 5.5, Gemini 4 Argon, and Kimi K3.1 Pro. Architecture decision records keep their original wording because they record the context of past decisions. `tests/unit/test_docs_model_stack_current.py` now fails if retired names (GPT-5.x, GPT-4o, Claude Sonnet/Opus 4.x, Kimi K2, Gemini 2.5) reappear in README/docs or `src`/`scripts`, except on lines announcing a retirement.
 - README restructured into a focused product page: pitch, hero demo, why, architecture
   diagram, 60-second quickstart (offline seed and live boards), feature map, current

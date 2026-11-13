@@ -37,6 +37,8 @@ More in the [MCP Server Guide](guides/MCP_SERVER_GUIDE.md#troubleshooting).
 | Enrichment silently absent | Missing provider API key | Set the key for active `LLM_PROVIDER` |
 | Provider timeouts | Network latency or slow model | Increase `LLM_TIMEOUT_SECONDS` |
 | Wrong provider selected | Misconfigured env | Use `gemini`, `kimi`, `claude`, or `gpt` |
+| Enrichment absent with `claude-fable-5-2` | Organization or workspace without 30-day data retention (HTTP 400) | Enable 30-day retention or use `claude-opus-5-5` |
+| Kimi enrichment stops on a `kimi-k2.*` model | K2 models are retiring by the end of December 2026 (closed to new users on 2026-10-31) | Set `KIMI_MODEL=kimi-k3.1-pro` |
 
 Provider key mapping:
 
