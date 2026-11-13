@@ -41,6 +41,12 @@ pythonpath = ["src"]
 testpaths = ["tests"]
 asyncio_mode = "auto"
 
+[tool.uv]
+# Security floor for transitive dependencies (keep `uv lock` from resolving known-vulnerable
+# versions). soupsieve < 4.0 is affected by CVE-2026-126190 / GHSA-mmhr-3c5m-f64f
+# (polynomial-time DoS in the descendant combinator); 4.x requires Python >= 3.11.5.
+constraint-dependencies = ["soupsieve>=4.0; python_full_version >= '3.11.5'"]
+
 [tool.ruff]
 line-length = 100
 target-version = "py311"
