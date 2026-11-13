@@ -239,37 +239,17 @@ class InProcessWorker:
             decision = self._decision_engine.evaluate(job_candidate, run.query)
             llm_enrichment = None
             if self._llm_enrichment_service is not None:
+                # Never wait on the provider inside a write transaction: on SQLite it
+                # would lock every API write, a cancel included, out of the database.
+                await session.commit()
                 llm_enrichment = await self._llm_enrichment_service.enrich_job_decision(
                     job_candidate=job_candidate,
                     query=run.query,
                     deterministic_rationale=decision.rationale,
                 )
-                if llm_enrichment is not None:
-                    await append_run_event(
-                        session,
-                        run.id,
-                        "agent.llm_enrichment",
-                        f"LLM enrichment consumed from {llm_enrichment.provider}",
-                        payload={
-                            "source_config_id": source_config.id,
-                            "url": job_candidate.url,
-                            "provider": llm_enrichment.provider,
-                            "model": llm_enrichment.model,
-                        },
-                    )
-            await append_run_event(
-                session,
-                run.id,
-                "agent.decision",
-                f"Decision created for {job_candidate.title}",
-                payload={
-                    "source_config_id": source_config.id,
-                    "url": job_candidate.url,
-                    "priority_tier": decision.priority_tier,
-                    "score": decision.score,
-                    "matched_terms": decision.matched_query_terms,
-                },
-            )
+            # Insert the job before its events: on SQLite the INSERT takes the write lock
+            # first, so the event sequence read next counts events the API (a cancel)
+            # committed while the provider call was in flight.
             session.add(
                 Job(
                     run_id=run.id,
@@ -283,6 +263,33 @@ class InProcessWorker:
                     plan_steps=self._build_plan_steps(decision, llm_enrichment),
                     raw=self._build_job_raw_payload(job_candidate.raw, decision, llm_enrichment),
                 )
+            )
+            await session.flush()
+            if llm_enrichment is not None:
+                await append_run_event(
+                    session,
+                    run.id,
+                    "agent.llm_enrichment",
+                    f"LLM enrichment consumed from {llm_enrichment.provider}",
+                    payload={
+                        "source_config_id": source_config.id,
+                        "url": job_candidate.url,
+                        "provider": llm_enrichment.provider,
+                        "model": llm_enrichment.model,
+                    },
+                )
+            await append_run_event(
+                session,
+                run.id,
+                "agent.decision",
+                f"Decision created for {job_candidate.title}",
+                payload={
+                    "source_config_id": source_config.id,
+                    "url": job_candidate.url,
+                    "priority_tier": decision.priority_tier,
+                    "score": decision.score,
+                    "matched_terms": decision.matched_query_terms,
+                },
             )
             seen_urls.add(job_candidate.url)
             inserted_count += 1
