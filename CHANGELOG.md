@@ -777,6 +777,16 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `reasoning_effort: none`.
 
 ### Fixed
+- Worker: with LLM enrichment enabled, a run can be cancelled while a provider call is
+  in flight. The worker awaited each provider call (up to `LLM_TIMEOUT_SECONDS`) inside
+  the write transaction it holds from a source's first job to its last, so on SQLite
+  every API write waited for the whole source: `POST /runs/{run_id}/cancel` failed with
+  HTTP 500 (`database is locked`) after SQLite's 5 s busy timeout, the cancel was lost
+  and the run kept calling the provider until it completed. The worker now commits
+  before each provider call, so the cancel is accepted at once and the run stops at the
+  next job (the job being enriched is kept; no further provider call is made). Each job
+  is now inserted before its events, so their sequence numbers are read under the write
+  lock and cannot collide with a `run.cancel_requested` committed during the call.
 - LLM enrichment on Gemini 4 (`gemini-4-hydrogen`, `gemini-4-carbon`, `gemini-4-argon`)
   no longer sends the 1,024-token `maxOutputTokens` cap. The cap covers thinking and
   reply together, and Google's thinking guide warns that a small cap can end the turn

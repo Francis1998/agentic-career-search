@@ -47,6 +47,11 @@ includes a run that finishes while the cancel request waits for the worker's dat
 write (on SQLite, a cancel sent while the last source is being ingested). Such a run
 used to be switched from `completed` to `cancel_requested`, which it never left.
 
+With LLM enrichment enabled the worker commits before each provider call, so a cancel
+sent while a call is in flight is accepted at once; the job being enriched is still
+stored and no further provider call is made. Such a cancel used to wait for the whole
+source on SQLite and fail with a 500 (`database is locked`).
+
 ## Jobs
 
 | Method | Path | Description |
