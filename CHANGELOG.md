@@ -777,6 +777,7 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `reasoning_effort: none`.
 
 ### Fixed
+- Dependencies: bump the transitive `soupsieve` (CSS selectors for `beautifulsoup4`) from 3.0.4 to 4.1 to fix CVE-2026-126190 / GHSA-mmhr-3c5m-f64f, a polynomial-time denial of service in the descendant combinator that affects every release before 4.0.0 and made the `Security Scan` workflow (`pip-audit`) fail on `main`. `[tool.uv] constraint-dependencies` now pins `soupsieve>=4.0` on Python >= 3.11.5 so a future `uv lock` cannot resolve a vulnerable version. soupsieve 4.x requires Python 3.11.5+, so installs on Python 3.11.0-3.11.4 still resolve 2.10 (no fixed release exists there); use Python 3.11.5 or newer. The adapters only run constant `a[href]` selectors, so practical exposure was low.
 - Worker: with LLM enrichment enabled, a run can be cancelled while a provider call is
   in flight. The worker awaited each provider call (up to `LLM_TIMEOUT_SECONDS`) inside
   the write transaction it holds from a source's first job to its last, so on SQLite
