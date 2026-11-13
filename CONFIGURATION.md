@@ -15,12 +15,12 @@ Configuration is environment-variable driven via `pydantic-settings`.
 | `LLM_PROVIDER` | `gemini` | Active LLM provider: `gemini`, `kimi`, `claude`, `gpt` |
 | `LLM_TIMEOUT_SECONDS` | `12.0` | LLM API timeout in seconds |
 | `GEMINI_API_KEY` | _empty_ | Gemini API key |
-| `GEMINI_MODEL` | `gemini-3.8-flash` | Gemini model; Gemini 3+ models get `thinkingLevel: LOW` |
+| `GEMINI_MODEL` | `gemini-3.8-flash` | Gemini model; Gemini 3+ models get `thinkingLevel: LOW`, and Gemini 4 models (`gemini-4-hydrogen`, `gemini-4-argon`, `gemini-4-carbon`) keep Google's default output limit |
 | `KIMI_API_KEY` | _empty_ | Kimi (Moonshot) API key |
 | `KIMI_MODEL` | `kimi-k3.1-pro` | Kimi model; K3 models get `reasoning_effort: low` |
 | `KIMI_BASE_URL` | `https://api.moonshot.ai/v1` | Kimi base URL (`https://api.moonshot.cn/v1` for mainland-China accounts) |
 | `CLAUDE_API_KEY` | _empty_ | Anthropic Claude API key |
-| `CLAUDE_MODEL` | `claude-haiku-5-5` | Claude model |
+| `CLAUDE_MODEL` | `claude-haiku-5-5` | Claude model; `claude-sonnet-5-5`, `claude-opus-5-5` and `claude-fable-5-2` take the same request shape |
 | `CLAUDE_EFFORT` | `low` | Claude `output_config.effort` (`low`…`max`); empty omits it |
 | `OPENAI_API_KEY` | _empty_ | GPT / OpenAI-compatible API key |
 | `OPENAI_MODEL` | `gpt-6-luna` | GPT model name |
@@ -58,6 +58,7 @@ LLM_ENABLE_ENRICHMENT=true
 LLM_PROVIDER=gemini
 GEMINI_API_KEY=your_key_here
 GEMINI_MODEL=gemini-3.8-flash
+# GEMINI_MODEL=gemini-4-hydrogen   # Google's recommended upgrade; 2x the price through 2026-12-31
 ```
 
 ### LLM enrichment enabled (Kimi example)
@@ -77,6 +78,7 @@ LLM_ENABLE_ENRICHMENT=true
 LLM_PROVIDER=claude
 CLAUDE_API_KEY=your_key_here
 CLAUDE_MODEL=claude-haiku-5-5
+# CLAUDE_MODEL=claude-fable-5-2   # demanding reasoning; needs 30-day data retention
 CLAUDE_EFFORT=low
 ```
 
@@ -112,7 +114,16 @@ Client configuration examples: [docs/guides/MCP_SERVER_GUIDE.md](docs/guides/MCP
 - Keep `HTTP_USER_AGENT` explicit and consistent across environments for easier request attribution.
 - When LLM enrichment is enabled, provider failures degrade gracefully to deterministic-only output.
 - Current models reason before answering and count those tokens against the output cap,
-  so each call allows 1,024 output tokens at low effort. Sampling parameters are only
-  sent where the provider accepts them: Kimi K3 fixes `temperature` at `1.0`, Claude 5.5
-  and Gemini 3.6+ reject or ignore custom values, and OpenAI accepts `temperature` only
-  with `reasoning_effort: none`.
+  so each call allows 1,024 output tokens at low effort. Gemini 4 requests are the
+  exception: Google advises keeping their default output limit and lowering
+  `thinkingLevel` instead, because a small cap can end the turn with `MAX_TOKENS` and no
+  text while the thinking tokens are still billed. Sampling parameters are only sent
+  where the provider accepts them: Kimi K3 fixes `temperature` at `1.0`, Claude 5.5 and
+  Fable 5.2 return 400 for custom values, Gemini 3.6+ ignores them, and OpenAI accepts
+  `temperature` only with `reasoning_effort: none`.
+- `claude-fable-5-2` always thinks (adaptive thinking cannot be turned off) and requires
+  30-day data retention: a request from an organization or workspace without it (for
+  example under zero data retention) returns HTTP 400, so enrichment falls back to
+  deterministic-only output.
+- Kimi K2 models are retiring by the end of December 2026 and closed to new users on
+  2026-10-31; use a K3 model such as `kimi-k3.1-pro`.

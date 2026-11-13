@@ -7,6 +7,7 @@ import json
 from typing import TYPE_CHECKING
 
 import httpx
+import pytest
 
 from autoapply_agent.adapters.base import JobCandidate
 from autoapply_agent.core.config import Settings
@@ -213,22 +214,27 @@ def test_gpt_6_requests_use_reasoning_effort_and_completion_token_budget(
         assert payload["max_completion_tokens"] >= 1024
 
 
-def test_claude_5_5_requests_omit_temperature_and_budget_for_thinking(
-    monkeypatch: MonkeyPatch,
+@pytest.mark.parametrize("model", ["claude-haiku-5-5", "claude-fable-5-2"])
+def test_claude_requests_omit_sampling_and_budget_for_adaptive_thinking(
+    monkeypatch: MonkeyPatch, model: str
 ) -> None:
-    """Claude 5.5 models 400 on any non-default temperature; thinking counts toward max_tokens."""
+    """Claude 5.5 and Fable 5.2 400 on custom sampling; thinking counts toward max_tokens.
+
+    Fable 5.2 thinks adaptively at all times (disabling it or sending a manual budget
+    is a 400), so effort is the only cost control the request carries.
+    """
 
     captured = _capture_requests(
         monkeypatch,
         {"content": [{"type": "thinking", "thinking": ""}, {"type": "text", "text": "Good fit."}]},
     )
 
-    result = _enrich(Settings(LLM_PROVIDER="claude", CLAUDE_API_KEY="test-key"))
+    result = _enrich(Settings(LLM_PROVIDER="claude", CLAUDE_API_KEY="test-key", CLAUDE_MODEL=model))
 
     assert result is not None and result.summary == "Good fit."
     payload = captured[0]
-    assert payload["model"] == "claude-haiku-5-5"
-    assert {"temperature", "top_p", "top_k"}.isdisjoint(payload)
+    assert payload["model"] == model
+    assert {"temperature", "top_p", "top_k", "thinking"}.isdisjoint(payload)
     assert payload["output_config"] == {"effort": "low"}
     assert payload["max_tokens"] >= 1024
 
@@ -253,3 +259,23 @@ def test_gemini_3_requests_use_thinking_level_instead_of_sampling(
     assert current["thinkingConfig"] == {"thinkingLevel": "LOW"}
     assert current["maxOutputTokens"] >= 1024
     assert "thinkingConfig" not in legacy
+
+
+@pytest.mark.parametrize("model", ["gemini-4-hydrogen", "gemini-4-carbon", "gemini-4-argon"])
+def test_gemini_4_requests_think_low_without_a_small_output_cap(
+    monkeypatch: MonkeyPatch, model: str
+) -> None:
+    """Gemini 4 caps thinking plus reply together: a small cap can end the turn empty."""
+
+    captured = _capture_requests(
+        monkeypatch, {"candidates": [{"content": {"parts": [{"text": "Fit."}]}}]}
+    )
+
+    result = _enrich(Settings(LLM_PROVIDER="gemini", GEMINI_API_KEY="test-key", GEMINI_MODEL=model))
+
+    assert result is not None and result.model == model
+    config = captured[0]["generationConfig"]
+    assert isinstance(config, dict)
+    assert config["thinkingConfig"] == {"thinkingLevel": "LOW"}
+    assert "maxOutputTokens" not in config
+    assert {"temperature", "topP", "topK"}.isdisjoint(config)

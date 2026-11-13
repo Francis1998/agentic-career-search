@@ -17,18 +17,18 @@ _MAX_OUTPUT_TOKENS = 1024
 _GEMINI_GENERATION = re.compile(r"^gemini-(\d+)")
 
 
-def _gemini_supports_thinking_level(model: str) -> bool:
-    """Return True for Gemini 3+ models, which accept ``thinkingLevel``.
+def _gemini_generation(model: str) -> int:
+    """Return the major Gemini generation of a model id.
 
     Args:
-        model: Gemini model id.
+        model: Gemini model id, such as ``gemini-3.8-flash`` or ``gemini-4-hydrogen``.
 
     Returns:
-        Whether ``generationConfig.thinkingConfig.thinkingLevel`` may be sent.
+        The generation number, or 0 for ids without one (``gemini-flash-latest``).
     """
 
     match = _GEMINI_GENERATION.match(model)
-    return match is not None and int(match.group(1)) >= 3
+    return int(match.group(1)) if match else 0
 
 
 @dataclass(frozen=True, slots=True)
@@ -115,8 +115,14 @@ class LLMEnrichmentService:
         endpoint = (
             f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
         )
-        generation_config: dict[str, object] = {"maxOutputTokens": _MAX_OUTPUT_TOKENS}
-        if _gemini_supports_thinking_level(model):
+        generation = _gemini_generation(model)
+        generation_config: dict[str, object] = {}
+        # Google's Gemini 4 guidance: keep the default output limit and lower
+        # thinkingLevel instead, because a small cap can end the turn with MAX_TOKENS
+        # and no text while the thinking tokens are still billed.
+        if generation < 4:
+            generation_config["maxOutputTokens"] = _MAX_OUTPUT_TOKENS
+        if generation >= 3:
             # Gemini 3.6+ ignores custom sampling values; steer cost via thinking.
             generation_config["thinkingConfig"] = {"thinkingLevel": "LOW"}
         payload: dict[str, object] = {
