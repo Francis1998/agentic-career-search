@@ -11,7 +11,7 @@ bespoke DOM scraper per provider.
 from __future__ import annotations
 
 import json
-from collections.abc import Iterator
+from collections.abc import Iterable, Iterator
 from urllib.parse import urljoin
 
 from bs4 import BeautifulSoup
@@ -19,6 +19,7 @@ from bs4 import BeautifulSoup
 from autoapply_agent.adapters.base import CareerSourceAdapter, JobCandidate, company_from_url
 
 _JOB_POSTING_TYPE = "JobPosting"
+_TELECOMMUTE = "TELECOMMUTE"
 _ADDRESS_FIELDS = ("addressLocality", "addressRegion", "addressCountry")
 
 
@@ -207,9 +208,13 @@ class JsonLdAdapter(CareerSourceAdapter):
             else base_url
         )
 
-        location = cls._extract_location(node.get("jobLocation"))
-        if location is None and cls._is_remote(node.get("jobLocationType")):
-            location = "Remote"
+        office = cls._extract_location(node.get("jobLocation"))
+        regions = cls._extract_regions(node.get("applicantLocationRequirements"))
+        location = (
+            cls._remote_location(office, regions)
+            if cls._is_remote_posting(node, regions)
+            else office
+        )
 
         company = cls._extract_company(node.get("hiringOrganization")) or company_from_url(base_url)
 
@@ -221,6 +226,36 @@ class JsonLdAdapter(CareerSourceAdapter):
             url=absolute_url,
             raw={"source": "jsonld"},
         )
+
+    @classmethod
+    def _is_remote_posting(cls, node: dict[str, object], regions: list[str]) -> bool:
+        """Report whether a posting can be done fully remotely.
+
+        Google's work-from-home markup sets ``jobLocationType: TELECOMMUTE``, also when
+        the job can alternatively be done at the office given in ``jobLocation``, and
+        still accepts the older ``jobLocation.additionalProperty`` ``TELECOMMUTE``.
+        ``TELECOMMUTE`` means 100% remote, so hybrid and on-site postings never carry
+        it. schema.org's own example marks a telecommute job with
+        ``applicantLocationRequirements`` alone, so remote-eligible regions count as
+        remote too when the posting lists no ``jobLocation`` at all (a Place is an
+        office even when no address can be read from it) and declares no
+        ``jobLocationType``.
+
+        Args:
+            node: Decoded JobPosting object.
+            regions: Remote-eligible regions from ``applicantLocationRequirements``.
+
+        Returns:
+            True when the posting is remote (possibly besides an office option).
+        """
+
+        job_location_type = node.get("jobLocationType")
+        if cls._is_remote(job_location_type):
+            return True
+        job_location = node.get("jobLocation")
+        if cls._has_telecommute_property(job_location):
+            return True
+        return bool(regions) and cls._is_blank(job_location) and not cls._texts(job_location_type)
 
     @classmethod
     def _is_remote(cls, job_location_type: object) -> bool:
@@ -240,14 +275,103 @@ class JsonLdAdapter(CareerSourceAdapter):
             (case-insensitive).
         """
 
-        if isinstance(job_location_type, str):
-            return cls._type_term(job_location_type).upper() == "TELECOMMUTE"
-        if isinstance(job_location_type, list):
-            return any(
-                isinstance(item, str) and cls._type_term(item).upper() == "TELECOMMUTE"
-                for item in job_location_type
-            )
+        return any(
+            cls._type_term(value).upper() == _TELECOMMUTE for value in cls._texts(job_location_type)
+        )
+
+    @classmethod
+    def _has_telecommute_property(cls, job_location: object) -> bool:
+        """Report whether a ``jobLocation`` carries the legacy ``TELECOMMUTE`` flag.
+
+        Google's original markup flagged work-from-home jobs on the Place itself,
+        ``"additionalProperty": {"@type": "PropertyValue", "value": "TELECOMMUTE"}``,
+        and still supports that form next to ``jobLocationType``.
+
+        Args:
+            job_location: A ``Place`` object or list of ``Place`` objects.
+
+        Returns:
+            True when a Place has an ``additionalProperty`` valued ``TELECOMMUTE``.
+        """
+
+        places = job_location if isinstance(job_location, list) else [job_location]
+        for place in places:
+            if not isinstance(place, dict):
+                continue
+            properties = place.get("additionalProperty")
+            for item in properties if isinstance(properties, list) else [properties]:
+                if isinstance(item, dict) and cls._is_remote(item.get("value")):
+                    return True
         return False
+
+    @classmethod
+    def _extract_regions(cls, requirements: object) -> list[str]:
+        """Collect the remote-eligible regions named by ``applicantLocationRequirements``.
+
+        Args:
+            requirements: An ``AdministrativeArea`` (``Country``, ``State``, ...)
+                object, its name as text, or a list of either.
+
+        Returns:
+            Region names in document order, without blanks or duplicates.
+        """
+
+        items = requirements if isinstance(requirements, list) else [requirements]
+        names = [
+            name
+            for item in items
+            for name in cls._texts(item.get("name") if isinstance(item, dict) else item)
+        ]
+        return cls._unique(names)
+
+    @classmethod
+    def _remote_location(cls, office: str | None, regions: list[str]) -> str:
+        """Fold remote status into the location, as ``Remote - London`` on Lever boards.
+
+        Args:
+            office: Location resolved from ``jobLocation``, if any.
+            regions: Remote-eligible regions from ``applicantLocationRequirements``.
+
+        Returns:
+            ``Remote - {office} / {regions...}``, ``Remote`` without any place, or the
+            places alone when they already say remote.
+        """
+
+        places = " / ".join(cls._unique([office, *regions] if office else regions))
+        if not places:
+            return "Remote"
+        if "remote" in places.casefold():
+            return places
+        return f"Remote - {places}"
+
+    @staticmethod
+    def _texts(value: object) -> list[str]:
+        """Return the non-blank strings of a JSON-LD value given as text or a list."""
+
+        items = value if isinstance(value, list) else [value]
+        return [item.strip() for item in items if isinstance(item, str) and item.strip()]
+
+    @classmethod
+    def _is_blank(cls, value: object) -> bool:
+        """Report whether a JSON-LD value is missing, empty or only blank text."""
+
+        if isinstance(value, str):
+            return not value.strip()
+        if isinstance(value, list):
+            return all(cls._is_blank(item) for item in value)
+        return not value
+
+    @staticmethod
+    def _unique(values: Iterable[str]) -> list[str]:
+        """Drop case-insensitive duplicates, keeping the first spelling and the order."""
+
+        seen: set[str] = set()
+        unique: list[str] = []
+        for value in values:
+            if value.casefold() not in seen:
+                seen.add(value.casefold())
+                unique.append(value)
+        return unique
 
     @staticmethod
     def _extract_identifier(identifier: object) -> str | None:

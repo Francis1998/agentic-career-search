@@ -109,12 +109,14 @@ are the same instant.
 
 **Remote rule.** A job is remote when its location contains (case-insensitively) any
 of `remote`, `anywhere`, `work from home`, `wfh`, `telecommute` or `distributed`.
-Adapters normalize remote signals into the location (for example JSON-LD
-`jobLocationType: TELECOMMUTE` and BambooHR `isRemote` postings without a location
-become `Remote`, and Lever postings labelled with the `Remote` workplace type become
-`Remote - <location>`), so the same rule drives the `remote` filter, the CSV `remote`
-column and the feed summary. Hybrid roles are not remote: Lever's `Hybrid` and
-`On-site` labels leave the location unchanged.
+Adapters normalize remote signals into the location (for example JSON-LD postings
+that declare `jobLocationType: TELECOMMUTE` become
+`Remote - <office> / <applicant regions>`, or `Remote` without either, BambooHR
+`isRemote` postings without a location become `Remote`, and Lever postings labelled
+with the `Remote` workplace type become `Remote - <location>`), so the same rule
+drives the `remote` filter, the CSV `remote` column and the feed summary. Hybrid
+roles are not remote: Lever's `Hybrid` and `On-site` labels leave the location
+unchanged, and JSON-LD postings without `TELECOMMUTE` keep their office location.
 
 **Dedupe rule.** With `dedupe=true` results are *postings*, not captures. Every
 stored job is visited in capture order and joins the posting of an earlier job with

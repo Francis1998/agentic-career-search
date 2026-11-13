@@ -142,6 +142,16 @@ a bespoke scraper. It understands bare objects, arrays, `@graph`/`ItemList`
 containers, `TELECOMMUTE` remote roles, and `PropertyValue` identifiers, and it
 skips malformed blocks instead of failing the whole page.
 
+Remote roles follow [Google's work-from-home markup](https://developers.google.com/search/docs/appearance/structured-data/job-posting#remote-jobs):
+a posting with `jobLocationType: TELECOMMUTE` (text or list, any case) or the older
+`jobLocation.additionalProperty` `TELECOMMUTE` flag is remote even when it also lists
+an office, and the remote-eligible regions in `applicantLocationRequirements` follow
+the office in its location: `Remote - Detroit, MI, US / Michigan, USA / Texas, USA`,
+`Remote - USA`, or `Remote` when it names neither. Regions alone, with no `jobLocation`
+and no `jobLocationType` (schema.org's own example), also mark a role remote.
+`TELECOMMUTE` means 100% remote, so hybrid and on-site postings keep their office
+location and are not remote, even when they name applicant regions.
+
 ```bash
 # Register a JSON-LD source
 curl -X POST localhost:8000/source-configs \
