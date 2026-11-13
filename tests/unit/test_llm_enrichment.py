@@ -7,6 +7,7 @@ import json
 from typing import TYPE_CHECKING
 
 import httpx
+import pytest
 
 from autoapply_agent.adapters.base import JobCandidate
 from autoapply_agent.core.config import Settings
@@ -253,3 +254,23 @@ def test_gemini_3_requests_use_thinking_level_instead_of_sampling(
     assert current["thinkingConfig"] == {"thinkingLevel": "LOW"}
     assert current["maxOutputTokens"] >= 1024
     assert "thinkingConfig" not in legacy
+
+
+@pytest.mark.parametrize("model", ["gemini-4-hydrogen", "gemini-4-carbon", "gemini-4-argon"])
+def test_gemini_4_requests_think_low_without_a_small_output_cap(
+    monkeypatch: MonkeyPatch, model: str
+) -> None:
+    """Gemini 4 caps thinking plus reply together: a small cap can end the turn empty."""
+
+    captured = _capture_requests(
+        monkeypatch, {"candidates": [{"content": {"parts": [{"text": "Fit."}]}}]}
+    )
+
+    result = _enrich(Settings(LLM_PROVIDER="gemini", GEMINI_API_KEY="test-key", GEMINI_MODEL=model))
+
+    assert result is not None and result.model == model
+    config = captured[0]["generationConfig"]
+    assert isinstance(config, dict)
+    assert config["thinkingConfig"] == {"thinkingLevel": "LOW"}
+    assert "maxOutputTokens" not in config
+    assert {"temperature", "topP", "topK"}.isdisjoint(config)
