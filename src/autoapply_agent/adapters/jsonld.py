@@ -212,7 +212,7 @@ class JsonLdAdapter(CareerSourceAdapter):
         regions = cls._extract_regions(node.get("applicantLocationRequirements"))
         location = (
             cls._remote_location(office, regions)
-            if cls._is_remote_posting(node, office, regions)
+            if cls._is_remote_posting(node, regions)
             else office
         )
 
@@ -228,9 +228,7 @@ class JsonLdAdapter(CareerSourceAdapter):
         )
 
     @classmethod
-    def _is_remote_posting(
-        cls, node: dict[str, object], office: str | None, regions: list[str]
-    ) -> bool:
+    def _is_remote_posting(cls, node: dict[str, object], regions: list[str]) -> bool:
         """Report whether a posting can be done fully remotely.
 
         Google's work-from-home markup sets ``jobLocationType: TELECOMMUTE``, also when
@@ -238,12 +236,13 @@ class JsonLdAdapter(CareerSourceAdapter):
         still accepts the older ``jobLocation.additionalProperty`` ``TELECOMMUTE``.
         ``TELECOMMUTE`` means 100% remote, so hybrid and on-site postings never carry
         it. schema.org's own example marks a telecommute job with
-        ``applicantLocationRequirements`` alone, so remote-eligible regions without an
-        office and without a declared ``jobLocationType`` count as remote too.
+        ``applicantLocationRequirements`` alone, so remote-eligible regions count as
+        remote too when the posting lists no ``jobLocation`` at all (a Place is an
+        office even when no address can be read from it) and declares no
+        ``jobLocationType``.
 
         Args:
             node: Decoded JobPosting object.
-            office: Location resolved from ``jobLocation``, if any.
             regions: Remote-eligible regions from ``applicantLocationRequirements``.
 
         Returns:
@@ -253,9 +252,10 @@ class JsonLdAdapter(CareerSourceAdapter):
         job_location_type = node.get("jobLocationType")
         if cls._is_remote(job_location_type):
             return True
-        if cls._has_telecommute_property(node.get("jobLocation")):
+        job_location = node.get("jobLocation")
+        if cls._has_telecommute_property(job_location):
             return True
-        return bool(regions) and office is None and not cls._texts(job_location_type)
+        return bool(regions) and cls._is_blank(job_location) and not cls._texts(job_location_type)
 
     @classmethod
     def _is_remote(cls, job_location_type: object) -> bool:
@@ -317,8 +317,12 @@ class JsonLdAdapter(CareerSourceAdapter):
         """
 
         items = requirements if isinstance(requirements, list) else [requirements]
-        names = [item.get("name") if isinstance(item, dict) else item for item in items]
-        return cls._unique(cls._texts(names))
+        names = [
+            name
+            for item in items
+            for name in cls._texts(item.get("name") if isinstance(item, dict) else item)
+        ]
+        return cls._unique(names)
 
     @classmethod
     def _remote_location(cls, office: str | None, regions: list[str]) -> str:
@@ -346,6 +350,16 @@ class JsonLdAdapter(CareerSourceAdapter):
 
         items = value if isinstance(value, list) else [value]
         return [item.strip() for item in items if isinstance(item, str) and item.strip()]
+
+    @classmethod
+    def _is_blank(cls, value: object) -> bool:
+        """Report whether a JSON-LD value is missing, empty or only blank text."""
+
+        if isinstance(value, str):
+            return not value.strip()
+        if isinstance(value, list):
+            return all(cls._is_blank(item) for item in value)
+        return not value
 
     @staticmethod
     def _unique(values: Iterable[str]) -> list[str]:

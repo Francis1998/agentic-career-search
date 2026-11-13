@@ -147,8 +147,8 @@ a posting with `jobLocationType: TELECOMMUTE` (text or list, any case) or the ol
 `jobLocation.additionalProperty` `TELECOMMUTE` flag is remote even when it also lists
 an office, and the remote-eligible regions in `applicantLocationRequirements` follow
 the office in its location: `Remote - Detroit, MI, US / Michigan, USA / Texas, USA`,
-`Remote - USA`, or `Remote` when it names neither. Regions alone, with no office and
-no `jobLocationType` (schema.org's own example), also mark a role remote.
+`Remote - USA`, or `Remote` when it names neither. Regions alone, with no `jobLocation`
+and no `jobLocationType` (schema.org's own example), also mark a role remote.
 `TELECOMMUTE` means 100% remote, so hybrid and on-site postings keep their office
 location and are not remote, even when they name applicant regions.
 
