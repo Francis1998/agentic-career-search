@@ -766,6 +766,14 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `reasoning_effort: none`.
 
 ### Fixed
+- LLM enrichment on Gemini 4 (`gemini-4-hydrogen`, `gemini-4-carbon`, `gemini-4-argon`)
+  no longer sends the 1,024-token `maxOutputTokens` cap. The cap covers thinking and
+  reply together, and Google's thinking guide warns that a small cap can end the turn
+  with `finishReason: MAX_TOKENS` and empty output while the thinking tokens are still
+  billed, so a summary could silently come back empty. Gemini 4 requests now keep
+  Google's default output limit and steer cost with `thinkingLevel: LOW` (required on
+  Gemini 4). Gemini 3.x requests, including the default `gemini-3.8-flash`, are
+  unchanged.
 - `LeverAdapter`: remote postings on live Lever boards are now reported as remote.
   Boards render each posting's workplace type (the postings API's `workplaceType`) as
   a `Remote —` / `Hybrid —` / `On-site —` label beside the location rather than in it,
