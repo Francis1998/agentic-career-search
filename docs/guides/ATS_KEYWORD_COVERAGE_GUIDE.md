@@ -44,6 +44,7 @@ assert scorer.score("python redis", "Python Redis Kafka") == score_keyword_cover
 |---|---|---|
 | `SkillsProfileFitScorer` | Candidate skills **list** | Each skill token in JD |
 | `AtsKeywordCoverageScorer` | Free-form **resume text** | JD keywords present in resume |
+| `POST /jobs/match` / MCP `match_resume_to_jobs` | Resume text vs **every captured job** | Lexicon skills with aliases, through the same `keyword_coverage()` ([guide](RESUME_JOB_MATCH_GUIDE.md)) |
 
 ## Edge cases
 

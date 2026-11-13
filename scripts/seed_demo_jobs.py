@@ -7,7 +7,9 @@ Usage::
 Each invocation records one completed demo run that captured the jobs below, so
 running it twice simulates a second run re-capturing the same postings (try
 ``GET /jobs?dedupe=true``). The last row is deliberately hostile to show the CSV
-formula-injection and URL hardening of ``GET /jobs/export``.
+formula-injection and URL hardening of ``GET /jobs/export``. Every other row carries a
+short ``raw.description`` (the field a schema.org ``JobPosting`` calls ``description``)
+so that ``POST /jobs/match`` has posting text to match a resume against.
 """
 
 from __future__ import annotations
@@ -122,6 +124,37 @@ DEMO_JOBS: tuple[tuple[int, str, str, str, str, str, float, str, int], ...] = (
     ),
 )
 
+_ACME_DESCRIPTION = (
+    "Build the fleet telemetry backend in Python with FastAPI and PostgreSQL. Ship services "
+    "on AWS with Docker and Kubernetes, CI/CD in GitHub Actions. Nice to have: Go, Kafka."
+)
+# External id -> raw.description (the hostile row has none).
+DEMO_DESCRIPTIONS: dict[str, str] = {
+    "gh-4101": _ACME_DESCRIPTION,
+    "lv-7f3c": _ACME_DESCRIPTION,
+    "gh-5202": (
+        "Own the internal developer platform: Kubernetes (EKS), Terraform, Helm and Argo CD "
+        "on AWS. Write Python and Go tooling, run observability with Prometheus and Grafana "
+        "and lead system design reviews."
+    ),
+    "lv-payments": (
+        "Design payment APIs in Java and Spring Boot on PostgreSQL and Kafka. You know "
+        "microservices, distributed systems and PCI DSS."
+    ),
+    "gh-6303": (
+        "Keep production healthy on Linux and Kubernetes with Terraform, Prometheus and "
+        "Grafana; join the incident response rotation. Automate in Python or Bash."
+    ),
+    "lv-ml": (
+        "Train and ship models with PyTorch and scikit-learn; MLOps with MLflow and Docker on "
+        "AWS SageMaker. Strong SQL and statistics."
+    ),
+    "gh-7404": (
+        "Build batch and streaming pipelines with Spark, Airflow, dbt and Kafka on GCP "
+        "(BigQuery). SQL and Python required."
+    ),
+}
+
 
 async def _demo_sources(session: AsyncSession) -> list[SourceConfig]:
     """Return the demo source configs, creating any that are missing."""
@@ -161,6 +194,12 @@ async def seed_demo_jobs() -> tuple[str, int]:
         session.add(run)
         for index, external_id, title, company, location, url, score, tier, hours_ago in DEMO_JOBS:
             source = sources[index]
+            raw: dict[str, object] = {
+                "source": source.source_type,
+                "agent_decision": {"priority_tier": tier},
+            }
+            if external_id in DEMO_DESCRIPTIONS:
+                raw["description"] = DEMO_DESCRIPTIONS[external_id]
             session.add(
                 Job(
                     run_id=run.id,
@@ -172,7 +211,7 @@ async def seed_demo_jobs() -> tuple[str, int]:
                     url=url,
                     score=score,
                     plan_steps=["Review fit with the decision trace", "Tailor resume bullets"],
-                    raw={"source": source.source_type, "agent_decision": {"priority_tier": tier}},
+                    raw=raw,
                     created_at=now - timedelta(hours=hours_ago),
                 )
             )

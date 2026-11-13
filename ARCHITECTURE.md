@@ -11,13 +11,17 @@ flowchart TD
     LLM --> STORE
     STORE --> API
     STORE --> MCP[Read-only MCP server]
+    STORE --> MATCH[Resume match, in memory]
+    MATCH --> API
+    MATCH --> MCP
 ```
 
 ## Components
 
 - **API Layer** (`autoapply_agent.api`): FastAPI routes for health, source config, run lifecycle, and jobs search/detail/export/Atom feed.
 - **Job Search & Export** (`autoapply_agent.services.job_search`, `job_export`): shared filter/sort/dedupe query builder plus streamed CSV (formula-injection safe), JSON Lines and Atom 1.0 renderers.
-- **MCP Server** (`autoapply_agent.mcp`, console script `career-search-mcp`): read-only, stdlib-only Model Context Protocol server over stdio (2026-07-28 stateless + 2025-11-25/2025-06-18 handshake). Its six tools reuse `job_search`, `DeterministicScoringService.breakdown()`, `priority_tier_for_score()` and `read_queries`; SQLite connections run `PRAGMA query_only`. See [docs/guides/MCP_SERVER_GUIDE.md](docs/guides/MCP_SERVER_GUIDE.md).
+- **Resume Match** (`autoapply_agent.services.skill_extraction`, `resume_match`; route `POST /jobs/match` in `api/routes_match.py`): deterministic skill extraction with a curated 254-skill alias-aware lexicon (symbol-aware boundaries, case-sensitive ambiguous words, resume-side implied skills), coverage scoring through `ats_keyword_coverage.keyword_coverage()`, `match`/`blend` ranking over `job_search.iter_jobs` with a bounded top-k heap, and CSV through the export's hardening. The route reads and caps the body itself (1 MiB, `413`) so errors never echo the resume; resume text is never persisted or logged (SHA-256 digest only). See [docs/guides/RESUME_JOB_MATCH_GUIDE.md](docs/guides/RESUME_JOB_MATCH_GUIDE.md).
+- **MCP Server** (`autoapply_agent.mcp`, console script `career-search-mcp`): read-only, stdlib-only Model Context Protocol server over stdio (2026-07-28 stateless + 2025-11-25/2025-06-18 handshake). Its seven tools reuse `job_search`, `DeterministicScoringService.breakdown()`, `priority_tier_for_score()`, `read_queries` and `resume_match`; SQLite connections run `PRAGMA query_only`. See [docs/guides/MCP_SERVER_GUIDE.md](docs/guides/MCP_SERVER_GUIDE.md).
 - **Read queries** (`autoapply_agent.services.read_queries`): run, run-event and source-config listings shared by the HTTP routes and the MCP server.
 - **Worker** (`autoapply_agent.services.worker`): in-process async polling loop that claims queued runs.
 - **Adapters** (`autoapply_agent.adapters`): Greenhouse and Lever HTML parsers plus a vendor-neutral `schema.org/JobPosting` JSON-LD parser (`jsonld`).

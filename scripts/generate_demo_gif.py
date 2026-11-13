@@ -202,6 +202,18 @@ def _transcript_decks() -> Sequence[TranscriptDeck]:
             highlights=(("→ ", (121, 192, 255)), ("← ", (255, 166, 87))),
             pause_before=("→ ", "legacy client", "stdin closed"),
         ),
+        TranscriptDeck(
+            output_filename="resume-job-match.gif",
+            transcript=Path("docs/guides/RESUME_JOB_MATCH_DEMO_TRANSCRIPT.txt"),
+            title="agentic-career-search: POST /jobs/match - rank your job feed against a resume",
+            highlights=(
+                *((f"{rank}. ", (121, 192, 255)) for rank in range(1, 10)),
+                ("Matches", (255, 166, 87)),
+                ("   Matches", (255, 166, 87)),
+                ('{"detail"', (255, 123, 114)),
+            ),
+            pause_before=("1. ", "Matches", '{"detail"', "Resume:", "rank | "),
+        ),
     )
 
 

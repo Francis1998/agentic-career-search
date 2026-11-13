@@ -13,6 +13,8 @@ New advisor, use-case and demo entries belong in this file, not in the README (s
 
 ![Read-only MCP Server](../assets/demo/mcp-server.gif)
 
+![Resume-to-Job Match](../assets/demo/resume-job-match.gif)
+
 ![LLM Provider Flow](../assets/demo/llm-provider-flow.gif)
 
 ![Ops Reliability Loop](../assets/demo/ops-reliability-loop.gif)
@@ -78,6 +80,7 @@ This project solves those issues with explicit agent engineering primitives:
 - optional LLM enrichment via multiple providers,
 - JobSpy-style job search API (text/company/location/remote/score/time filters, paging with `X-Total-Count`, cross-board dedupe), OWASP-safe CSV + JSON Lines export, and an Atom feed for Slack/Teams/feed readers — see `docs/guides/JOB_SEARCH_EXPORT_GUIDE.md`,
 - read-only MCP server (`career-search-mcp`) so Claude Desktop/Code, VS Code or Cursor can search the feed, read decision traces and explain scores without scraping or writes — see `docs/guides/MCP_SERVER_GUIDE.md`,
+- resume-to-job match (`POST /jobs/match`, MCP `match_resume_to_jobs`): the captured feed ranked against resume text with matched/missing skills from an alias-aware skill lexicon; the resume is never stored — see `docs/guides/RESUME_JOB_MATCH_GUIDE.md`,
 - skills-profile fit scoring (`fit_score` 0–1 + matched/missing) — see `docs/guides/SKILLS_PROFILE_FIT_GUIDE.md`,
 - assistive USD salary-band estimates from title/location heuristics — see `docs/guides/SALARY_BAND_ESTIMATOR_GUIDE.md`,
 - HITL application drafts (resume bullets + cover notes) with no auto-submit — see `docs/guides/APPLICATION_DRAFT_SERVICE_GUIDE.md`,
@@ -110,6 +113,7 @@ This project solves those issues with explicit agent engineering primitives:
 | Same role appears on Indeed and other large aggregators with different URLs | Duplicate noise in triage and CRM | `CrossSourceJobDeduper` clusters fuzzy title+company near-duplicates after URL pass |
 | "Ask your assistant for this week's best-fit remote roles" — but JobSpy-wrapper and browser-session job-board MCP servers re-scrape live boards with no ranking rationale or memory | Assistants cannot see the curated, scored, deduplicated feed you already have | `career-search-mcp` (read-only MCP): `search_jobs` (`remote`, `hours_old=168`, `sort=score`, `dedupe`) then `explain_job_score` / `get_job` for the why; never starts runs or applies |
 | Resume free text is not scored against JD keywords | ATS rejection risk is opaque | `AtsKeywordCoverageScorer` reports coverage + present/missing JD keywords |
+| Resume-Matcher tailors a resume to one pasted job description and JobSpy only scrapes, so nothing ranks the jobs you already captured by fit with your resume | Best-fit roles hide in a long feed; skill gaps stay invisible | `POST /jobs/match` / MCP `match_resume_to_jobs` rank the feed by skill coverage with matched/missing skills and an explanation; deterministic, resume never stored |
 | Candidates research companies ad hoc before outreach | Inconsistent talking points and invented facts | `CompanyResearchBriefService` builds offline HITL briefs from JD signals |
 | Multiple offers lack a side-by-side total-comp view | Hard to triage cash vs equity trade-offs offline | `OfferCompareMatrix` ranks offers by cash+equity heuristic without auto-accept |
 | RemoteOK-style location prefs are board-UI-only | Hard to reuse geo/remote filters in agent triage | `LocationRemoteFitScorer` scores candidate prefs vs posting location/policy |
