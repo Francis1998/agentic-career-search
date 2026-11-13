@@ -474,6 +474,14 @@ def test_jsonld_telecommute_posting_with_an_office_is_remote(posting: dict[str, 
             id="text-region",
         ),
         pytest.param(
+            {
+                "applicantLocationRequirements": {"@type": "Country", "name": ["USA"]},
+                "jobLocationType": "TELECOMMUTE",
+            },
+            "Remote - USA",
+            id="list-valued-region-name",
+        ),
+        pytest.param(
             {"applicantLocationRequirements": {"@type": "Country", "name": "USA"}},
             "Remote - USA",
             id="regions-without-jobLocationType",
@@ -526,6 +534,14 @@ def test_jsonld_remote_postings_name_their_remote_eligible_regions(
             },
             None,
             id="declared-non-telecommute-type",
+        ),
+        pytest.param(
+            {
+                "jobLocation": {"@type": "Place", "name": "Detroit headquarters"},
+                "applicantLocationRequirements": {"@type": "Country", "name": "USA"},
+            },
+            None,
+            id="office-without-address-and-regions",
         ),
         pytest.param(
             {
