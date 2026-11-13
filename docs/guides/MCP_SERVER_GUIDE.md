@@ -63,8 +63,9 @@ LLM inside the server, and nothing written back.
 | `list_runs` | Discovery runs, newest first, with status, query, timestamps and captured job counts | `services/read_queries.py` |
 | `get_run` | One run and its most recent events (`run.*`, `source.*`, `agent.decision`, …) | `services/read_queries.py` |
 | `list_sources` | Configured sources (id, name, adapter type, enabled, URL) with captured job counts | `services/read_queries.py` |
+| `match_resume_to_jobs` | The feed ranked against resume text the user provides: match score, matched and missing skills, explanation (`sort=match\|blend`, `limit` ≤ 50); the resume is never stored or logged | `services/resume_match.py` (`POST /jobs/match`) |
 
-All six tools are annotated `readOnlyHint: true`, `destructiveHint: false`,
+All seven tools are annotated `readOnlyHint: true`, `destructiveHint: false`,
 `idempotentHint: true`, `openWorldHint: false`, validate their arguments against the
 advertised `inputSchema`, return `structuredContent` that conforms to their `outputSchema`,
 and are listed in a deterministic (alphabetical) order. Write tools are **intentionally out
@@ -495,6 +496,17 @@ Input: optional `enabled` (boolean). Real result:
 Each source has `id`, `name`, `source_type`, `enabled`, `base_url` (http(s) only) and
 `job_count`.
 
+### `match_resume_to_jobs`
+
+Input: `resume_text` (required, plain text, 1–50,000 characters), the `search_jobs` filters,
+`dedupe` (default `true`), `sort` (`match` | `blend`), `limit` (1–50, default 10),
+`min_match` and `include_extra_skills`. It runs the ranking of `POST /jobs/match` —
+deterministic skill extraction with an alias-aware lexicon (`k8s` → `kubernetes`), no LLM —
+and returns each job's `match_score`, `matched_skills`, `missing_skills`, optional
+`extra_skills` and a one-line `explanation`. The resume never reaches logs, the audit log
+(only the keyed argument hash) or the database. Reference and a recorded session:
+[Resume-to-Job Match Guide](RESUME_JOB_MATCH_GUIDE.md#mcp-tool-reference).
+
 ## Protocol versions
 
 | Client | How it opens | Server behaviour | Result shape |
@@ -526,7 +538,7 @@ get a response. Requests are handled one at a time; the server exits when stdin 
 
 ## Privacy, safety and the audit log
 
-**Read-only by design.** The six tools above are the whole surface: no tool queues or
+**Read-only by design.** The seven tools above are the whole surface: no tool queues or
 cancels runs, edits source configs, writes application state or touches the network, and
 `tools/call` for any other name is a `-32602` protocol error. Writes are intentionally out of
 scope for this release: starting a run makes the worker fetch third-party career pages,
@@ -662,6 +674,10 @@ the repository's GIF tool (Pillow, typing animation for `$` lines, one shared pa
 ```bash
 ./scripts/generate_demo_gif.sh --only mcp-server.gif
 ```
+
+This recording predates `match_resume_to_jobs`, so its `tools/list` shows six tools; the
+resume-match tool has its own recorded session in the
+[Resume-to-Job Match Guide](RESUME_JOB_MATCH_GUIDE.md#how-this-demo-was-recorded).
 
 ## See also
 

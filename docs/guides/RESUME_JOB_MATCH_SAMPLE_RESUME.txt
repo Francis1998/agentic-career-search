@@ -1,0 +1,21 @@
+JORDAN RIVERA
+Senior Backend Engineer | Remote (US) | jordan.rivera@example.com
+
+SUMMARY
+Backend engineer with 8 years of experience shipping Python services and the cloud
+infrastructure they run on. (Synthetic sample resume for demos and tests.)
+
+SKILLS
+Python (FastAPI, Django), Go, SQL, Postgres, Redis, Docker, k8s, Terraform,
+AWS (EC2, S3, EKS), GitHub Actions, Prometheus, Grafana, Linux
+
+EXPERIENCE
+Senior Backend Engineer, Example Logistics (2021 - present)
+- Built event-driven microservices in Python/FastAPI on Postgres; cut p99 latency 40%.
+- Ran Kubernetes on EKS with Helm and Terraform; joined the on-call SRE rotation.
+
+Software Engineer, Sample Analytics (2017 - 2021)
+- Wrote ETL jobs in Python and SQL and built Tableau dashboards for operations.
+
+EDUCATION
+B.S. Computer Science, State University

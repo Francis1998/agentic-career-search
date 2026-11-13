@@ -22,6 +22,8 @@ Job-search automation usually fails in practice because it:
   state machine with cooperative cancellation and an ordered event log;
 - **leaves results in a terminal** → JobSpy-style search, CSV/JSONL export and an Atom
   feed for Slack, Teams or any feed reader;
+- **can't tell what fits *you*** → `POST /jobs/match` ranks the captured feed against your
+  resume text with matched and missing skills — deterministic, and the resume is never stored;
 - **can't be asked about** → a read-only MCP server lets Claude Desktop, Claude Code,
   VS Code or Cursor search your feed and explain any score;
 - **depends on one LLM** → enrichment is optional and works with the current OpenAI,
@@ -41,6 +43,7 @@ flowchart LR
     DT --> DB[("Jobs + run events")]
     DB --> API["Search · export · Atom feed<br/>GET /jobs …"]
     DB --> MCP["Read-only MCP server<br/>career-search-mcp (stdio)"]
+    DB --> MATCH["Resume match<br/>POST /jobs/match"]
 ```
 
 Every step is observable through `GET /runs/{run_id}/events`, and every stored job carries
@@ -71,6 +74,19 @@ curl -sS -OJ 'localhost:8000/jobs/export?format=csv&min_score=0.7'    # spreadsh
 curl -sS 'localhost:8000/jobs/feed.atom?remote=true' | head -20       # Atom feed
 ```
 
+Rank the same feed against a resume (plain text; the sample is synthetic):
+
+```bash
+jq -n --rawfile resume docs/guides/RESUME_JOB_MATCH_SAMPLE_RESUME.txt '{resume_text: $resume, remote: true}' \
+  | curl -sS localhost:8000/jobs/match -H 'content-type: application/json' -d @- \
+  | jq -c '.jobs[] | [.rank, .match_score, .title, .missing_skills]'
+```
+
+![Resume-to-job match — real terminal session](assets/demo/resume-job-match.gif)
+
+[RESUME_JOB_MATCH_GUIDE.md](docs/guides/RESUME_JOB_MATCH_GUIDE.md) covers the skill lexicon,
+`sort=blend`, CSV output, limits and privacy.
+
 For live data, start the API with the worker enabled (omit `ENABLE_WORKER=false`), then
 register a public board and start a run:
 
@@ -88,10 +104,10 @@ end to end, and [QUICKSTART.md](QUICKSTART.md) covers setup details.
 
 `career-search-mcp` is a read-only [Model Context Protocol](https://modelcontextprotocol.io)
 server (stdio; protocol 2026-07-28 plus the 2025-11-25 / 2025-06-18 handshake). Assistants
-get six tools — `search_jobs`, `get_job`, `explain_job_score`, `list_runs`, `get_run`,
-`list_sources` — over the jobs your runs already captured, scored and deduplicated, so
-*"show me this week's best-fit remote roles and why the top one ranks first"* needs no
-scraping, keys or writes. For example, in Claude Code:
+get seven tools — `search_jobs`, `get_job`, `explain_job_score`, `list_runs`, `get_run`,
+`list_sources`, `match_resume_to_jobs` — over the jobs your runs already captured, scored
+and deduplicated, so *"show me this week's best-fit remote roles and why the top one ranks
+first"* needs no scraping, keys or writes. For example, in Claude Code:
 
 ```bash
 claude mcp add --transport stdio career-search -- \
@@ -110,6 +126,7 @@ Cursor configuration examples, every tool, the audit log and a recorded session.
 | Runs | Queue, worker, cooperative cancel, ordered run events | [ARCHITECTURE.md](ARCHITECTURE.md) |
 | Decisions | Deterministic score, priority tier, matched terms, rationale, plan steps per job | [ARCHITECTURE.md](ARCHITECTURE.md) |
 | Search & export | Filters, `X-Total-Count` paging, cross-board dedupe, OWASP-safe CSV, JSON Lines, Atom 1.0 | [Search & export guide](docs/guides/JOB_SEARCH_EXPORT_GUIDE.md) |
+| Resume match | `POST /jobs/match` and MCP `match_resume_to_jobs`: rank jobs against resume text with a 254-skill alias-aware lexicon (`k8s` → `kubernetes`); match score, matched/missing skills, explanation, `sort=match\|blend`, CSV; resume never stored or logged | [Resume match guide](docs/guides/RESUME_JOB_MATCH_GUIDE.md) |
 | AI assistants (MCP) | Read-only stdio MCP server: search, decision traces, plain-language score explanations, runs and events; audit log with hashed arguments | [MCP server guide](docs/guides/MCP_SERVER_GUIDE.md) |
 | LLM enrichment | Optional summaries from GPT-6, Claude 5.5 / Fable 5.2, Gemini 3.8 / 4 or Kimi K3.1 models | [CONFIGURATION.md](CONFIGURATION.md) |
 | Alerts | Fail-soft webhook for high-priority jobs (Slack, Discord, custom) | [CONFIGURATION.md](CONFIGURATION.md) |
@@ -167,6 +184,7 @@ Then set matching API keys in `.env` (see `CONFIGURATION.md`).
 - `GET /jobs/{job_id}` inspect one job
 - `GET /jobs/export?format=csv|jsonl` stream filtered results as a download
 - `GET /jobs/feed.atom` subscribe to new matches (Atom 1.0)
+- `POST /jobs/match` rank jobs against resume text (JSON body: `resume_text` + the `GET /jobs` filters, `sort=match|blend`, `limit`, `min_match`); matched/missing skills; `?format=csv`
 - `GET /health/live` and `GET /health/ready`
 
 MCP (stdio, read-only): `career-search-mcp` / `python -m autoapply_agent.mcp` — see the
@@ -180,6 +198,7 @@ MCP (stdio, read-only): `career-search-mcp` / `python -m autoapply_agent.mcp` �
 | [docs/guides/PORTFOLIO_WALKTHROUGH.md](docs/guides/PORTFOLIO_WALKTHROUGH.md) | One real job search, end to end |
 | [docs/guides/JOB_SEARCH_EXPORT_GUIDE.md](docs/guides/JOB_SEARCH_EXPORT_GUIDE.md) | Filters, CSV/JSONL export, Atom feed |
 | [docs/guides/MCP_SERVER_GUIDE.md](docs/guides/MCP_SERVER_GUIDE.md) | Read-only MCP server for AI assistants: client setup, tools, privacy |
+| [docs/guides/RESUME_JOB_MATCH_GUIDE.md](docs/guides/RESUME_JOB_MATCH_GUIDE.md) | Resume-to-job match: API + MCP reference, skill lexicon, ranking, privacy |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Components, run lifecycle, events |
 | [docs/API.md](docs/API.md) | HTTP API reference |
 | [CONFIGURATION.md](CONFIGURATION.md) | Environment variables and provider profiles |

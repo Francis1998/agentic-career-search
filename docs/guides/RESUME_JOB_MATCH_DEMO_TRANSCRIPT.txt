@@ -1,0 +1,45 @@
+$ export DATABASE_URL=sqlite+aiosqlite:///./match-demo.db
+$ uv run python scripts/seed_demo_jobs.py
+seeded 8 jobs (run e5383e90-3306-4888-8081-e75cb59f3e96) into sqlite+aiosqlite:///./match-demo.db
+$ ENABLE_WORKER=false uv run uvicorn autoapply_agent.main:app --port 8000 --log-level warning &
+$ sed -n '8,10p' docs/guides/RESUME_JOB_MATCH_SAMPLE_RESUME.txt   # synthetic sample resume
+SKILLS
+Python (FastAPI, Django), Go, SQL, Postgres, Redis, Docker, k8s, Terraform,
+AWS (EC2, S3, EKS), GitHub Actions, Prometheus, Grafana, Linux
+$ BODY=$(jq -n --rawfile resume docs/guides/RESUME_JOB_MATCH_SAMPLE_RESUME.txt '{resume_text: $resume, remote: true, limit: 3}')
+$ curl -s localhost:8000/jobs/match -H 'content-type: application/json' -d "$BODY" | jq -r '.resume_skills | length, join(", ")'
+25
+amazon s3, aws, backend development, django, docker, ec2, eks, etl, event-driven architecture, fastapi, github actions, go, grafana, helm, kubernetes, linux, microservices, postgresql, prometheus, python, redis, site reliability engineering, sql, tableau, terraform
+$ curl -s localhost:8000/jobs/match -H 'content-type: application/json' -d "$BODY" | jq -r '.jobs[] | "\(.rank). \(.match_score) \(.title) | missing: \(.missing_skills | join(", "))"'
+1. 0.9091 Senior Python Engineer | missing: kafka
+2. 0.7778 Site Reliability Engineer | missing: incident response, bash
+3. 0.6923 Staff Platform Engineer (Python, Kubernetes) | missing: platform engineering, argo cd, observability, system design
+$ curl -s localhost:8000/jobs/match -H 'content-type: application/json' -d "$BODY" | jq -r '(.implied_skills | tojson), .jobs[0].explanation'
+{"ci/cd":["github actions"],"data visualization":["tableau"],"infrastructure as code":["terraform"]}
+Matches 10 of 11 skills in this posting: python, backend development, fastapi, postgresql, aws, docker, kubernetes, ci/cd (via github actions), github actions, go. Missing: kafka.
+$ jq '.sort = "blend"' <<< "$BODY" | curl -s localhost:8000/jobs/match -H 'content-type: application/json' -d @- | jq -r '.jobs[] | "\(.rank). blend \(.blend_score) = 0.7 x match \(.match_score) + 0.3 x score \(.score)"'
+1. blend 0.9124 = 0.7 x match 0.9091 + 0.3 x score 0.92
+2. blend 0.7486 = 0.7 x match 0.6923 + 0.3 x score 0.88
+3. blend 0.7425 = 0.7 x match 0.7778 + 0.3 x score 0.66
+$ jq '.remote = null | .limit = 8' <<< "$BODY" | curl -s 'localhost:8000/jobs/match?format=csv' -H 'content-type: application/json' -d @- | python3 -c 'import csv, sys; [print(*(row[i] for i in (0, 1, 4, 8)), sep=" | ") for row in csv.reader(sys.stdin)]'
+rank | match_score | missing_skills | title
+1 | 0.9091 | kafka | Senior Python Engineer
+2 | 0.7778 | incident response; bash | Site Reliability Engineer
+3 | 0.6923 | platform engineering; argo cd; observability; system design | Staff Platform Engineer (Python, Kubernetes)
+4 | 0.375 | payments; java; spring; kafka; distributed systems | Backend Engineer, Payments
+5 | 0.2222 | machine learning; pytorch; scikit-learn; mlops; mlflow; sagemaker; statistics | Machine Learning Engineer
+6 | 0.2222 | data engineering; spark; airflow; dbt; kafka; gcp; bigquery | Data Engineer
+7 | 0.0 |  | '=HYPERLINK("https://evil.example","Apply here")
+$ jq -n '{resume_text: ("x" * 50001)}' | curl -s -w ' %{http_code}\n' localhost:8000/jobs/match -H 'content-type: application/json' -d @-
+{"detail":[{"type":"string_too_long","loc":["body","resume_text"],"msg":"String should have at most 50000 characters","ctx":{"max_length":50000}}]} 422
+$ yes a | head -c 1100000 | jq -Rs '{resume_text: .}' | curl -s -w ' %{http_code}\n' localhost:8000/jobs/match -H 'content-type: application/json' -d @-
+{"detail":"Request body exceeds 1048576 bytes; resume_text is limited to 50000 characters."} 413
+$ jq -nc --rawfile r docs/guides/RESUME_JOB_MATCH_SAMPLE_RESUME.txt '{jsonrpc: "2.0", id: 1, method: "tools/call", params: {name: "match_resume_to_jobs", arguments: {resume_text: $r, limit: 2}, _meta: {"io.modelcontextprotocol/protocolVersion": "2026-07-28", "io.modelcontextprotocol/clientCapabilities": {}}}}' | uv run career-search-mcp --audit-log logs/match-audit.jsonl | jq -r '.result.content[0].text'
+Resume: 25 skills recognized (amazon s3, aws, backend development, django, docker, ec2, eks, etl, event-driven architecture, fastapi, github actions, go, grafana, helm, kubernetes, linux, microservices, postgresql, prometheus, python, redis, site reliability engineering, sql, tableau, terraform).
+7 jobs ranked (sort=match, dedupe=on); top 2:
+1. #1 match 0.9091 Senior Python Engineer — Acme Robotics · Remote - US
+   Matches 10 of 11 skills in this posting: python, backend development, fastapi, postgresql, aws, docker, kubernetes, ci/cd (via github actions), github actions, go. Missing: kafka.
+2. #5 match 0.7778 Site Reliability Engineer — Vandelay Industries · Remote (EU)
+   Matches 7 of 9 skills in this posting: site reliability engineering, linux, kubernetes, terraform, prometheus, grafana, python. Missing: incident response, bash.
+$ tail -n 1 logs/match-audit.jsonl
+{"arguments_hash": "hmac-sha256:5277151a575459539a2ac625a2b5f07dc0bfd58ded5b6426bbf64fed7c89f3dd", "duration_ms": 3.9, "error_kind": null, "event": "mcp_tool_call", "is_error": false, "result_count": 2, "timestamp": "2026-11-13T05:25:43.080+00:00", "tool": "match_resume_to_jobs"}

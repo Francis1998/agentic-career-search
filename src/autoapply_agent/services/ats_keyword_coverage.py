@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import re
 from collections import Counter
+from collections.abc import Container, Sequence
 from dataclasses import dataclass
 
 _WORD_RE = re.compile(r"[a-z][a-z0-9+.#/-]{1,}", re.IGNORECASE)
@@ -156,6 +157,43 @@ def extract_jd_keywords(job_text: str, *, top_k: int = _DEFAULT_TOP_K) -> list[s
     return ranked[:top_k]
 
 
+def keyword_coverage(
+    jd_keywords: Sequence[str],
+    resume_keywords: Container[str],
+) -> KeywordCoverageResult:
+    """Measure how many ranked JD keywords a resume's keyword set covers.
+
+    Shared by :func:`score_keyword_coverage` (frequency keywords) and resume-to-job
+    matching (lexicon skills, :mod:`autoapply_agent.services.resume_match`).
+
+    Args:
+        jd_keywords: Distinct job keywords in ranking order.
+        resume_keywords: Keywords found in (or implied by) the resume.
+
+    Returns:
+        KeywordCoverageResult keeping the order of ``jd_keywords``; coverage_score is
+        0.0 when there are no JD keywords.
+    """
+
+    if not jd_keywords:
+        return KeywordCoverageResult(
+            coverage_score=0.0,
+            jd_keywords=[],
+            present_keywords=[],
+            missing_keywords=[],
+        )
+
+    present = [keyword for keyword in jd_keywords if keyword in resume_keywords]
+    missing = [keyword for keyword in jd_keywords if keyword not in resume_keywords]
+    coverage = round(len(present) / len(jd_keywords), 4)
+    return KeywordCoverageResult(
+        coverage_score=coverage,
+        jd_keywords=list(jd_keywords),
+        present_keywords=present,
+        missing_keywords=missing,
+    )
+
+
 def score_keyword_coverage(
     resume_text: str | None,
     job_text: str | None,
@@ -175,24 +213,7 @@ def score_keyword_coverage(
     """
 
     jd_keywords = extract_jd_keywords(job_text or "", top_k=top_k)
-    if not jd_keywords:
-        return KeywordCoverageResult(
-            coverage_score=0.0,
-            jd_keywords=[],
-            present_keywords=[],
-            missing_keywords=[],
-        )
-
-    resume_tokens = set(tokenize(resume_text or ""))
-    present = [keyword for keyword in jd_keywords if keyword in resume_tokens]
-    missing = [keyword for keyword in jd_keywords if keyword not in resume_tokens]
-    coverage = round(len(present) / len(jd_keywords), 4)
-    return KeywordCoverageResult(
-        coverage_score=coverage,
-        jd_keywords=jd_keywords,
-        present_keywords=present,
-        missing_keywords=missing,
-    )
+    return keyword_coverage(jd_keywords, set(tokenize(resume_text or "")))
 
 
 class AtsKeywordCoverageScorer:

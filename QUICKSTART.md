@@ -70,6 +70,17 @@ curl -s "http://127.0.0.1:8000/jobs/feed.atom?q=python&remote=true"
 
 See [docs/guides/JOB_SEARCH_EXPORT_GUIDE.md](docs/guides/JOB_SEARCH_EXPORT_GUIDE.md).
 
+Rank the captured jobs against your resume (plain text; it is never stored) and see the
+matched and missing skills of each posting:
+
+```bash
+jq -n --rawfile resume resume.txt '{resume_text: $resume, remote: true}' \
+  | curl -s "http://127.0.0.1:8000/jobs/match" -H "content-type: application/json" -d @- \
+  | jq -c '.jobs[] | [.match_score, .title, .missing_skills]'
+```
+
+See [docs/guides/RESUME_JOB_MATCH_GUIDE.md](docs/guides/RESUME_JOB_MATCH_GUIDE.md).
+
 ## 6) Optional: cancel an active run
 
 ```bash
