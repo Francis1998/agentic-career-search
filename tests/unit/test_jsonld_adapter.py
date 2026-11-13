@@ -2,9 +2,13 @@
 
 from __future__ import annotations
 
+import json
 from typing import TYPE_CHECKING
 
+import pytest
+
 from autoapply_agent.adapters.jsonld import JsonLdAdapter
+from autoapply_agent.services.job_search import is_remote_location
 
 if TYPE_CHECKING:
     from _pytest.capture import CaptureFixture
@@ -365,3 +369,186 @@ def test_jsonld_recognises_telecommute_iri_and_curie() -> None:
     curie_jobs = adapter._parse_html("https://careers.example.com/careers", curie_html, max_jobs=10)
     assert len(curie_jobs) == 1
     assert curie_jobs[0].location == "Remote"
+
+
+DETROIT_OFFICE: dict[str, object] = {
+    "@type": "Place",
+    "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Detroit",
+        "addressRegion": "MI",
+        "addressCountry": "US",
+    },
+}
+LEGACY_TELECOMMUTE = {"@type": "PropertyValue", "value": "TELECOMMUTE"}
+
+
+def _location(posting: dict[str, object]) -> str | None:
+    """Parse one embedded JobPosting with ``posting``'s properties; return its location."""
+
+    document = {
+        "@context": "https://schema.org/",
+        "@type": "JobPosting",
+        "title": "Platform Engineer",
+        "url": "https://careers.example.com/jobs/1",
+        "hiringOrganization": {"@type": "Organization", "name": "Acme"},
+        **posting,
+    }
+    html = f'<script type="application/ld+json">{json.dumps(document)}</script>'
+    adapter = JsonLdAdapter(user_agent="test-agent")
+    jobs = adapter._parse_html("https://careers.example.com/careers", html, max_jobs=10)
+    assert len(jobs) == 1
+    return jobs[0].location
+
+
+@pytest.mark.parametrize(
+    "posting",
+    [
+        pytest.param(
+            {"jobLocation": DETROIT_OFFICE, "jobLocationType": "TELECOMMUTE"},
+            id="jobLocationType",
+        ),
+        pytest.param(
+            {"jobLocation": [DETROIT_OFFICE], "jobLocationType": ["telecommute"]},
+            id="list-values-lowercase",
+        ),
+        pytest.param(
+            {"jobLocation": {**DETROIT_OFFICE, "additionalProperty": LEGACY_TELECOMMUTE}},
+            id="legacy-additionalProperty",
+        ),
+        pytest.param(
+            {
+                "jobLocation": [
+                    {
+                        **DETROIT_OFFICE,
+                        "additionalProperty": [{"@type": "PropertyValue", "value": "Telecommute"}],
+                    }
+                ]
+            },
+            id="legacy-additionalProperty-list",
+        ),
+    ],
+)
+def test_jsonld_telecommute_posting_with_an_office_is_remote(posting: dict[str, object]) -> None:
+    """A TELECOMMUTE posting that also lists an office is remote, not on-site.
+
+    Google's work-from-home markup uses ``jobLocation`` + ``jobLocationType: TELECOMMUTE``
+    for a job done at the office *or* fully from home, and still accepts the older
+    ``jobLocation.additionalProperty`` ``TELECOMMUTE`` form. Only remote postings
+    without an office used to become ``Remote``; these kept the bare office location,
+    so the remote filter, exports, the feed and MCP results called them on-site.
+    """
+
+    location = _location(posting)
+
+    assert location == "Remote - Detroit, MI, US"
+    assert is_remote_location(location)
+
+
+@pytest.mark.parametrize(
+    ("posting", "expected"),
+    [
+        pytest.param(
+            {
+                "applicantLocationRequirements": {"@type": "Country", "name": "USA"},
+                "jobLocationType": "TELECOMMUTE",
+            },
+            "Remote - USA",
+            id="regions-without-office",
+        ),
+        pytest.param(
+            {
+                "jobLocation": DETROIT_OFFICE,
+                "applicantLocationRequirements": [
+                    {"@type": "State", "name": "Michigan, USA"},
+                    {"@type": "State", "name": "Texas, USA"},
+                ],
+                "jobLocationType": "TELECOMMUTE",
+            },
+            "Remote - Detroit, MI, US / Michigan, USA / Texas, USA",
+            id="office-and-regions",
+        ),
+        pytest.param(
+            {"applicantLocationRequirements": "Canada", "jobLocationType": "TELECOMMUTE"},
+            "Remote - Canada",
+            id="text-region",
+        ),
+        pytest.param(
+            {"applicantLocationRequirements": {"@type": "Country", "name": "USA"}},
+            "Remote - USA",
+            id="regions-without-jobLocationType",
+        ),
+        pytest.param(
+            {
+                "jobLocation": {
+                    "@type": "Place",
+                    "address": {"addressLocality": "Remote", "addressCountry": "US"},
+                },
+                "jobLocationType": "TELECOMMUTE",
+            },
+            "Remote, US",
+            id="office-already-says-remote",
+        ),
+    ],
+)
+def test_jsonld_remote_postings_name_their_remote_eligible_regions(
+    posting: dict[str, object], expected: str
+) -> None:
+    """``applicantLocationRequirements`` lists where remote employees may be located.
+
+    The regions follow the office in the location, so location filters match them.
+    schema.org's own example marks a telecommute job with the regions alone (no
+    ``jobLocationType``, no office), which is remote as well.
+    """
+
+    location = _location(posting)
+
+    assert location == expected
+    assert is_remote_location(location)
+
+
+@pytest.mark.parametrize(
+    ("posting", "expected"),
+    [
+        pytest.param({"jobLocation": DETROIT_OFFICE}, "Detroit, MI, US", id="on-site"),
+        pytest.param(
+            {
+                "jobLocation": DETROIT_OFFICE,
+                "applicantLocationRequirements": {"@type": "State", "name": "Michigan, USA"},
+            },
+            "Detroit, MI, US",
+            id="office-and-regions-without-telecommute",
+        ),
+        pytest.param(
+            {
+                "jobLocationType": "HYBRID",
+                "applicantLocationRequirements": {"@type": "Country", "name": "USA"},
+            },
+            None,
+            id="declared-non-telecommute-type",
+        ),
+        pytest.param(
+            {
+                "jobLocation": {
+                    **DETROIT_OFFICE,
+                    "additionalProperty": {"@type": "PropertyValue", "name": "team", "value": "IT"},
+                }
+            },
+            "Detroit, MI, US",
+            id="unrelated-additionalProperty",
+        ),
+    ],
+)
+def test_jsonld_on_site_and_hybrid_postings_stay_non_remote(
+    posting: dict[str, object], expected: str | None
+) -> None:
+    """Only TELECOMMUTE (or regions with no office) marks a posting remote.
+
+    ``TELECOMMUTE`` means 100% remote, so a posting without it keeps its office, even
+    when it names applicant regions: hybrid roles must not leak into ``remote=true``.
+    """
+
+    location = _location(posting)
+
+    assert location == expected
+    assert not is_remote_location(location)
