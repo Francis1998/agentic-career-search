@@ -214,22 +214,27 @@ def test_gpt_6_requests_use_reasoning_effort_and_completion_token_budget(
         assert payload["max_completion_tokens"] >= 1024
 
 
-def test_claude_5_5_requests_omit_temperature_and_budget_for_thinking(
-    monkeypatch: MonkeyPatch,
+@pytest.mark.parametrize("model", ["claude-haiku-5-5", "claude-fable-5-2"])
+def test_claude_requests_omit_sampling_and_budget_for_adaptive_thinking(
+    monkeypatch: MonkeyPatch, model: str
 ) -> None:
-    """Claude 5.5 models 400 on any non-default temperature; thinking counts toward max_tokens."""
+    """Claude 5.5 and Fable 5.2 400 on custom sampling; thinking counts toward max_tokens.
+
+    Fable 5.2 thinks adaptively at all times (disabling it or sending a manual budget
+    is a 400), so effort is the only cost control the request carries.
+    """
 
     captured = _capture_requests(
         monkeypatch,
         {"content": [{"type": "thinking", "thinking": ""}, {"type": "text", "text": "Good fit."}]},
     )
 
-    result = _enrich(Settings(LLM_PROVIDER="claude", CLAUDE_API_KEY="test-key"))
+    result = _enrich(Settings(LLM_PROVIDER="claude", CLAUDE_API_KEY="test-key", CLAUDE_MODEL=model))
 
     assert result is not None and result.summary == "Good fit."
     payload = captured[0]
-    assert payload["model"] == "claude-haiku-5-5"
-    assert {"temperature", "top_p", "top_k"}.isdisjoint(payload)
+    assert payload["model"] == model
+    assert {"temperature", "top_p", "top_k", "thinking"}.isdisjoint(payload)
     assert payload["output_config"] == {"effort": "low"}
     assert payload["max_tokens"] >= 1024
 

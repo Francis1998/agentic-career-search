@@ -2,11 +2,11 @@
 
 Guides, catalogs, and docstrings used to say enrichment can use
 "GPT-5.5 / Claude Sonnet 4.6 / Gemini 3.x / Kimi K2" long after the LLM defaults
-moved to the GPT-6, Claude 5.5, Gemini 4, and Kimi K3.1 families. Historical
-records (CHANGELOG, daily/badge/PR logs, release notes, and ADRs, which record the
-context of past decisions) are exempt; tests are not scanned. Lines that announce
-a retirement or deprecation (e.g. "Kimi K2 models are being retired") may name
-the retired model.
+moved to the GPT-6, Claude 5.5, Gemini 4, and Kimi K3.1 families, and Claude Fable
+5.2 supersedes Fable 5.1. Historical records (CHANGELOG, daily/badge/PR logs,
+release notes, and ADRs, which record the context of past decisions) are exempt;
+tests are not scanned. Lines that announce a retirement or deprecation (e.g. "Kimi
+K2 models are being retired") may name the retired model.
 """
 
 from __future__ import annotations
@@ -19,6 +19,7 @@ ROOT = Path(__file__).resolve().parents[2]
 RETIRED_PROSE = re.compile(
     r"\bGPT-5\.\d\b|\bGPT-4o\b|\bClaude\s+(?:Sonnet|Opus)\s+4\.\d\b"
     r"|\bSonnet\s+4\.6\b|\bKimi\s+K2\b(?!\.\d)|\bGemini\s+2\.5\b"
+    r"|\bFable\s+5\.1\b|\bclaude-fable-5-1\b"
 )
 RETIREMENT_NOTICE = re.compile(r"\bretir(?:ed|ing|ement)\b|\bdeprecat", re.IGNORECASE)
 
