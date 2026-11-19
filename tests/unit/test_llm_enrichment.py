@@ -214,6 +214,50 @@ def test_gpt_6_requests_use_reasoning_effort_and_completion_token_budget(
         assert payload["max_completion_tokens"] >= 1024
 
 
+@pytest.mark.parametrize(
+    "model",
+    ["gpt-6.2-sol", "gpt-6.2-astra", "gpt-6.1-sol", "gpt-6-astra", "openai/gpt-6.2-sol"],
+)
+def test_gpt_models_that_always_reason_get_low_effort_without_sampling(
+    monkeypatch: MonkeyPatch, model: str
+) -> None:
+    """These models reject effort ``none``; OpenAI says to send ``low`` for none/minimal.
+
+    The default ``OPENAI_REASONING_EFFORT=none`` (meant for GPT-6 Luna) must not leak
+    into their requests, and neither may ``temperature``/``top_p``/``logprobs``, which
+    they reject, or tools, which GPT-6.2 only accepts through the Responses API.
+    """
+
+    captured = _capture_requests(monkeypatch, _OPENAI_REPLY)
+
+    _enrich(Settings(LLM_PROVIDER="gpt", OPENAI_API_KEY="test-key", OPENAI_MODEL=model))
+    for effort in ("minimal", "high"):
+        _enrich(
+            Settings(
+                LLM_PROVIDER="gpt",
+                OPENAI_API_KEY="test-key",
+                OPENAI_MODEL=model,
+                OPENAI_REASONING_EFFORT=effort,
+            )
+        )
+
+    assert [payload["reasoning_effort"] for payload in captured] == ["low", "low", "high"]
+    for payload in captured:
+        assert payload["model"] == model
+        assert {"temperature", "top_p", "logprobs", "top_logprobs", "tools"}.isdisjoint(payload)
+
+
+def test_gpt_6_1_terra_keeps_effort_none_and_temperature(monkeypatch: MonkeyPatch) -> None:
+    """GPT-6.1 Terra, like GPT-6 Luna, accepts ``none``: its requests stay unchanged."""
+
+    captured = _capture_requests(monkeypatch, _OPENAI_REPLY)
+
+    _enrich(Settings(LLM_PROVIDER="gpt", OPENAI_API_KEY="test-key", OPENAI_MODEL="gpt-6.1-terra"))
+
+    assert captured[0]["reasoning_effort"] == "none"
+    assert captured[0]["temperature"] == 0.2
+
+
 @pytest.mark.parametrize("model", ["claude-haiku-5-5", "claude-fable-5-2"])
 def test_claude_requests_omit_sampling_and_budget_for_adaptive_thinking(
     monkeypatch: MonkeyPatch, model: str
