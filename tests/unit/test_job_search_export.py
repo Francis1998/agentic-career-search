@@ -94,6 +94,28 @@ def test_posting_key_keeps_non_latin_postings_distinct() -> None:
     assert tokyo == posting_key("ソフトウェアエンジニア", "株式会社サンプル Inc.", "東京")
 
 
+def test_posting_key_keeps_plus_and_sharp_that_end_a_word() -> None:
+    """C, C++, C# and F# roles are different postings; their mirrors still collapse."""
+
+    keys = {
+        posting_key(f"Senior {language} Engineer", "Acme Games", "Berlin")
+        for language in ("C", "C++", "C#", "F", "F#")
+    }
+
+    assert len(keys) == 5
+    assert posting_key("Senior C# Engineer (.NET)", "Acme Games, Inc.", "Berlin") == posting_key(
+        "senior c# engineer - .net", "ACME GAMES", "berlin"
+    )
+    # Full-width C and number sign (U+FF23, U+FF03) are NFKC-equal to "C#".
+    assert posting_key("\uff23\uff03 Engineer", "Acme", None) == posting_key(
+        "C# Engineer", "Acme", None
+    )
+    # A "+" between two words is still punctuation.
+    assert posting_key("Python+Django Engineer", "Acme", None) == posting_key(
+        "Python Django Engineer", "Acme", None
+    )
+
+
 def test_as_utc_and_rfc3339_treat_naive_values_as_utc() -> None:
     """Naive datetimes (SQLite) are UTC; offsets are converted."""
 

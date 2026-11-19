@@ -625,6 +625,77 @@ def test_dedupe_keeps_distinct_non_latin_postings(sqlite_database_url: str) -> N
         ]
 
 
+# One studio, office and board: the C, C++ and C# roles differ only in "++" or "#".
+LANGUAGE_JOBS = (
+    SeedJob(
+        "cpp",
+        "run-a",
+        1,
+        "Senior C++ Engineer",
+        "Acme Games",
+        "Berlin, Germany",
+        "https://boards.greenhouse.io/acmegames/jobs/1",
+        0.7,
+        0,
+    ),
+    SeedJob(
+        "csharp",
+        "run-a",
+        1,
+        "Senior C# Engineer",
+        "Acme Games",
+        "Berlin, Germany",
+        "https://boards.greenhouse.io/acmegames/jobs/2",
+        0.7,
+        1,
+    ),
+    SeedJob(
+        "c",
+        "run-a",
+        1,
+        "Senior C Engineer",
+        "Acme Games",
+        "Berlin, Germany",
+        "https://boards.greenhouse.io/acmegames/jobs/3",
+        0.7,
+        2,
+    ),
+    SeedJob(
+        "csharp-mirror",
+        "run-b",
+        2,
+        "Senior C# Engineer",
+        "Acme Games GmbH",
+        "Berlin, Germany",
+        "https://jobs.lever.co/acmegames/csharp",
+        0.7,
+        3,
+    ),
+)
+
+
+def test_dedupe_keeps_c_cpp_and_csharp_postings_apart(sqlite_database_url: str) -> None:
+    """Titles that differ only in a word-final ``++`` or ``#`` are different postings."""
+
+    for client in _client_for(sqlite_database_url, LANGUAGE_JOBS):
+        response = client.get("/jobs", params={"dedupe": "true"})
+        entries = _feed(client).findall(f"{ATOM}entry")
+        # POST /jobs/match deduplicates by default.
+        match = client.post("/jobs/match", json={"resume_text": "Game developer: C#, .NET."})
+
+        assert _keys(response) == ["c", "csharp", "cpp"]
+        assert response.headers["x-total-count"] == "3"
+        assert [entry.findtext(f"{ATOM}title") for entry in entries] == [
+            "Senior C Engineer at Acme Games",
+            "Senior C# Engineer at Acme Games",
+            "Senior C++ Engineer at Acme Games",
+        ]
+        assert match.status_code == 200, match.text
+        ranked = match.json()["jobs"]
+        assert [job["external_id"] for job in ranked] == ["csharp", "c", "cpp"]
+        assert (ranked[0]["match_score"], ranked[0]["matched_skills"]) == (1.0, ["c#"])
+
+
 CONFLICT_JOBS = (
     SeedJob(
         "senior-at-a",
