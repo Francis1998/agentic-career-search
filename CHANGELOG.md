@@ -802,6 +802,17 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   as `low` (OpenAI's GPT-6.2 migration advice) and never send `temperature`; gateway ids
   such as `openai/gpt-6.2-sol` are recognised too. Other efforts pass through unchanged,
   and `gpt-6-luna` / `gpt-6.1-terra`, which accept `none`, keep `none` with `temperature`.
+- Dedupe: postings whose titles differ only in a `+` or `#` that ends a word are no
+  longer merged. The posting identity (normalized title + company + location) dropped
+  every symbol, so `Senior C++ Engineer`, `Senior C# Engineer` and `Senior C Engineer`
+  at the same company and location were one posting and only the first capture
+  survived: `GET /jobs?dedupe=true`, `GET /jobs/export?dedupe=true`, the Atom feed
+  (always deduplicated), `POST /jobs/match` (dedupe on by default) and the MCP
+  `search_jobs` / `match_resume_to_jobs` tools silently dropped the other roles, so a
+  C# resume was ranked only against the C++ job (match score 0). Word-final `+`/`#`
+  (`C++`, `C#`, `F#`, `A+`) now stay in the key; mirrors still collapse across case,
+  punctuation, spacing and legal suffixes, and a `+` between two words
+  (`Python+Django`) is still punctuation.
 - `JsonLdAdapter`: schema.org `JobPosting` roles that can be done fully remotely are now
   reported as remote even when they also list an office. Google's work-from-home markup
   pairs an office `jobLocation` with `jobLocationType: TELECOMMUTE` ("at the Detroit
