@@ -305,7 +305,9 @@ def test_gemini_3_requests_use_thinking_level_instead_of_sampling(
     assert "thinkingConfig" not in legacy
 
 
-@pytest.mark.parametrize("model", ["gemini-4-hydrogen", "gemini-4-carbon", "gemini-4-argon"])
+@pytest.mark.parametrize(
+    "model", ["gemini-4-hydrogen", "gemini-4-neon", "gemini-4-carbon", "gemini-4-argon"]
+)
 def test_gemini_4_requests_think_low_without_a_small_output_cap(
     monkeypatch: MonkeyPatch, model: str
 ) -> None:
