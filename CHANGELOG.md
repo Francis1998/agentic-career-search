@@ -749,6 +749,20 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `external_id`. See ADR-086.
 
 ### Changed
+- LLM enrichment docs follow the model line-ups verified on 2026-11-19 on the OpenAI and
+  Google model pages (Anthropic and Moonshot are unchanged). README, `CONFIGURATION.md`,
+  `docs/CONFIGURATION.md`, `.env.example`, `ARCHITECTURE.md`, `docs/TROUBLESHOOTING.md`
+  and the use-case catalog add `gpt-6.2-sol` (OpenAI's everyday model, released
+  2026-11-17, superseding `gpt-6.1-sol` at the same price), `gpt-6.2-astra` (flagship,
+  superseding `gpt-6-astra` at 20% lower input and output prices) and `gemini-4-neon` (GA
+  2026-11-18, between Gemini 4 Hydrogen and Carbon, paid tier only). A new
+  *Newest models* table in `CONFIGURATION.md` records their context windows, prices
+  (including cached input, cache writes and the GPT-6.2 surcharge above 272K input
+  tokens) and request shape, and the troubleshooting table covers Gemini 4 Neon on a
+  free-tier key and GPT aliases that hide the model id. Defaults are unchanged
+  (`gpt-6-luna`, `gemini-3.8-flash`), and the Gemini 4 request test now also pins
+  `gemini-4-neon` (`thinkingLevel: LOW`, Google's default output limit, no sampling
+  parameters).
 - LLM enrichment docs follow the model line-ups verified on 2026-11-12 on the OpenAI,
   Anthropic, Google and Moonshot model pages. README, `CONFIGURATION.md`,
   `.env.example` and `docs/TROUBLESHOOTING.md` add `claude-fable-5-2` (Anthropic's new
@@ -782,12 +796,12 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `reasoning_effort: none`. With `OPENAI_MODEL` set to `gpt-6.2-sol` or `gpt-6.2-astra`
   (released 2026-11-17), or to `gpt-6.1-sol` or `gpt-6-astra`, the default
   `OPENAI_REASONING_EFFORT=none` (meant for `gpt-6-luna`) was sent together with
-  `temperature: 0.2`. OpenAI rejects `none` for these models (and `temperature` whenever
-  reasoning is on), so every enrichment call failed and runs silently fell back to
-  deterministic-only output. Their requests now send `none` and `minimal` as `low`
-  (OpenAI's GPT-6.2 migration advice) and never send `temperature`; gateway ids such as
-  `openai/gpt-6.2-sol` are recognised too. Other efforts pass through unchanged, and
-  `gpt-6-luna` / `gpt-6.1-terra`, which accept `none`, keep `none` with `temperature`.
+  `temperature: 0.2`. These models only accept efforts from `low` up (OpenAI's GPT-6.2
+  pages say the API rejects `none`), so every enrichment call failed and runs silently
+  fell back to deterministic-only output. Their requests now send `none` and `minimal`
+  as `low` (OpenAI's GPT-6.2 migration advice) and never send `temperature`; gateway ids
+  such as `openai/gpt-6.2-sol` are recognised too. Other efforts pass through unchanged,
+  and `gpt-6-luna` / `gpt-6.1-terra`, which accept `none`, keep `none` with `temperature`.
 - `JsonLdAdapter`: schema.org `JobPosting` roles that can be done fully remotely are now
   reported as remote even when they also list an office. Google's work-from-home markup
   pairs an office `jobLocation` with `jobLocationType: TELECOMMUTE` ("at the Detroit

@@ -38,7 +38,7 @@ flowchart LR
     W --> AD["119 source adapters<br/>Greenhouse · Lever · Workday · JSON-LD …"]
     AD --> SCORE["Deterministic scoring<br/>+ planning"]
     SCORE --> DT["Decision trace<br/>agent_decision + run events"]
-    SCORE -. optional .-> LLM["LLM enrichment<br/>GPT-6 · Claude 5.5 / Fable 5.2<br/>Gemini 3.8 / 4 · Kimi K3.1"]
+    SCORE -. optional .-> LLM["LLM enrichment<br/>GPT-6 / 6.2 · Claude 5.5 / Fable 5.2<br/>Gemini 3.8 / 4 · Kimi K3.1"]
     LLM -.-> DT
     DT --> DB[("Jobs + run events")]
     DB --> API["Search · export · Atom feed<br/>GET /jobs …"]
@@ -128,7 +128,7 @@ Cursor configuration examples, every tool, the audit log and a recorded session.
 | Search & export | Filters, `X-Total-Count` paging, cross-board dedupe, OWASP-safe CSV, JSON Lines, Atom 1.0 | [Search & export guide](docs/guides/JOB_SEARCH_EXPORT_GUIDE.md) |
 | Resume match | `POST /jobs/match` and MCP `match_resume_to_jobs`: rank jobs against resume text with a 254-skill alias-aware lexicon (`k8s` → `kubernetes`); match score, matched/missing skills, explanation, `sort=match\|blend`, CSV; resume never stored or logged | [Resume match guide](docs/guides/RESUME_JOB_MATCH_GUIDE.md) |
 | AI assistants (MCP) | Read-only stdio MCP server: search, decision traces, plain-language score explanations, runs and events; audit log with hashed arguments | [MCP server guide](docs/guides/MCP_SERVER_GUIDE.md) |
-| LLM enrichment | Optional summaries from GPT-6, Claude 5.5 / Fable 5.2, Gemini 3.8 / 4 or Kimi K3.1 models | [CONFIGURATION.md](CONFIGURATION.md) |
+| LLM enrichment | Optional summaries from GPT-6 / 6.2, Claude 5.5 / Fable 5.2, Gemini 3.8 / 4 or Kimi K3.1 models | [CONFIGURATION.md](CONFIGURATION.md) |
 | Alerts | Fail-soft webhook for high-priority jobs (Slack, Discord, custom) | [CONFIGURATION.md](CONFIGURATION.md) |
 | Career toolkit | 175+ offline, human-in-the-loop helpers (fit, salary bands, interview prep, offer and benefit gap advisors) | [Use-case catalog](docs/USE_CASE_CATALOG.md) |
 | Operations | Health probes, Alembic migrations, CI (ruff, mypy, pytest), weekly security scan | [DEPLOYMENT.md](docs/DEPLOYMENT.md) |
@@ -137,31 +137,41 @@ Cursor configuration examples, every tool, the audit log and a recorded session.
 
 Provider integration is built into the code path and is optional: deterministic scoring
 and decision traces work without any key. Each default is a provider's cost-efficient
-current model (line-ups verified 2026-11-12 on the linked provider pages):
+current model (line-ups verified 2026-11-19 on the linked provider pages):
 
 | Provider | `LLM_PROVIDER` | Default model | Request shape |
 |---|---|---|---|
-| [OpenAI](https://developers.openai.com/api/docs/models) | `gpt` | `gpt-6-luna` | Chat Completions; `reasoning_effort` from `OPENAI_REASONING_EFFORT` (`none`, so `temperature` is allowed); `gpt-6.1-sol` / `gpt-6-astra` need `low` or higher |
+| [OpenAI](https://developers.openai.com/api/docs/models) | `gpt` | `gpt-6-luna` | Chat Completions without tools; `reasoning_effort` from `OPENAI_REASONING_EFFORT` (`none`, so `temperature` is allowed); `gpt-6.2-sol`, `gpt-6.2-astra`, `gpt-6.1-sol` and `gpt-6-astra` always reason, so they get `low` instead of `none` / `minimal` and no `temperature` |
 | [Anthropic](https://platform.claude.com/docs/en/models/overview) | `claude` | `claude-haiku-5-5` | Messages API; `output_config.effort` from `CLAUDE_EFFORT` (`low`); no sampling parameters (Claude 5.5 and Fable 5.2 return 400 for custom values) |
 | [Google](https://aistudio.google.com/docs/models) | `gemini` | `gemini-3.8-flash` | `generateContent`; `thinkingLevel: LOW` on Gemini 3+ (required on Gemini 4); Gemini 4 keeps Google's default output limit; no sampling parameters |
 | [Moonshot Kimi](https://platform.kimi.ai/docs/api/models-overview.md) | `kimi` | `kimi-k3.1-pro` | OpenAI-compatible; `reasoning_effort: low`; `temperature` is fixed at 1.0 by K3 and never sent |
 
 Other current models:
 
-- OpenAI: `gpt-6.1-terra`, `gpt-6.1-sol`, `gpt-6-astra` (flagship).
+- OpenAI: `gpt-6.1-terra` (fast and efficient),
+  [`gpt-6.2-sol`](https://developers.openai.com/api/docs/models/gpt-6.2-sol) (released
+  2026-11-17; OpenAI's go-to model for everyday work and agents, at the price of the
+  `gpt-6.1-sol` it supersedes),
+  [`gpt-6.2-astra`](https://developers.openai.com/api/docs/models/gpt-6.2-astra) (released
+  2026-11-17; flagship for the hardest work, with input and output prices 20% below the
+  `gpt-6-astra` it supersedes). `gpt-6.1-sol` and `gpt-6-astra` remain available.
 - Anthropic: `claude-sonnet-5-5`, `claude-opus-5-5` (Anthropic's recommended starting
   point), `claude-fable-5-2` (demanding reasoning and long-horizon agentic work; needs
   30-day data retention).
 - Google: `gemini-3.5-flash-lite` (cheapest),
   [`gemini-4-hydrogen`](https://aistudio.google.com/docs/whats-new-gemini-4-hydrogen)
   (released 2026-11-12; Google's recommended upgrade from Gemini 3.8 Flash, at twice its
-  price until the 3.8 Flash introductory rate ends on 2026-12-31), `gemini-4-argon`,
-  `gemini-4-carbon` (strongest reasoning).
+  price until the 3.8 Flash introductory rate ends on 2026-12-31),
+  [`gemini-4-neon`](https://aistudio.google.com/docs/whats-new-gemini-4-neon) (GA
+  2026-11-18; between Hydrogen and Carbon, with quality close to Carbon at a lower token
+  cost per task; paid tier only), `gemini-4-argon`, `gemini-4-carbon` (strongest
+  reasoning).
 - Kimi: `kimi-k3.1-pro-highspeed` (same intelligence, about 2-3x the speed).
   Kimi K2 models are retiring by the end of December 2026 and closed to new users on
   2026-10-31 ([Moonshot](https://platform.kimi.ai/docs/models)).
 
-See each provider's page for pricing.
+See each provider's page for pricing; [CONFIGURATION.md](CONFIGURATION.md#newest-models-verified-2026-11-19)
+lists the limits, prices and request shape of the models added on 2026-11-19.
 
 Enable provider enrichment:
 

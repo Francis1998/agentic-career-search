@@ -105,7 +105,7 @@ This project solves those issues with explicit agent engineering primitives:
 |---|---|---|
 | Teams can scrape jobs but cannot justify recommendations | Low trust from users and reviewers | `AgentDecisionEngine` stores score, matched terms, priority tier, and rationale |
 | Background runs are hard to debug | Silent failures block iteration speed | Durable run events (`run.*`, `source.*`, `agent.*`) support replay-style troubleshooting |
-| Vendor lock-in around one model provider | High migration cost and brittle integrations | Configurable LLM enrichment supports GPT-6 Astra, Claude Opus 5.5, Gemini 4 Argon, and Kimi K3.1 Pro-style APIs |
+| Vendor lock-in around one model provider | High migration cost and brittle integrations | Configurable LLM enrichment supports GPT-6.2 Sol / Astra, Claude Opus 5.5 / Fable 5.2, Gemini 4 Neon / Carbon, and Kimi K3.1 Pro-style APIs |
 | Model/API outages break the entire flow | System appears unreliable | Graceful fallback preserves deterministic baseline output when LLM enrichment is unavailable |
 | Scraped jobs pile up without a pipeline CRM | Candidates lose track of where each role stands | `ApplicationStageTracker` enforces an auditable saved→offer stage machine |
 | Postings omit pay and scrapers leave empty salary fields | Candidates cannot triage roles by compensation | `SalaryBandEstimator` produces an auditable USD band from title/location heuristics |
