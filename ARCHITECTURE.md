@@ -26,7 +26,7 @@ flowchart TD
 - **Worker** (`autoapply_agent.services.worker`): in-process async polling loop that claims queued runs.
 - **Adapters** (`autoapply_agent.adapters`): Greenhouse and Lever HTML parsers plus a vendor-neutral `schema.org/JobPosting` JSON-LD parser (`jsonld`).
 - **Agent Decision Engine** (`autoapply_agent.services.agent_decision`): deterministic scoring + rationale + priority + planning synthesis.
-- **LLM Enrichment Service** (`autoapply_agent.services.llm_enrichment`): optional Gemini/Kimi/Claude/GPT summary augmentation for decision traces.
+- **LLM Enrichment Service** (`autoapply_agent.services.llm_enrichment`): optional Gemini/Kimi/Claude/GPT summary augmentation for decision traces. Requests are shaped per model family (reasoning effort or thinking level, output cap, and sampling parameters only where the provider accepts them; see [CONFIGURATION.md](CONFIGURATION.md)), and provider failures fall back to deterministic-only output.
 - **Domain Services** (`autoapply_agent.services.scoring`, `planning`): deterministic policy primitives used by the decision engine.
 - **Persistence** (`autoapply_agent.db`): SQLAlchemy async models/session with SQLite.
 

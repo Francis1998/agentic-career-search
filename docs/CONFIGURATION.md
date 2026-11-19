@@ -26,6 +26,13 @@ OPENAI_REASONING_EFFORT=none   # empty for gateways that do not accept reasoning
 OPENAI_BASE_URL=https://api.openai.com/v1
 ```
 
+Request shaping keys off `OPENAI_MODEL`: `gpt-6.2-sol`, `gpt-6.2-astra`, `gpt-6.1-sol` and
+`gpt-6-astra`, also with a gateway prefix such as `openai/gpt-6.2-sol`, always reason, so
+`none` and `minimal` are sent to them as `low` without `temperature`. If a gateway serves
+one of them under an alias (for example an Azure deployment name), set
+`OPENAI_REASONING_EFFORT=low` or higher yourself. Enrichment sends no tools, so Chat
+Completions also works for GPT-6.2, which accepts tool calls only through the Responses API.
+
 ## Safety-oriented defaults
 
 - Keep `MAX_JOBS_PER_SOURCE` bounded in shared environments.

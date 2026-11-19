@@ -15,6 +15,11 @@ from autoapply_agent.core.config import Settings
 # limit, so the cap leaves room for low-effort reasoning plus a 1-2 sentence reply.
 _MAX_OUTPUT_TOKENS = 1024
 _GEMINI_GENERATION = re.compile(r"^gemini-(\d+)")
+# OpenAI models that cannot turn reasoning off: the API rejects reasoning_effort
+# "none", and OpenAI's GPT-6.2 migration guide says to send "low" instead of "none"
+# or "minimal". Gateway ids such as "openai/gpt-6.2-sol" match too.
+_GPT_ALWAYS_REASONS = re.compile(r"(?:^|/)gpt-(?:6\.2|6\.1-sol|6-astra)(?:-|$)")
+_GPT_EFFORTS_BELOW_LOW = frozenset({"none", "minimal"})
 
 
 def _gemini_generation(model: str) -> int:
@@ -169,10 +174,16 @@ class LLMEnrichmentService:
 
         ``OPENAI_REASONING_EFFORT`` is sent as ``reasoning_effort`` when set;
         ``temperature`` is only sent with ``none``, as OpenAI rejects sampling
-        parameters while reasoning is on.
+        parameters while reasoning is on. GPT-6.2, GPT-6.1 Sol and GPT-6 Astra
+        always reason, so ``none`` and ``minimal`` are sent as ``low`` for them. No
+        tools are sent, so Chat Completions also works for GPT-6.2, which only
+        accepts tool calls through the Responses API.
         """
 
+        model = self._settings.openai_model
         effort = self._settings.openai_reasoning_effort.strip()
+        if effort in _GPT_EFFORTS_BELOW_LOW and _GPT_ALWAYS_REASONS.search(model):
+            effort = "low"
         options: dict[str, object] = {"max_completion_tokens": _MAX_OUTPUT_TOKENS}
         if effort:
             options["reasoning_effort"] = effort
@@ -181,7 +192,7 @@ class LLMEnrichmentService:
         return await self._call_openai_compatible(
             provider="gpt",
             api_key=self._settings.openai_api_key,
-            model=self._settings.openai_model,
+            model=model,
             base_url=self._settings.openai_base_url,
             prompt=prompt,
             options=options,

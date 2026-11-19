@@ -38,6 +38,8 @@ More in the [MCP Server Guide](guides/MCP_SERVER_GUIDE.md#troubleshooting).
 | Provider timeouts | Network latency or slow model | Increase `LLM_TIMEOUT_SECONDS` |
 | Wrong provider selected | Misconfigured env | Use `gemini`, `kimi`, `claude`, or `gpt` |
 | Enrichment absent with `claude-fable-5-2` | Organization or workspace without 30-day data retention (HTTP 400) | Enable 30-day retention or use `claude-opus-5-5` |
+| Enrichment absent with `gemini-4-neon` | Free-tier Gemini API key (Neon is available on the paid tier only) | Enable billing for the key's project or use `gemini-4-hydrogen` |
+| GPT enrichment absent behind a gateway alias for GPT-6.2, GPT-6.1 Sol or GPT-6 Astra | The alias hides the model id, so `reasoning_effort: none` is sent and rejected (HTTP 400) | Set `OPENAI_REASONING_EFFORT=low` (or higher) |
 | Kimi enrichment stops on a `kimi-k2.*` model | K2 models are retiring by the end of December 2026 (closed to new users on 2026-10-31) | Set `KIMI_MODEL=kimi-k3.1-pro` |
 
 Provider key mapping:
