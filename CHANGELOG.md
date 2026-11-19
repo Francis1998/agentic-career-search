@@ -778,6 +778,16 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `reasoning_effort: none`.
 
 ### Fixed
+- LLM enrichment: GPT models that always reason no longer receive
+  `reasoning_effort: none`. With `OPENAI_MODEL` set to `gpt-6.2-sol` or `gpt-6.2-astra`
+  (released 2026-11-17), or to `gpt-6.1-sol` or `gpt-6-astra`, the default
+  `OPENAI_REASONING_EFFORT=none` (meant for `gpt-6-luna`) was sent together with
+  `temperature: 0.2`. OpenAI rejects `none` for these models (and `temperature` whenever
+  reasoning is on), so every enrichment call failed and runs silently fell back to
+  deterministic-only output. Their requests now send `none` and `minimal` as `low`
+  (OpenAI's GPT-6.2 migration advice) and never send `temperature`; gateway ids such as
+  `openai/gpt-6.2-sol` are recognised too. Other efforts pass through unchanged, and
+  `gpt-6-luna` / `gpt-6.1-terra`, which accept `none`, keep `none` with `temperature`.
 - `JsonLdAdapter`: schema.org `JobPosting` roles that can be done fully remotely are now
   reported as remote even when they also list an office. Google's work-from-home markup
   pairs an office `jobLocation` with `jobLocationType: TELECOMMUTE` ("at the Detroit
