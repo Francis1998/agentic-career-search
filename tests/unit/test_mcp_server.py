@@ -39,8 +39,10 @@ SERVER_INFO_KEY = "io.modelcontextprotocol/serverInfo"
 REPO_ROOT = Path(__file__).resolve().parents[2]
 READ_ONLY_TOOLS = [
     "explain_job_score",
+    "get_application",
     "get_job",
     "get_run",
+    "list_applications",
     "list_runs",
     "list_sources",
     "match_resume_to_jobs",

@@ -1,4 +1,4 @@
-"""Database models for runs, events, sources, and jobs."""
+"""Database models for runs, events, sources, jobs and tracked applications."""
 
 from __future__ import annotations
 
@@ -254,6 +254,69 @@ class Job(Base):
     score: Mapped[float] = mapped_column(Float, nullable=False)
     plan_steps: Mapped[list[str]] = mapped_column(JSON, nullable=False)
     raw: Mapped[dict[str, object] | None] = mapped_column(JSON, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, default=utc_now
+    )
+
+
+class Application(Base):
+    """A captured job the user tracks through the application pipeline.
+
+    ``stage`` holds an :class:`~autoapply_agent.services.application_stages.ApplicationStage`
+    value; transitions are validated by that module's state machine and recorded in
+    :class:`ApplicationEvent`. This is local bookkeeping only: nothing here submits an
+    application or contacts an employer.
+    """
+
+    __tablename__ = "applications"
+    __table_args__ = (
+        UniqueConstraint("job_id", name="uq_applications_job_id"),
+        # Backs the follow-up filters and the calendar feed.
+        Index("ix_applications_next_action_at", "next_action_at"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    job_id: Mapped[int] = mapped_column(Integer, ForeignKey("jobs.id"), nullable=False)
+    stage: Mapped[str] = mapped_column(String(16), nullable=False, default="saved")
+    archived: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    applied_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    next_action_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    next_action: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    stage_changed_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, default=utc_now
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, default=utc_now
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=utc_now,
+        onupdate=utc_now,
+    )
+
+
+class ApplicationEvent(Base):
+    """Append-only history of one application: stage changes, follow-ups, notes, archiving."""
+
+    __tablename__ = "application_events"
+    __table_args__ = (
+        UniqueConstraint(
+            "application_id", "sequence", name="uq_application_events_application_sequence"
+        ),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    application_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("applications.id"), nullable=False
+    )
+    sequence: Mapped[int] = mapped_column(Integer, nullable=False)
+    event_type: Mapped[str] = mapped_column(String(32), nullable=False)
+    from_stage: Mapped[str | None] = mapped_column(String(16), nullable=True)
+    to_stage: Mapped[str | None] = mapped_column(String(16), nullable=True)
+    note: Mapped[str | None] = mapped_column(Text, nullable=True)
+    changes: Mapped[dict[str, object] | None] = mapped_column(JSON, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, default=utc_now
     )

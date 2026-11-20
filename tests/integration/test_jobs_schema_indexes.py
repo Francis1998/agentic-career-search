@@ -75,7 +75,8 @@ def test_alembic_head_matches_models_and_downgrades(tmp_path: Path) -> None:
             diff = compare_metadata(MigrationContext.configure(connection), Base.metadata)
     finally:
         engine.dispose()
-    command.downgrade(config, "-1")
+    # Back to the initial schema: undoes the index migration and every later one.
+    command.downgrade(config, "87de9ef55524")
     downgraded = _job_indexes(database_url)
 
     assert {name: upgraded.get(name) for name in ORDERING_INDEXES} == ORDERING_INDEXES

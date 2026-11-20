@@ -1,7 +1,10 @@
-"""In-process application stage tracker (CRM-lite pipeline).
+"""Application stage state machine and an in-process stage tracker (CRM-lite pipeline).
 
 Tracks job applications through saved → applied → interview → offer →
-rejected/accepted with explicit allowed transitions. v1 is in-memory only.
+rejected/accepted with explicit allowed transitions. The transition rules here are
+the single state machine of the project: :class:`ApplicationStageTracker` keeps
+records in memory, and the persistent tracker behind ``/applications``
+(:mod:`autoapply_agent.services.application_tracker`) stores them in the database.
 """
 
 from __future__ import annotations
@@ -49,8 +52,52 @@ class ApplicationRecord:
     updated_at: str
 
 
+PIPELINE_ORDER: tuple[ApplicationStage, ...] = (
+    ApplicationStage.SAVED,
+    ApplicationStage.APPLIED,
+    ApplicationStage.INTERVIEW,
+    ApplicationStage.OFFER,
+    ApplicationStage.ACCEPTED,
+    ApplicationStage.REJECTED,
+)
+"""Board column order: the forward path, then the two terminal stages."""
+
+
 class ApplicationStageError(ValueError):
     """Raised when a stage transition is not allowed."""
+
+
+def allowed_next_stages(stage: ApplicationStage) -> tuple[ApplicationStage, ...]:
+    """Return the legal next stages of ``stage`` in pipeline order.
+
+    Args:
+        stage: Current stage.
+
+    Returns:
+        Stages a record in ``stage`` may move to (empty for terminal stages).
+    """
+
+    return tuple(candidate for candidate in PIPELINE_ORDER if candidate in _ALLOWED[stage])
+
+
+def check_transition(current: ApplicationStage, target: ApplicationStage) -> None:
+    """Validate moving a record from ``current`` to ``target``.
+
+    Staying in the same stage is always allowed (it is not a transition).
+
+    Args:
+        current: Stage the record is in.
+        target: Requested stage.
+
+    Raises:
+        ApplicationStageError: If ``target`` is not a legal next stage of ``current``.
+    """
+
+    if target == current or target in _ALLOWED[current]:
+        return
+    allowed = ", ".join(stage.value for stage in allowed_next_stages(current))
+    reason = f"allowed: {allowed}" if allowed else f"{current.value} is a final stage"
+    raise ApplicationStageError(f"cannot move from {current.value} to {target.value} ({reason})")
 
 
 class ApplicationStageTracker:
@@ -88,12 +135,11 @@ class ApplicationStageTracker:
         if not key:
             raise ValueError("job_key must be non-empty")
         existing = self._records.get(key)
-        if existing is not None and stage != existing.stage:
-            allowed = self.allowed_transitions(existing.stage)
-            if stage not in allowed:
-                raise ApplicationStageError(
-                    f"cannot move {key} from {existing.stage.value} to {stage.value}"
-                )
+        if existing is not None:
+            try:
+                check_transition(existing.stage, stage)
+            except ApplicationStageError as exc:
+                raise ApplicationStageError(f"{key}: {exc}") from None
         record = ApplicationRecord(
             job_key=key,
             stage=stage,
