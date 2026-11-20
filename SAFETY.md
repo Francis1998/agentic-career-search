@@ -42,6 +42,10 @@
   outcomes; matching never applies, contacts employers or edits the resume.
 - Salary-band estimates are assistive triage signals, not offers, market truth, or legal advice.
 - Application stage tracking is local pipeline state only; it never submits applications or contacts employers.
+  The persistent tracker (`/applications`) records decisions the user made: stage moves follow
+  one state machine (illegal moves are `409`), the timeline is append-only, MCP access is
+  read-only, notes are never logged or written to the follow-up calendar feed, and exports
+  reuse the CSV-injection hardening.
 - Interview-prep briefs are assistive coaching content, not recruiter outreach or scheduling automation.
 - Equity vesting/cliff math is assistive triage only — never auto-accepts offers or writes broker orders.
 - Interview-round progress tracking is local pipeline state only; it never advances candidates or contacts employers.

@@ -5,9 +5,10 @@
 Track applications through a **CRM-lite pipeline**:
 `saved → applied → interview → offer → accepted|rejected`.
 
-v1 is an in-process state machine with explicit allowed transitions. Durable DB
-persistence can come later; this module keeps agent loops able to reason about
-pipeline stage without auto-submitting applications.
+This module is the in-process state machine with explicit allowed transitions; it keeps
+agent loops able to reason about pipeline stage without auto-submitting applications.
+For durable tracking (database, timeline, follow-ups, board, exports, MCP) use the
+[Application Tracker](APPLICATION_TRACKER_GUIDE.md), which enforces the same transitions.
 
 Optional LLM notes polish can later use GPT-6 Astra / Claude Opus 5.5 /
 Gemini 4 Argon / Kimi K3.1 Pro. Stage transitions themselves stay deterministic.

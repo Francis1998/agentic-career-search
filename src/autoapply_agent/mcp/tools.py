@@ -9,9 +9,12 @@ Every tool reuses the services behind the HTTP API instead of re-implementing qu
 * :mod:`~autoapply_agent.services.read_queries` for runs, run events and sources;
 * :mod:`~autoapply_agent.services.job_export` for http(s)-only links and timestamps;
 * :mod:`~autoapply_agent.services.resume_match` to rank jobs against resume text (the
-  ranking of ``POST /jobs/match``).
+  ranking of ``POST /jobs/match``);
+* :mod:`~autoapply_agent.services.application_tracker` for the application pipeline
+  (the queries behind ``GET /applications`` and ``GET /applications/{id}/events``).
 
-No tool writes: none can start or cancel runs, edit source configs or apply to jobs.
+No tool writes: none can start or cancel runs, edit source configs, track or move
+applications, or apply to jobs.
 Results carry ``structuredContent`` that conforms to each tool's ``outputSchema`` plus a
 short text rendering. Captured text (titles, companies, locations, rationale) comes from
 public career pages and is returned as data.
@@ -28,11 +31,35 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from autoapply_agent.adapters.base import JobCandidate
 from autoapply_agent.core.time import utc_now
-from autoapply_agent.db.models import SQLITE_MAX_INTEGER, Job, Run, RunStatus, SourceConfig
+from autoapply_agent.db.models import (
+    SQLITE_MAX_INTEGER,
+    Application,
+    Job,
+    Run,
+    RunStatus,
+    SourceConfig,
+)
+from autoapply_agent.schemas.applications import ApplicationEventRead, ApplicationRead
 from autoapply_agent.services.agent_decision import (
     HIGH_PRIORITY_MIN_SCORE,
     MEDIUM_PRIORITY_MIN_SCORE,
     priority_tier_for_score,
+)
+from autoapply_agent.services.application_stages import PIPELINE_ORDER, ApplicationStage
+from autoapply_agent.services.application_tracker import (
+    DUE_SOON_DAYS,
+    MAX_DUE_WITHIN_DAYS,
+    ApplicationEventType,
+    ApplicationFilters,
+    ApplicationSort,
+    FollowUpFilter,
+    FollowUpStatus,
+    application_events,
+    count_application_events,
+    follow_up_counts,
+    get_tracked,
+    list_applications,
+    stage_counts,
 )
 from autoapply_agent.services.job_export import rfc3339, safe_http_url
 from autoapply_agent.services.job_search import (
@@ -70,6 +97,7 @@ MAX_PAGE_SIZE = 50
 DEFAULT_EVENT_LIMIT = 20
 MAX_EVENT_LIMIT = 200
 _MAX_RUN_ID_LENGTH = 64
+LIST_NOTES_PREVIEW_CHARS = 280
 
 READ_ONLY_ANNOTATIONS: dict[str, bool] = {
     "readOnlyHint": True,
@@ -789,6 +817,191 @@ def _match_summary(result: dict[str, Any]) -> str:
 
 
 # ---------------------------------------------------------------------------
+# list_applications / get_application
+# ---------------------------------------------------------------------------
+
+
+def _application_record(
+    application: Application, job: Job, *, now: datetime, preview_notes: bool
+) -> dict[str, Any]:
+    """The ``GET /applications`` record of one application, plus ``notes_truncated``."""
+
+    view = ApplicationRead.from_records(application, job, now=now)
+    record = view.model_dump(mode="json")
+    # Second-precision RFC 3339 like every other tool (the API keeps microseconds).
+    record.update(
+        applied_at=_timestamp(view.applied_at),
+        next_action_at=_timestamp(view.next_action_at),
+        stage_changed_at=rfc3339(view.stage_changed_at),
+        created_at=rfc3339(view.created_at),
+        updated_at=rfc3339(view.updated_at),
+    )
+    record["job"]["captured_at"] = rfc3339(view.job.captured_at)
+    notes = record["notes"]
+    truncated = preview_notes and notes is not None and len(notes) > LIST_NOTES_PREVIEW_CHARS
+    if truncated:
+        record["notes"] = notes[:LIST_NOTES_PREVIEW_CHARS] + "…"
+    record["notes_truncated"] = truncated
+    return record
+
+
+def _follow_up_text(record: dict[str, Any]) -> str:
+    """``follow-up overdue 2026-11-18T17:00:00Z: Check in`` or ``no follow-up``."""
+
+    if record["next_action_at"] is None:
+        return f"next: {record['next_action']}" if record["next_action"] else "no follow-up"
+    label = f": {record['next_action']}" if record["next_action"] else ""
+    return f"follow-up {record['follow_up_status']} {record['next_action_at']}{label}"
+
+
+def _application_line(record: dict[str, Any]) -> str:
+    """One-line ``#id stage · title — company · follow-up`` summary."""
+
+    job = record["job"]
+    role = f"{job['title']} — {job['company']}" if job["company"] else job["title"]
+    archived = " (archived)" if record["archived"] else ""
+    return (
+        f"#{record['id']} {record['stage']}{archived} · {role} · job #{record['job_id']}"
+        f" · {_follow_up_text(record)}"
+    )
+
+
+async def _list_applications(session: AsyncSession, arguments: dict[str, Any]) -> ToolOutput:
+    """List tracked applications with the filters, sorting and paging of the HTTP API."""
+
+    now = utc_now()
+    stages = [ApplicationStage(stage) for stage in arguments.get("stage", [])]
+    filters = ApplicationFilters(
+        stages=tuple(dict.fromkeys(stages)),
+        company=arguments.get("company"),
+        q=arguments.get("q"),
+        follow_up=FollowUpFilter(arguments["follow_up"]) if "follow_up" in arguments else None,
+        due_within_days=_int_argument(arguments, "due_within_days", DUE_SOON_DAYS),
+        include_archived=bool(arguments.get("include_archived", False)),
+        job_id=_optional_int_argument(arguments, "job_id"),
+        sort=ApplicationSort(arguments.get("sort", ApplicationSort.UPDATED.value)),
+    )
+    limit = _int_argument(arguments, "limit", DEFAULT_PAGE_SIZE)
+    offset = _int_argument(arguments, "offset", 0)
+    page = await list_applications(session, filters, now=now, limit=limit, offset=offset)
+    records = [
+        _application_record(application, job, now=now, preview_notes=True)
+        for application, job in page.items
+    ]
+    structured: dict[str, Any] = {
+        "total": page.total,
+        "offset": offset,
+        "limit": limit,
+        "next_offset": _next_offset(offset, len(records), page.total),
+        "sort": filters.sort.value,
+        "include_archived": filters.include_archived,
+        "stage_counts": await stage_counts(session, filters, now=now),
+        "follow_ups": await follow_up_counts(session, filters, now=now),
+        "applications": records,
+    }
+    return ToolOutput(structured, _applications_summary(structured), len(records))
+
+
+def _applications_summary(result: dict[str, Any]) -> str:
+    """Render an application page as text."""
+
+    total = result["total"]
+    records = result["applications"]
+    scope = "including archived" if result["include_archived"] else "archived hidden"
+    board = " · ".join(f"{stage} {count}" for stage, count in result["stage_counts"].items())
+    follow_ups = result["follow_ups"]
+    lines: list[str] = []
+    if records:
+        noun = "application" if total == 1 else "applications"
+        lines.append(
+            f"{total} tracked {noun} ({scope}, sort={result['sort']}); showing "
+            f"{result['offset'] + 1}-{result['offset'] + len(records)}:"
+        )
+        lines.extend(_application_line(record) for record in records)
+    elif total:
+        lines.append(f"{total} applications match, but offset {result['offset']} is past the end.")
+    else:
+        lines.append(f"No tracked applications match ({scope}).")
+    lines.append(f"Board: {board}")
+    lines.append(
+        f"Follow-ups: {follow_ups['overdue']} overdue · {follow_ups['due']} due within "
+        f"{DUE_SOON_DAYS} days · {follow_ups['scheduled']} later · {follow_ups['none']} none"
+    )
+    if result["next_offset"] is not None:
+        lines.append(f"More: call list_applications again with offset={result['next_offset']}.")
+    return "\n".join(lines)
+
+
+async def _get_application(session: AsyncSession, arguments: dict[str, Any]) -> ToolOutput:
+    """Return one application, its job summary and its most recent timeline events."""
+
+    application_id = _int_argument(arguments, "application_id", 0)
+    tracked = await get_tracked(session, application_id)
+    if tracked is None:
+        raise ToolError(
+            f"No application with id {application_id}. Use list_applications to find ids.",
+            kind="not_found",
+        )
+    application, job = tracked
+    now = utc_now()
+    event_limit = _int_argument(arguments, "event_limit", DEFAULT_EVENT_LIMIT)
+    events = await application_events(session, application.id, limit=event_limit)
+    event_count = await count_application_events(session, application.id)
+    structured: dict[str, Any] = {
+        "application": _application_record(application, job, now=now, preview_notes=False),
+        "event_count": event_count,
+        "events_truncated": len(events) < event_count,
+        "events": [
+            {
+                **ApplicationEventRead.from_record(event).model_dump(mode="json"),
+                "created_at": rfc3339(event.created_at),
+            }
+            for event in events
+        ],
+    }
+    return ToolOutput(structured, _application_detail_summary(structured), 1)
+
+
+def _event_line(event: dict[str, Any]) -> str:
+    """One timeline entry as text."""
+
+    if event["event_type"] in (ApplicationEventType.TRACKED, ApplicationEventType.STAGE_CHANGED):
+        move = f"{event['from_stage'] or '·'} → {event['to_stage']}"
+    else:
+        move = ", ".join(sorted(event["changes"])) or "-"
+    note = f' "{event["note"]}"' if event["note"] else ""
+    return f"{event['sequence']:>4} {event['created_at']} {event['event_type']:<13} {move}{note}"
+
+
+def _application_detail_summary(result: dict[str, Any]) -> str:
+    """Render one application and its timeline as text."""
+
+    record = result["application"]
+    job = record["job"]
+    allowed = ", ".join(record["allowed_stages"]) or f"none, {record['stage']} is final"
+    lines = [
+        f"Application #{record['id']} · {record['stage']}"
+        + (" (archived)" if record["archived"] else "")
+        + f" for {record['days_in_stage']} day{'' if record['days_in_stage'] == 1 else 's'}"
+        + f" (next: {allowed})",
+        " · ".join(
+            part
+            for part in (job["title"], job["company"], job["location"], f"job #{job['id']}")
+            if part
+        ),
+    ]
+    facts = [f"applied {record['applied_at']}" if record["applied_at"] else "not applied yet"]
+    facts.append(_follow_up_text(record))
+    lines.append("; ".join(facts))
+    if record["notes"]:
+        lines.append(f"Notes: {record['notes']}")
+    shown = "Last" if result["events_truncated"] else "All"
+    lines.append(f"{shown} {len(result['events'])} of {result['event_count']} timeline events:")
+    lines.extend(_event_line(event) for event in result["events"])
+    return "\n".join(lines)
+
+
+# ---------------------------------------------------------------------------
 # Schemas
 # ---------------------------------------------------------------------------
 
@@ -1222,6 +1435,167 @@ _MATCH_OUTPUT: dict[str, Any] = _closed_object(
     }
 )
 
+_STAGE_VALUES = [stage.value for stage in PIPELINE_ORDER]
+_NULLABLE_STAGE: dict[str, Any] = _nullable({"type": "string", "enum": _STAGE_VALUES})
+_LIST_APPLICATIONS_INPUT: dict[str, Any] = {
+    "type": "object",
+    "properties": {
+        "stage": {
+            "type": "array",
+            "items": {"type": "string", "enum": _STAGE_VALUES},
+            "minItems": 1,
+            "maxItems": len(_STAGE_VALUES),
+            "description": 'Keep only these stages, e.g. ["applied", "interview"].',
+        },
+        "company": {
+            "type": "string",
+            "maxLength": 256,
+            "description": "Case-insensitive company substring.",
+        },
+        "q": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "Space-separated terms; each must appear in the job title, company "
+            "or location, or in the application's notes or next action.",
+        },
+        "follow_up": {
+            "type": "string",
+            "enum": [item.value for item in FollowUpFilter],
+            "description": "overdue: follow-up time passed; due: before now + due_within_days "
+            "(overdue included); scheduled: any follow-up; none: no follow-up.",
+        },
+        "due_within_days": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": MAX_DUE_WITHIN_DAYS,
+            "default": DUE_SOON_DAYS,
+            "description": "Horizon of follow_up=due, in days.",
+        },
+        "include_archived": {
+            "type": "boolean",
+            "default": False,
+            "description": "Include archived applications.",
+        },
+        "job_id": {**_ID_ARGUMENT, "description": "Only the application tracking this job."},
+        "sort": {
+            "type": "string",
+            "enum": [item.value for item in ApplicationSort],
+            "default": ApplicationSort.UPDATED.value,
+            "description": "updated / created (newest first), next_action (soonest first), "
+            "applied (latest first), score (job score, highest first).",
+        },
+        **_PAGE_ARGUMENTS,
+    },
+    "additionalProperties": False,
+}
+_APPLICATION_JOB_OUTPUT: dict[str, Any] = _closed_object(
+    {
+        "id": {"type": "integer"},
+        "title": _STRING,
+        "company": _NULLABLE_STRING,
+        "location": _NULLABLE_STRING,
+        "remote": {"type": "boolean"},
+        "url": _nullable(_STRING, "Posting link; null unless it is an absolute http(s) URL."),
+        "score": {"type": "number"},
+        "priority_tier": _NULLABLE_STRING,
+        "run_id": _STRING,
+        "captured_at": _TIMESTAMP,
+    }
+)
+_APPLICATION_OUTPUT: dict[str, Any] = _closed_object(
+    {
+        "id": {"type": "integer"},
+        "job_id": {"type": "integer"},
+        "stage": {"type": "string", "enum": _STAGE_VALUES},
+        "archived": {"type": "boolean"},
+        "notes": _nullable(_STRING, "The user's notes (list_applications shows a preview)."),
+        "notes_truncated": {"type": "boolean"},
+        "applied_at": _NULLABLE_TIMESTAMP,
+        "next_action_at": _nullable(_STRING, "Follow-up time (RFC 3339 UTC)."),
+        "next_action": _NULLABLE_STRING,
+        "follow_up_status": {
+            "type": "string",
+            "enum": [item.value for item in FollowUpStatus],
+            "description": f"overdue, due (within {DUE_SOON_DAYS} days), scheduled or none.",
+        },
+        "days_in_stage": _COUNT,
+        "stage_changed_at": _TIMESTAMP,
+        "allowed_stages": {
+            "type": "array",
+            "items": {"type": "string", "enum": _STAGE_VALUES},
+            "description": "Legal next stages (empty when the stage is final).",
+        },
+        "created_at": _TIMESTAMP,
+        "updated_at": _TIMESTAMP,
+        "job": _APPLICATION_JOB_OUTPUT,
+    }
+)
+_STAGE_COUNTS_OUTPUT: dict[str, Any] = {
+    **_closed_object({stage: _COUNT for stage in _STAGE_VALUES}),
+    "description": "Applications per stage for every filter except stage (the board).",
+}
+_FOLLOW_UPS_OUTPUT: dict[str, Any] = {
+    **_closed_object({item.value: _COUNT for item in FollowUpStatus}),
+    "description": "Matching applications per follow_up_status.",
+}
+_LIST_APPLICATIONS_OUTPUT: dict[str, Any] = _closed_object(
+    {
+        **_PAGE_FIELDS,
+        "sort": {"type": "string", "enum": [item.value for item in ApplicationSort]},
+        "include_archived": {"type": "boolean"},
+        "stage_counts": _STAGE_COUNTS_OUTPUT,
+        "follow_ups": _FOLLOW_UPS_OUTPUT,
+        "applications": {"type": "array", "items": _APPLICATION_OUTPUT},
+    }
+)
+_GET_APPLICATION_INPUT: dict[str, Any] = {
+    "type": "object",
+    "properties": {
+        "application_id": {
+            **_ID_ARGUMENT,
+            "description": "Application id from list_applications.",
+        },
+        "event_limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": MAX_EVENT_LIMIT,
+            "default": DEFAULT_EVENT_LIMIT,
+            "description": "How many of the most recent timeline events to return.",
+        },
+    },
+    "required": ["application_id"],
+    "additionalProperties": False,
+}
+_GET_APPLICATION_OUTPUT: dict[str, Any] = _closed_object(
+    {
+        "application": _APPLICATION_OUTPUT,
+        "event_count": _COUNT,
+        "events_truncated": {"type": "boolean"},
+        "events": {
+            "type": "array",
+            "items": _closed_object(
+                {
+                    "id": {"type": "integer"},
+                    "application_id": {"type": "integer"},
+                    "sequence": {"type": "integer"},
+                    "event_type": {
+                        "type": "string",
+                        "enum": [item.value for item in ApplicationEventType],
+                    },
+                    "from_stage": _NULLABLE_STAGE,
+                    "to_stage": _NULLABLE_STAGE,
+                    "note": _NULLABLE_STRING,
+                    "changes": {
+                        "type": "object",
+                        "description": "Changed fields as {field: {from, to}}.",
+                    },
+                    "created_at": _TIMESTAMP,
+                }
+            ),
+        },
+    }
+)
+
 TOOLS: tuple[ToolSpec, ...] = (
     ToolSpec(
         name="explain_job_score",
@@ -1235,6 +1609,20 @@ TOOLS: tuple[ToolSpec, ...] = (
         input_schema=_JOB_ID_INPUT,
         output_schema=_EXPLAIN_OUTPUT,
         handler=_explain_job_score,
+    ),
+    ToolSpec(
+        name="get_application",
+        title="Get a tracked application and its timeline",
+        description=(
+            "Return one tracked job application: stage, days in stage, legal next stages, "
+            "applied date, follow-up (next_action_at, next_action, overdue/due status), the "
+            "user's notes, a summary of the job, and its most recent timeline events (tracked, "
+            "stage_changed, updated, note_added, archived, unarchived). Read-only: stages are "
+            "moved through the HTTP API, never from here."
+        ),
+        input_schema=_GET_APPLICATION_INPUT,
+        output_schema=_GET_APPLICATION_OUTPUT,
+        handler=_get_application,
     ),
     ToolSpec(
         name="get_job",
@@ -1259,6 +1647,21 @@ TOOLS: tuple[ToolSpec, ...] = (
         input_schema=_GET_RUN_INPUT,
         output_schema=_GET_RUN_OUTPUT,
         handler=_get_run,
+    ),
+    ToolSpec(
+        name="list_applications",
+        title="List tracked job applications",
+        description=(
+            "List the user's tracked job applications (saved → applied → interview → offer → "
+            "accepted / rejected) with the filters of GET /applications: stage, company, q, "
+            "follow_up=overdue|due|scheduled|none, due_within_days, include_archived, job_id; "
+            "sort=updated|created|next_action|applied|score; limit (max "
+            f"{MAX_PAGE_SIZE}) and offset paging. Also returns per-stage board counts and "
+            "follow-up counts. Read-only: nothing is tracked, moved or submitted."
+        ),
+        input_schema=_LIST_APPLICATIONS_INPUT,
+        output_schema=_LIST_APPLICATIONS_OUTPUT,
+        handler=_list_applications,
     ),
     ToolSpec(
         name="list_runs",
