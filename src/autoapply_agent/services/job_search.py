@@ -6,6 +6,8 @@ queries here, so every surface applies exactly the same filter semantics.
 
 from __future__ import annotations
 
+import re
+import unicodedata
 from collections.abc import AsyncIterator, Sequence
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
@@ -29,6 +31,9 @@ REMOTE_LOCATION_KEYWORDS: tuple[str, ...] = (
 """Case-insensitive substrings of ``Job.location`` that mark a job as remote."""
 
 _BATCH_SIZE = 500
+# A run of "+" or "#" right after a letter or digit that ends the word: part of a name
+# (C++, C#, F#, A+), not punctuation. A "+" between two words is still punctuation.
+_WORD_FINAL_SYMBOLS = re.compile(r"(?<=[^\W_])([+#]+)(?![+#]|[^\W_])")
 
 
 class JobSort(StrEnum):
@@ -150,6 +155,22 @@ def is_remote_location(location: str | None) -> bool:
     return any(keyword in lowered for keyword in REMOTE_LOCATION_KEYWORDS)
 
 
+def _title_identity(title: str) -> str:
+    """Normalize a title for :func:`posting_key`, keeping ``+``/``#`` that end a word.
+
+    :func:`normalize_title` treats every symbol as punctuation, which would make
+    ``C++``, ``C#`` and ``C`` the same word; the symbols are kept between the
+    normalized pieces instead. Separators are dropped, as in :func:`posting_key`.
+    """
+
+    pieces = _WORD_FINAL_SYMBOLS.split(unicodedata.normalize("NFKC", title))
+    # re.split with one group alternates text (even indexes) and symbol runs (odd).
+    return "".join(
+        piece if index % 2 else normalize_title(piece).replace(" ", "")
+        for index, piece in enumerate(pieces)
+    )
+
+
 def posting_key(title: str, company: str | None, location: str | None) -> str:
     """Build the identity used to collapse one posting mirrored across sources.
 
@@ -157,7 +178,8 @@ def posting_key(title: str, company: str | None, location: str | None) -> str:
     (case, punctuation and legal suffixes ignored) and adds the location, so
     same-title openings in different cities stay distinct. Token separators are
     dropped too, so ``Front-end``/``Frontend`` and ``ソフトウェア・エンジニア``/
-    ``ソフトウェアエンジニア`` mirrors match.
+    ``ソフトウェアエンジニア`` mirrors match. A ``+`` or ``#`` that ends a word of the
+    title is kept, so ``C++``, ``C#`` and ``C`` roles stay three postings.
 
     Args:
         title: Job title.
@@ -168,8 +190,12 @@ def posting_key(title: str, company: str | None, location: str | None) -> str:
         ``"{title}|{company}|{location}"`` normalized key.
     """
 
-    parts = (normalize_title(title), normalize_company(company), normalize_title(location or ""))
-    return "|".join(part.replace(" ", "") for part in parts)
+    parts = (
+        _title_identity(title),
+        normalize_company(company).replace(" ", ""),
+        normalize_title(location or "").replace(" ", ""),
+    )
+    return "|".join(parts)
 
 
 def build_conditions(filters: JobSearchFilters) -> list[ColumnElement[bool]]:

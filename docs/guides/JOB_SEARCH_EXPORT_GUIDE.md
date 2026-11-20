@@ -125,7 +125,8 @@ if those two point to different postings, the one first seen earlier wins, so a
 capture's posting depends only on earlier captures and never changes later. Normalization reuses `services/cross_source_dedup.py` and
 works for every script (NFKC, case-folding; punctuation, spacing and legal suffixes
 such as `Inc`/`LLC`/`GmbH` are ignored, while letters such as `東京` vs `大阪` are
-kept), so `Senior Python Engineer · Acme Robotics, Inc. · Remote - US` on Lever and
+kept, and so is a `+` or `#` that ends a word of the title: `C++`, `C#` and `C` roles
+are three postings), so `Senior Python Engineer · Acme Robotics, Inc. · Remote - US` on Lever and
 `Senior Python Engineer · Acme Robotics · Remote - US` on Greenhouse count once, but
 the same title in two cities stays two jobs. Identity is resolved over the whole
 capture history, independent of the filters; the filters only decide which postings
