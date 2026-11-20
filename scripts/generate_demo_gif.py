@@ -214,6 +214,27 @@ def _transcript_decks() -> Sequence[TranscriptDeck]:
             ),
             pause_before=("1. ", "Matches", '{"detail"', "Resume:", "rank | "),
         ),
+        TranscriptDeck(
+            output_filename="application-tracker.gif",
+            transcript=Path("docs/guides/APPLICATION_TRACKER_DEMO_TRANSCRIPT.txt"),
+            title="agentic-career-search: /applications - track jobs from saved to offer",
+            highlights=(
+                ("#", (121, 192, 255)),
+                ('{"stage"', (121, 192, 255)),
+                ('{"detail"', (255, 123, 114)),
+                ("OVERDUE", (255, 166, 87)),
+                ("SUMMARY", (255, 166, 87)),
+                ("interview;", (126, 231, 135)),
+            ),
+            pause_before=(
+                '{"detail"',
+                "1 tracked",
+                "saved: ",
+                "OVERDUE",
+                "application_id",
+                "DTSTART",
+            ),
+        ),
     )
 
 
