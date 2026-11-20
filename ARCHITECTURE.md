@@ -21,7 +21,8 @@ flowchart TD
 - **API Layer** (`autoapply_agent.api`): FastAPI routes for health, source config, run lifecycle, and jobs search/detail/export/Atom feed.
 - **Job Search & Export** (`autoapply_agent.services.job_search`, `job_export`): shared filter/sort/dedupe query builder plus streamed CSV (formula-injection safe), JSON Lines and Atom 1.0 renderers.
 - **Resume Match** (`autoapply_agent.services.skill_extraction`, `resume_match`; route `POST /jobs/match` in `api/routes_match.py`): deterministic skill extraction with a curated 254-skill alias-aware lexicon (symbol-aware boundaries, case-sensitive ambiguous words, resume-side implied skills), coverage scoring through `ats_keyword_coverage.keyword_coverage()`, `match`/`blend` ranking over `job_search.iter_jobs` with a bounded top-k heap, and CSV through the export's hardening. The route reads and caps the body itself (1 MiB, `413`) so errors never echo the resume; resume text is never persisted or logged (SHA-256 digest only). See [docs/guides/RESUME_JOB_MATCH_GUIDE.md](docs/guides/RESUME_JOB_MATCH_GUIDE.md).
-- **MCP Server** (`autoapply_agent.mcp`, console script `career-search-mcp`): read-only, stdlib-only Model Context Protocol server over stdio (2026-07-28 stateless + 2025-11-25/2025-06-18 handshake). Its seven tools reuse `job_search`, `DeterministicScoringService.breakdown()`, `priority_tier_for_score()`, `read_queries` and `resume_match`; SQLite connections run `PRAGMA query_only`. See [docs/guides/MCP_SERVER_GUIDE.md](docs/guides/MCP_SERVER_GUIDE.md).
+- **Application Tracker** (`autoapply_agent.services.application_tracker`, `application_export`; routes in `api/routes_applications.py`): persistent pipeline over captured jobs. `applications` holds one card per job (stage, notes, `applied_at`, follow-up, archived); `application_events` is an append-only timeline numbered per application (unique `(application_id, sequence)`, so racing writers get a `409` instead of interleaving). Stage moves go through `application_stages.check_transition()`, the same state machine as the in-memory `ApplicationStageTracker`. Lists, the board, the CSV/JSONL export (job export's CSV hardening) and the iCalendar follow-up feed share one filter builder. Never submits applications. See [docs/guides/APPLICATION_TRACKER_GUIDE.md](docs/guides/APPLICATION_TRACKER_GUIDE.md).
+- **MCP Server** (`autoapply_agent.mcp`, console script `career-search-mcp`): read-only, stdlib-only Model Context Protocol server over stdio (2026-07-28 stateless + 2025-11-25/2025-06-18 handshake). Its nine tools reuse `job_search`, `DeterministicScoringService.breakdown()`, `priority_tier_for_score()`, `read_queries`, `resume_match` and `application_tracker`; SQLite connections run `PRAGMA query_only`. See [docs/guides/MCP_SERVER_GUIDE.md](docs/guides/MCP_SERVER_GUIDE.md).
 - **Read queries** (`autoapply_agent.services.read_queries`): run, run-event and source-config listings shared by the HTTP routes and the MCP server.
 - **Worker** (`autoapply_agent.services.worker`): in-process async polling loop that claims queued runs.
 - **Adapters** (`autoapply_agent.adapters`): Greenhouse and Lever HTML parsers plus a vendor-neutral `schema.org/JobPosting` JSON-LD parser (`jsonld`).
@@ -66,6 +67,8 @@ When no enabled source configs match a run, the worker sets `completed` and emit
 - `RunEvent`: ordered event stream for observability.
 - `SourceConfig`: source adapter configuration.
 - `Job`: normalized job snapshot tied to run, including `agent_decision` trace in `raw`.
+- `Application`: one tracked job's pipeline card (stage, notes, applied date, follow-up, archived).
+- `ApplicationEvent`: append-only, per-application numbered timeline of stage moves, follow-up changes, notes and archiving.
 
 ## Event Contracts
 
@@ -82,3 +85,4 @@ When no enabled source configs match a run, the worker sets `completed` and emit
 
 - Alembic scaffold included under `alembic/` and `alembic.ini`.
 - Runtime creates tables for local simplicity; migrations are ready for incremental schema control.
+- `d3a9f1c4b7e2` adds `applications` and `application_events` (`alembic upgrade head`; downgrade to `c41f2a7d9e60` drops them).

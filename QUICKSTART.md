@@ -81,6 +81,18 @@ jq -n --rawfile resume resume.txt '{resume_text: $resume, remote: true}' \
 
 See [docs/guides/RESUME_JOB_MATCH_GUIDE.md](docs/guides/RESUME_JOB_MATCH_GUIDE.md).
 
+Track the jobs you apply to (stage, timeline, follow-ups; nothing is submitted for you):
+
+```bash
+curl -s "http://127.0.0.1:8000/applications" -H "content-type: application/json" -d '{"job_id": 1}'
+curl -s -X PATCH "http://127.0.0.1:8000/applications/1" -H "content-type: application/json" \
+  -d '{"stage": "applied", "next_action_at": "2026-11-24T17:00:00Z", "next_action": "Email the recruiter"}'
+curl -s "http://127.0.0.1:8000/applications?follow_up=due" | jq -c '.[] | [.id, .stage, .next_action]'
+```
+
+An existing database needs `alembic upgrade head` once for the new tables. See
+[docs/guides/APPLICATION_TRACKER_GUIDE.md](docs/guides/APPLICATION_TRACKER_GUIDE.md).
+
 ## 6) Optional: cancel an active run
 
 ```bash

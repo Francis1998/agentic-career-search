@@ -64,8 +64,10 @@ LLM inside the server, and nothing written back.
 | `get_run` | One run and its most recent events (`run.*`, `source.*`, `agent.decision`, …) | `services/read_queries.py` |
 | `list_sources` | Configured sources (id, name, adapter type, enabled, URL) with captured job counts | `services/read_queries.py` |
 | `match_resume_to_jobs` | The feed ranked against resume text the user provides: match score, matched and missing skills, explanation (`sort=match\|blend`, `limit` ≤ 50); the resume is never stored or logged | `services/resume_match.py` (`POST /jobs/match`) |
+| `list_applications` | The user's tracked applications with the `GET /applications` filters (stage, company, q, overdue/due follow-ups, archived), sort and paging (`limit` ≤ 50), per-stage board counts and follow-up counts; notes as a 280-character preview | `services/application_tracker.py` (`GET /applications`) |
+| `get_application` | One tracked application: stage, legal next stages, follow-up, full notes, job summary and its most recent timeline events (`event_limit` ≤ 200) | `services/application_tracker.py` (`GET /applications/{id}/events`) |
 
-All seven tools are annotated `readOnlyHint: true`, `destructiveHint: false`,
+All nine tools are annotated `readOnlyHint: true`, `destructiveHint: false`,
 `idempotentHint: true`, `openWorldHint: false`, validate their arguments against the
 advertised `inputSchema`, return `structuredContent` that conforms to their `outputSchema`,
 and are listed in a deterministic (alphabetical) order. Write tools are **intentionally out
@@ -496,6 +498,18 @@ Input: optional `enabled` (boolean). Real result:
 Each source has `id`, `name`, `source_type`, `enabled`, `base_url` (http(s) only) and
 `job_count`.
 
+### `list_applications` and `get_application`
+
+Read the application pipeline the user keeps with the HTTP API (`/applications`):
+`list_applications` takes the list filters (`stage` as an array, `company`, `q`,
+`follow_up=overdue|due|scheduled|none`, `due_within_days`, `include_archived`, `job_id`,
+`sort=updated|created|next_action|applied|score`, `limit` default 10 / max 50, `offset`) and
+returns `stage_counts` and `follow_ups` with the page; `get_application` takes
+`application_id` and `event_limit` (default 20) and returns the full notes and the most
+recent timeline events. Unknown ids are `not_found` tool errors. Neither tool can track,
+move or archive an application. See the
+[application tracker guide](APPLICATION_TRACKER_GUIDE.md#mcp-tools).
+
 ### `match_resume_to_jobs`
 
 Input: `resume_text` (required, plain text, 1–50,000 characters), the `search_jobs` filters,
@@ -538,8 +552,8 @@ get a response. Requests are handled one at a time; the server exits when stdin 
 
 ## Privacy, safety and the audit log
 
-**Read-only by design.** The seven tools above are the whole surface: no tool queues or
-cancels runs, edits source configs, writes application state or touches the network, and
+**Read-only by design.** The nine tools above are the whole surface: no tool queues or
+cancels runs, edits source configs, tracks or moves applications, or touches the network, and
 `tools/call` for any other name is a `-32602` protocol error. Writes are intentionally out of
 scope for this release: starting a run makes the worker fetch third-party career pages,
 and cancelling runs or editing sources changes what you see later — decisions that stay with

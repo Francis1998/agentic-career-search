@@ -80,6 +80,39 @@ for a non-JSON body, `422` for invalid fields (inputs are never echoed). The res
 stored or logged (only its SHA-256 digest is logged). Details:
 [Resume-to-Job Match Guide](guides/RESUME_JOB_MATCH_GUIDE.md).
 
+## Applications
+
+Track captured jobs through `saved → applied → interview → offer → accepted / rejected`
+(local bookkeeping only; nothing is submitted). Legal moves: `saved → applied | rejected`,
+`applied → interview | rejected`, `interview → offer | rejected`, `offer → accepted |
+rejected`; `accepted` and `rejected` are final. Ids must be 1..2^63-1; datetimes without an
+offset are UTC. Errors are `{"detail": ...}`.
+
+- `POST /applications` body `{job_id, stage?, notes?, note?, applied_at?, next_action_at?,
+  next_action?}` → `201` + `Location`; `404` unknown job; `409` (with `Location`) when the
+  job, or another capture of the same posting URL, is already tracked; `422` invalid fields
+  (`notes` ≤ 10,000, `note` ≤ 2,000, `next_action` ≤ 200 single-line, `applied_at` not in
+  the future, unknown fields).
+- `GET /applications` filters `stage` (repeatable), `company`, `q`,
+  `follow_up=overdue|due|scheduled|none`, `due_within_days` (0–366, default 7),
+  `include_archived`, `job_id`, `sort=updated|created|next_action|applied|score`,
+  `limit` (1–500, default 50) / `offset`; total in `X-Total-Count`.
+- `GET /applications/board` same filters + `per_stage` (1–100, default 20): six stage
+  columns in pipeline order with counts and cards, plus `follow_ups` counts.
+- `GET /applications/{id}`; `PATCH /applications/{id}` with any of `stage`, `note`,
+  `notes`, `applied_at`, `next_action_at`, `next_action` (`null` clears) → `409` for an
+  illegal move (nothing changes) or a concurrent update; one timeline event per request.
+- `GET /applications/{id}/events` append-only timeline (`tracked`, `stage_changed`,
+  `updated`, `note_added`, `archived`, `unarchived`), oldest first.
+- `POST /applications/{id}/archive` / `POST /applications/{id}/unarchive` optional body
+  `{note}`; idempotent.
+- `GET /applications/export?format=csv|jsonl` list filters + optional `limit`
+  (1–100,000): attachment, CSV-injection safe, `X-Total-Count`.
+- `GET /applications/calendar.ics` list filters + `limit` (1–10,000, default 1,000):
+  iCalendar feed of follow-ups (30-minute free events; notes never included).
+
+Details: [Application Tracker Guide](guides/APPLICATION_TRACKER_GUIDE.md).
+
 ## MCP (stdio)
 
 The same data is available read-only to AI assistants through the Model Context Protocol:
@@ -96,9 +129,12 @@ handshake.
 | `get_run` | `GET /runs/{run_id}` + the most recent `GET /runs/{run_id}/events` |
 | `list_sources` | `GET /source-configs`, with job counts |
 | `match_resume_to_jobs` | `POST /jobs/match` (same ranking; `limit` ≤ 50) |
+| `list_applications` | `GET /applications` (same filters; `limit` ≤ 50) + board and follow-up counts |
+| `get_application` | `GET /applications/{id}` + its most recent `GET /applications/{id}/events` |
 
 There are no MCP tools for the routes that change state (`POST /source-configs`, `PATCH`,
-`POST /runs`, `POST /runs/{run_id}/cancel`); `POST /jobs/match` only reads. Reference, client
+`POST /runs`, `POST /runs/{run_id}/cancel`, `POST`/`PATCH /applications...`); `POST /jobs/match`
+only reads. Reference, client
 configuration and privacy notes: [MCP Server Guide](guides/MCP_SERVER_GUIDE.md).
 
 ## Example flow
