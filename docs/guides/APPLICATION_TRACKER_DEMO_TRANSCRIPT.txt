@@ -1,0 +1,49 @@
+$ export DATABASE_URL=sqlite+aiosqlite:///./tracker-demo.db
+$ python scripts/seed_demo_jobs.py
+seeded 8 jobs (run 4360b034-7f7d-4535-a521-849907b1c0cc) into sqlite+aiosqlite:///./tracker-demo.db
+$ ENABLE_WORKER=false uvicorn autoapply_agent.main:app --port 8000 --log-level warning &
+$ export CT='content-type: application/json'
+$ for job in 1 3 4 5 8; do curl -s localhost:8000/applications -H "$CT" -d "{\"job_id\": $job}" | jq -r '"#\(.id) \(.stage)  \(.job.title) | \(.job.company)"'; done
+#1 saved  Senior Python Engineer | Acme Robotics
+#2 saved  Staff Platform Engineer (Python, Kubernetes) | Globex
+#3 saved  Backend Engineer, Payments | Initech
+#4 saved  Site Reliability Engineer | Vandelay Industries
+#5 saved  =HYPERLINK("https://evil.example","Apply here") | Injected Co
+$ curl -s localhost:8000/applications -H "$CT" -d '{"job_id": 1}' -w '  HTTP %{http_code}\n'
+{"detail":"job 1 is already tracked as application 1"}  HTTP 409
+$ curl -s -X PATCH localhost:8000/applications/1 -H "$CT" -d '{"stage": "applied", "next_action_at": "2026-11-24T17:00:00Z", "next_action": "Email the recruiter"}' | jq -c '{stage, applied_at, next_action, follow_up_status}'
+{"stage":"applied","applied_at":"2026-11-20T09:55:02.098531Z","next_action":"Email the recruiter","follow_up_status":"due"}
+$ curl -s -X PATCH localhost:8000/applications/1 -H "$CT" -d '{"stage": "offer"}' -w '  HTTP %{http_code}\n'
+{"detail":"cannot move from applied to offer (allowed: interview, rejected)"}  HTTP 409
+$ curl -s -X PATCH localhost:8000/applications/1 -H "$CT" -d '{"stage": "interview", "note": "Phone screen booked with Sam"}' | jq -r '"\(.stage); legal next stages: \(.allowed_stages | join(", "))"'
+interview; legal next stages: offer, rejected
+$ curl -s -X PATCH localhost:8000/applications/2 -H "$CT" -d '{"stage": "applied", "next_action_at": "2026-11-18T17:00:00Z", "next_action": "Check in"}' | jq -r '"#\(.id) \(.stage), follow-up \(.follow_up_status)"'
+#2 applied, follow-up overdue
+$ curl -s -X PATCH localhost:8000/applications/4 -H "$CT" -d '{"stage": "rejected", "note": "Role filled internally"}' | jq -r '"#\(.id) \(.stage), final: \(.allowed_stages == [])"'
+#4 rejected, final: true
+$ curl -s localhost:8000/applications/1/events | jq -r '.[] | "\(.sequence) \(.event_type) \(.from_stage // "-") -> \(.to_stage // "-") \(.note // "")"'
+1 tracked - -> saved 
+2 stage_changed saved -> applied 
+3 stage_changed applied -> interview Phone screen booked with Sam
+$ curl -s localhost:8000/applications/board | jq -r '(.columns[] | "\(.stage): \(.count) \([.applications[].job.company] | join(", "))"), (.follow_ups | tojson)'
+saved: 2 Injected Co, Initech
+applied: 1 Globex
+interview: 1 Acme Robotics
+offer: 0 
+accepted: 0 
+rejected: 1 Vandelay Industries
+{"overdue":1,"due":1,"scheduled":0,"none":3}
+$ curl -s 'localhost:8000/applications?follow_up=overdue' | jq -r '.[] | "OVERDUE #\(.id) \(.job.company): \(.next_action) (\(.next_action_at))"'
+OVERDUE #2 Globex: Check in (2026-11-18T17:00:00Z)
+$ curl -s 'localhost:8000/applications/export?format=csv&sort=created' | python3 -c 'import csv, sys; [print(*(r[i] for i in (0, 2, 4, 5)), sep=" | ") for r in csv.reader(sys.stdin)]'
+application_id | stage | title | company
+5 | saved | '=HYPERLINK("https://evil.example","Apply here") | Injected Co
+4 | rejected | Site Reliability Engineer | Vandelay Industries
+3 | saved | Backend Engineer, Payments | Initech
+2 | applied | Staff Platform Engineer (Python, Kubernetes) | Globex
+1 | interview | Senior Python Engineer | Acme Robotics
+$ curl -s localhost:8000/applications/calendar.ics | grep -E '^(DTSTART|SUMMARY)'
+DTSTART:20261118T170000Z
+SUMMARY:Check in - Staff Platform Engineer (Python\, Kubernetes) at Globex
+DTSTART:20261124T170000Z
+SUMMARY:Email the recruiter - Senior Python Engineer at Acme Robotics

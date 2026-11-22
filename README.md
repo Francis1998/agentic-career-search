@@ -87,6 +87,22 @@ jq -n --rawfile resume docs/guides/RESUME_JOB_MATCH_SAMPLE_RESUME.txt '{resume_t
 [RESUME_JOB_MATCH_GUIDE.md](docs/guides/RESUME_JOB_MATCH_GUIDE.md) covers the skill lexicon,
 `sort=blend`, CSV output, limits and privacy.
 
+Track the jobs you go for through `saved → applied → interview → offer → accepted / rejected`,
+with an append-only timeline, follow-up dates, a board, a spreadsheet-safe CSV export and a
+follow-up calendar feed (local bookkeeping only: nothing is ever submitted):
+
+```bash
+curl -sS localhost:8000/applications -H 'content-type: application/json' -d '{"job_id": 1}'
+curl -sS -X PATCH localhost:8000/applications/1 -H 'content-type: application/json' \
+  -d '{"stage": "applied", "next_action_at": "2026-11-24T17:00:00Z", "next_action": "Email the recruiter"}'
+curl -sS localhost:8000/applications/board | jq -c '.columns[] | [.stage, .count]'
+```
+
+![Application tracker — real terminal session](assets/demo/application-tracker.gif)
+
+[APPLICATION_TRACKER_GUIDE.md](docs/guides/APPLICATION_TRACKER_GUIDE.md) covers the state
+machine, every endpoint, the MCP tools, the CSV and calendar exports and troubleshooting.
+
 For live data, start the API with the worker enabled (omit `ENABLE_WORKER=false`), then
 register a public board and start a run:
 
@@ -104,8 +120,8 @@ end to end, and [QUICKSTART.md](QUICKSTART.md) covers setup details.
 
 `career-search-mcp` is a read-only [Model Context Protocol](https://modelcontextprotocol.io)
 server (stdio; protocol 2026-07-28 plus the 2025-11-25 / 2025-06-18 handshake). Assistants
-get seven tools — `search_jobs`, `get_job`, `explain_job_score`, `list_runs`, `get_run`,
-`list_sources`, `match_resume_to_jobs` — over the jobs your runs already captured, scored
+get nine tools — `search_jobs`, `get_job`, `explain_job_score`, `list_runs`, `get_run`,
+`list_sources`, `match_resume_to_jobs`, `list_applications`, `get_application` — over the jobs your runs already captured, scored
 and deduplicated, so *"show me this week's best-fit remote roles and why the top one ranks
 first"* needs no scraping, keys or writes. For example, in Claude Code:
 
@@ -127,6 +143,7 @@ Cursor configuration examples, every tool, the audit log and a recorded session.
 | Decisions | Deterministic score, priority tier, matched terms, rationale, plan steps per job | [ARCHITECTURE.md](ARCHITECTURE.md) |
 | Search & export | Filters, `X-Total-Count` paging, cross-board dedupe, OWASP-safe CSV, JSON Lines, Atom 1.0 | [Search & export guide](docs/guides/JOB_SEARCH_EXPORT_GUIDE.md) |
 | Resume match | `POST /jobs/match` and MCP `match_resume_to_jobs`: rank jobs against resume text with a 254-skill alias-aware lexicon (`k8s` → `kubernetes`); match score, matched/missing skills, explanation, `sort=match\|blend`, CSV; resume never stored or logged | [Resume match guide](docs/guides/RESUME_JOB_MATCH_GUIDE.md) |
+| Application tracker | `/applications`: persistent pipeline `saved → applied → interview → offer → accepted/rejected` on one state machine (illegal moves `409`), append-only timeline, follow-ups (overdue/due), board, CSV/JSONL export, iCalendar follow-up feed; MCP `list_applications` / `get_application`; never submits anything | [Application tracker guide](docs/guides/APPLICATION_TRACKER_GUIDE.md) |
 | AI assistants (MCP) | Read-only stdio MCP server: search, decision traces, plain-language score explanations, runs and events; audit log with hashed arguments | [MCP server guide](docs/guides/MCP_SERVER_GUIDE.md) |
 | LLM enrichment | Optional summaries from GPT-6 / 6.2, Claude 5.5 / Fable 5.2, Gemini 3.8 / 4 or Kimi K3.1 models | [CONFIGURATION.md](CONFIGURATION.md) |
 | Alerts | Fail-soft webhook for high-priority jobs (Slack, Discord, custom) | [CONFIGURATION.md](CONFIGURATION.md) |
@@ -195,6 +212,10 @@ Then set matching API keys in `.env` (see `CONFIGURATION.md`).
 - `GET /jobs/export?format=csv|jsonl` stream filtered results as a download
 - `GET /jobs/feed.atom` subscribe to new matches (Atom 1.0)
 - `POST /jobs/match` rank jobs against resume text (JSON body: `resume_text` + the `GET /jobs` filters, `sort=match|blend`, `limit`, `min_match`); matched/missing skills; `?format=csv`
+- `POST /applications` track a captured job (`404` unknown job, `409` already tracked); `GET /applications` list (`stage`, `company`, `q`, `follow_up=overdue|due|scheduled|none`, `due_within_days`, `include_archived`, `job_id`, `sort`, `limit`/`offset`)
+- `GET /applications/board` pipeline grouped by stage with counts; `GET /applications/{id}`; `PATCH /applications/{id}` move stage (`409` on illegal moves), notes, follow-up
+- `GET /applications/{id}/events` append-only timeline; `POST /applications/{id}/archive` / `unarchive`
+- `GET /applications/export?format=csv|jsonl` spreadsheet-safe export; `GET /applications/calendar.ics` follow-up calendar feed
 - `GET /health/live` and `GET /health/ready`
 
 MCP (stdio, read-only): `career-search-mcp` / `python -m autoapply_agent.mcp` — see the
@@ -209,6 +230,7 @@ MCP (stdio, read-only): `career-search-mcp` / `python -m autoapply_agent.mcp` �
 | [docs/guides/JOB_SEARCH_EXPORT_GUIDE.md](docs/guides/JOB_SEARCH_EXPORT_GUIDE.md) | Filters, CSV/JSONL export, Atom feed |
 | [docs/guides/MCP_SERVER_GUIDE.md](docs/guides/MCP_SERVER_GUIDE.md) | Read-only MCP server for AI assistants: client setup, tools, privacy |
 | [docs/guides/RESUME_JOB_MATCH_GUIDE.md](docs/guides/RESUME_JOB_MATCH_GUIDE.md) | Resume-to-job match: API + MCP reference, skill lexicon, ranking, privacy |
+| [docs/guides/APPLICATION_TRACKER_GUIDE.md](docs/guides/APPLICATION_TRACKER_GUIDE.md) | Application tracker: pipeline stages, timeline, follow-ups, board, CSV and calendar exports, MCP |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Components, run lifecycle, events |
 | [docs/API.md](docs/API.md) | HTTP API reference |
 | [CONFIGURATION.md](CONFIGURATION.md) | Environment variables and provider profiles |

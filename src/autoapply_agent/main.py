@@ -127,6 +127,7 @@ from autoapply_agent.adapters.workintheopen import WorkintheopenAdapter
 from autoapply_agent.adapters.yello import YelloAdapter
 from autoapply_agent.adapters.ziprecruiter import ZiprecruiterAdapter
 from autoapply_agent.adapters.zoho_recruit import ZohoRecruitAdapter
+from autoapply_agent.api.routes_applications import router as applications_router
 from autoapply_agent.api.routes_health import router as health_router
 from autoapply_agent.api.routes_jobs import router as jobs_router
 from autoapply_agent.api.routes_match import router as match_router
@@ -156,6 +157,7 @@ def _create_api_router() -> APIRouter:
     router.include_router(runs_router)
     router.include_router(jobs_router)
     router.include_router(match_router)
+    router.include_router(applications_router)
     return router
 
 
