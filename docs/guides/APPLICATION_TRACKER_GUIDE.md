@@ -164,7 +164,8 @@ Body (unknown fields are `422`):
 Responses: `201` with the application and a `Location` header; `404 {"detail": "job not
 found"}`; `409` when the job is already tracked — or when another capture of the **same
 posting URL** (a later run re-captured it; compared case-insensitively after trimming) is
-tracked. The `409` carries a `Location` header pointing at the existing application.
+tracked. The `409` carries a `Location` header pointing at the existing application;
+a double submit (two requests tracking the same job at once) gets the same answer.
 
 ### `GET /applications` — list
 
@@ -208,8 +209,11 @@ Send at least one field; omitted fields are untouched, `null` clears `notes`,
 
 Each request appends **at most one** event. Errors: `404`; `409 {"detail": "cannot move
 from saved to offer (allowed: applied, rejected)"}` or `"... (rejected is a final
-stage)"`; `409 {"detail": "application was changed by another request; retry"}` when two
-writers race for the same timeline slot; `422` for invalid fields or an empty body.
+stage)"`; `409 {"detail": "application was changed by another request; retry"}` when
+another request changed the application after this one read it (two writers raced for
+the same timeline slot): nothing from the losing request is recorded, so a move that was
+validated against a stage that is gone never lands; `422` for invalid fields or an empty
+body.
 
 ### `GET /applications/{id}/events` — timeline
 
@@ -223,7 +227,8 @@ Events are never edited or deleted by the API.
 Optional body `{"note": "..."}`. Archiving hides a card from lists, the board, exports
 and the calendar (unless `include_archived=true`) and keeps its stage and history.
 Both are idempotent: repeating the current state records nothing (a note sent with it is
-recorded as `note_added`).
+recorded as `note_added`). Like `PATCH`, a request that loses a race with another write
+is `409 application was changed by another request; retry`.
 
 ### `GET /applications/export?format=csv|jsonl`
 
@@ -349,7 +354,7 @@ with a leading `'` in the CSV so a spreadsheet never evaluates it.
 | `409 job N is already tracked` | One application per job. Follow the `Location` header to the existing card. |
 | `409 this posting is already tracked ...` | A later run captured the same posting URL again. Use the existing card. |
 | `409 cannot move from X to Y` | Not a legal move; the `allowed` list in `detail` (and `allowed_stages`) shows the options. Go through intermediate stages, or `rejected` to close it. |
-| `409 application was changed by another request` | Two writes raced; repeat the request. |
+| `409 application was changed by another request` | Two writes raced and this one changed nothing; repeat the request (it is checked against the other write's result). |
 | `422` on a date | Use ISO-8601 (`2026-11-24T17:00:00Z`); `applied_at` cannot be in the future. |
 | A card disappeared | It is archived: add `include_archived=true`, or `POST /applications/{id}/unarchive`. |
 | `no such table: applications` | An old database: run `alembic upgrade head`. |

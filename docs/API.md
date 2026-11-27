@@ -101,11 +101,12 @@ offset are UTC. Errors are `{"detail": ...}`.
   columns in pipeline order with counts and cards, plus `follow_ups` counts.
 - `GET /applications/{id}`; `PATCH /applications/{id}` with any of `stage`, `note`,
   `notes`, `applied_at`, `next_action_at`, `next_action` (`null` clears) → `409` for an
-  illegal move (nothing changes) or a concurrent update; one timeline event per request.
+  illegal move or a concurrent update (nothing changes; retry the latter); one timeline
+  event per request.
 - `GET /applications/{id}/events` append-only timeline (`tracked`, `stage_changed`,
   `updated`, `note_added`, `archived`, `unarchived`), oldest first.
 - `POST /applications/{id}/archive` / `POST /applications/{id}/unarchive` optional body
-  `{note}`; idempotent.
+  `{note}`; idempotent; `409` when a concurrent update won the race (retry).
 - `GET /applications/export?format=csv|jsonl` list filters + optional `limit`
   (1–100,000): attachment, CSV-injection safe, `X-Total-Count`.
 - `GET /applications/calendar.ics` list filters + `limit` (1–10,000, default 1,000):
