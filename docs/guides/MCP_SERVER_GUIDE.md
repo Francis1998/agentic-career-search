@@ -57,7 +57,7 @@ LLM inside the server, and nothing written back.
 
 | Tool | What it returns | Reuses |
 | --- | --- | --- |
-| `search_jobs` | One page of jobs with the filters, sorting, dedupe and paging of `GET /jobs` (`limit` ≤ 50), total match count, `next_offset` | `services/job_search.py` |
+| `search_jobs` | One page of jobs with the filters (pay included), sorting (`newest`, `score`, `salary`), dedupe and paging of `GET /jobs` (`limit` ≤ 50), total match count, `next_offset`; each job's stated pay | `services/job_search.py` |
 | `get_job` | One job: score, priority tier, matched terms, rationale, plan steps, optional LLM summary, run and source provenance | `Job` + decision trace in `raw.agent_decision` |
 | `explain_job_score` | Plain-language breakdown of the score (base + keyword bonus + URL-hash tiebreaker), tier thresholds and the gap to the next tier — recomputed, no LLM | `DeterministicScoringService.breakdown()`, `priority_tier_for_score()` |
 | `list_runs` | Discovery runs, newest first, with status, query, timestamps and captured job counts | `services/read_queries.py` |
@@ -329,7 +329,7 @@ message never contains SQL). Protocol problems are JSON-RPC errors (see
 [Errors](#errors)). Real example:
 
 ```text
-Invalid arguments: arguments.limit must be <= 50; arguments has unexpected properties (allowed: company, created_after, dedupe, hours_old, limit, location, min_score, offset, q, remote, run_id, sort, source_config_id)
+Invalid arguments: arguments.limit must be <= 50; arguments has unexpected properties (allowed: company, created_after, dedupe, has_salary, hours_old, limit, location, max_salary, min_salary, min_score, offset, q, remote, run_id, salary_currency, sort, source_config_id)
 ```
 
 ### `search_jobs`
@@ -351,7 +351,11 @@ identical ids and totals.
 | `run_id` | string, 1–64 chars | Captured by this run (see `list_runs`) |
 | `created_after` | ISO-8601 string | Captured at or after this instant (naive = UTC) |
 | `hours_old` | integer 1–8760 | Captured within the last N hours (with `created_after`, the later bound wins) |
-| `sort` | `newest` (default) / `score` | Newest capture first, or highest score first (ties newest first) |
+| `min_salary` | integer ≥ 0 | Annualized pay floor, overlap semantics (`annual_max >= min_salary`); needs `salary_currency` |
+| `max_salary` | integer ≥ 0 | Annualized pay ceiling (`annual_min <= max_salary`); needs `salary_currency` |
+| `salary_currency` | ISO 4217 code (`^[A-Za-z]{3}$`) | Only jobs paying in this currency; required by the two bounds and `sort=salary` |
+| `has_salary` | boolean | Only jobs with (`true`) or without (`false`) captured pay |
+| `sort` | `newest` (default) / `score` / `salary` | Newest capture first, highest score first, or highest annualized pay first (needs `salary_currency`); ties newest first |
 | `dedupe` | boolean (default `false`) | Collapse re-captures and cross-board mirrors; adds `first_seen_at` |
 | `limit` | integer 1–50 (default 10) | Page size |
 | `offset` | integer ≥ 0 (default 0) | Matches to skip; pass the previous page's `next_offset` |
@@ -359,7 +363,10 @@ identical ids and totals.
 Result: `total`, `offset`, `limit`, `next_offset` (null on the last page), `sort`, `dedupe`,
 `captured_since` (the effective lower bound from `created_after`/`hours_old`) and `jobs[]`
 with `id`, `title`, `company`, `location`, `remote`, `score`, `priority_tier`, `url`,
-`source_config_id`, `run_id`, `captured_at`, `first_seen_at`. See
+`source_config_id`, `run_id`, `captured_at`, `first_seen_at` and `pay` (`null`, or
+`min_amount`, `max_amount`, `currency`, `interval`, `annual_min`, `annual_max`, `source`;
+see the [Pay Transparency Guide](PAY_TRANSPARENCY_GUIDE.md)). Text lines end in
+`· USD 176,800-197,600/yr` when pay is known. See
 [step 3](#3-talk-to-the-server) for a complete real response.
 
 ### `get_job`
@@ -371,6 +378,7 @@ Input: `{"job_id": <integer ≥ 1>}`. Real text block for job 1 of the demo data
 Score 0.8331 · priority high · captured 2026-11-07T18:32:12Z
 From run fdadcd5d-6711-4727-8f09-988087a0ea4e · query "python backend remote" · source demo-greenhouse (greenhouse)
 URL: https://boards.greenhouse.io/acme/jobs/4101
+Pay: not stated in the captured posting
 Rationale:
 - Priority tier set to high from deterministic score.
 - Role title considered: Senior Python Backend Engineer.
@@ -512,7 +520,7 @@ move or archive an application. See the
 
 ### `match_resume_to_jobs`
 
-Input: `resume_text` (required, plain text, 1–50,000 characters), the `search_jobs` filters,
+Input: `resume_text` (required, plain text, 1–50,000 characters), the `search_jobs` filters (pay included),
 `dedupe` (default `true`), `sort` (`match` | `blend`), `limit` (1–50, default 10),
 `min_match` and `include_extra_skills`. It runs the ranking of `POST /jobs/match` —
 deterministic skill extraction with an alias-aware lexicon (`k8s` → `kubernetes`), no LLM —

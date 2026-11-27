@@ -72,8 +72,13 @@ Stamp the initial revision once, then upgrade:
 ```bash
 uv run alembic current             # no revision listed: the schema was created by the app
 uv run alembic stamp 87de9ef55524  # record the initial schema as applied
-uv run alembic upgrade head        # adds the job ordering indexes (c41f2a7d9e60)
+uv run alembic upgrade head        # job ordering indexes (c41f2a7d9e60), tracker tables (d3a9f1c4b7e2), pay columns (e5b8c2a7f913)
 ```
+
+The app's startup `create_all` adds missing tables but never adds columns to an existing
+table: a database created before `e5b8c2a7f913` fails on `/jobs` (`no such column:
+jobs.salary_min_annual`) until it is upgraded. Jobs captured before the upgrade get pay
+when discovery captures them again (no backfill).
 
 ## Operational notes
 

@@ -93,6 +93,22 @@ curl -s "http://127.0.0.1:8000/applications?follow_up=due" | jq -c '.[] | [.id, 
 An existing database needs `alembic upgrade head` once for the new tables. See
 [docs/guides/APPLICATION_TRACKER_GUIDE.md](docs/guides/APPLICATION_TRACKER_GUIDE.md).
 
+### Filter by pay
+
+Jobs whose posting states pay carry it annualized (`salary_min_annual`, `salary_max_annual`,
+`salary_currency`, `salary_interval`; full range in `raw.compensation`). Pay comparisons
+always name a currency:
+
+```bash
+curl -s "http://127.0.0.1:8000/jobs?salary_currency=USD&min_salary=150000&sort=salary" \
+  | jq -c '.[] | [.title, .salary_min_annual, .salary_max_annual, .salary_interval]'
+curl -s "http://127.0.0.1:8000/jobs?has_salary=false" | jq -r '.[].title'
+```
+
+An existing database needs `alembic upgrade head` once for the pay columns; jobs captured
+before that get pay when a run captures them again. See
+[docs/guides/PAY_TRANSPARENCY_GUIDE.md](docs/guides/PAY_TRANSPARENCY_GUIDE.md).
+
 ## 6) Optional: cancel an active run
 
 ```bash

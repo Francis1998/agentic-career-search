@@ -62,12 +62,38 @@ source on SQLite and fail with a 500 (`database is locked`).
 | `GET` | `/jobs/feed.atom` | Atom 1.0 feed of the newest distinct matches (stable entry ids) |
 | `POST` | `/jobs/match` | Rank jobs against resume text: `match_score`, `matched_skills`, `missing_skills`, `explanation`; `?format=csv` |
 
-Shared filters: `q` (each term in title/company/location), `company`, `location`, `remote`, `min_score`, `source_config_id`, `run_id`, `created_after` (ISO-8601), `hours_old`. `/jobs` and `/jobs/export` also take `sort=newest|score` and `dedupe=true|false`; the feed is always deduplicated. Without parameters `GET /jobs` still returns the 50 newest jobs. Semantics, recipes and security notes: [Job Search, Export & Atom Feed Guide](guides/JOB_SEARCH_EXPORT_GUIDE.md).
+Shared filters: `q` (each term in title/company/location), `company`, `location`, `remote`, `min_score`, `source_config_id`, `run_id`, `created_after` (ISO-8601), `hours_old`, and the pay filters below. `/jobs` and `/jobs/export` also take `sort=newest|score|salary` and `dedupe=true|false`; the feed is always deduplicated. Without parameters `GET /jobs` still returns the 50 newest jobs. Semantics, recipes and security notes: [Job Search, Export & Atom Feed Guide](guides/JOB_SEARCH_EXPORT_GUIDE.md).
 
 Job payloads include deterministic `agent_decision` traces and optional `llm_enrichment` when provider enrichment is enabled.
 
+### Pay filters and fields
+
+Pay stated by the posting (schema.org `baseSalary`, else the description text) is captured
+for new jobs: `raw.compensation` holds `min_amount`, `max_amount`, `currency`, `interval`,
+`annual_min`, `annual_max`, `source` (`structured` | `description`) and `snippet`, and
+every job has `salary_min_annual`, `salary_max_annual`, `salary_currency` and
+`salary_interval` (all `null` without pay). Annual factors: hour ×2080, day ×260, week ×52,
+month ×12.
+
+| Parameter | Values | Meaning |
+|---|---|---|
+| `salary_currency` | ISO 4217 code, case-insensitive | Only jobs paying in this currency |
+| `min_salary` | integer 0 – 2^63-1 | Overlap: `salary_max_annual >= min_salary` |
+| `max_salary` | integer 0 – 2^63-1 | Overlap: `salary_min_annual <= max_salary` |
+| `has_salary` | `true` / `false` | Only jobs with / without captured pay |
+| `sort=salary` | — | Highest `salary_max_annual` first, ties newest first, no pay last |
+
+`min_salary`, `max_salary` and `sort=salary` **require** `salary_currency` (amounts are
+never converted or compared across currencies); otherwise, for an unknown currency code or
+for `min_salary > max_salary`, the response is `422` with
+`{"detail": [{"type": "value_error", "loc": ["query", "salary_currency"], "msg": "min_salary needs salary_currency ..."}]}`.
+The CSV export appends `salary_min`, `salary_max`, `salary_interval`, `salary_currency`,
+`salary_min_annual`, `salary_max_annual`, `salary_source`; Atom summaries add `Pay: ...`.
+Details: [Pay Transparency Guide](guides/PAY_TRANSPARENCY_GUIDE.md).
+
 `POST /jobs/match` takes a JSON body (`Content-Type: application/json`, at most 1 MiB):
-`resume_text` (required, 1–50,000 characters, plain text), the shared filters above,
+`resume_text` (required, 1–50,000 characters, plain text), the shared filters above
+(pay filters included, errors at `["body", ...]`),
 `dedupe` (default `true`), `sort=match|blend`, `limit` (1–500, default 20), `min_match`
 and `include_extra_skills`. Skills are extracted deterministically from the resume and from
 each job's title and description-like `raw` fields with a curated alias-aware lexicon;
@@ -123,8 +149,8 @@ handshake.
 
 | Tool | HTTP equivalent |
 |---|---|
-| `search_jobs` | `GET /jobs` (same filters, `sort`, `dedupe`, `limit` ≤ 50 / `offset`, total in the result) |
-| `get_job` | `GET /jobs/{job_id}`, with the decision trace unpacked |
+| `search_jobs` | `GET /jobs` (same filters incl. pay, `sort=newest\|score\|salary`, `dedupe`, `limit` ≤ 50 / `offset`, total in the result; each job has a `pay` object or `null`) |
+| `get_job` | `GET /jobs/{job_id}`, with the decision trace unpacked and the stated `pay` |
 | `explain_job_score` | — (score breakdown recomputed by the deterministic scorer) |
 | `list_runs` | — (runs newest first, with job counts) |
 | `get_run` | `GET /runs/{run_id}` + the most recent `GET /runs/{run_id}/events` |
