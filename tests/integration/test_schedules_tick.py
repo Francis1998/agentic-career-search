@@ -26,6 +26,7 @@ from autoapply_agent.services import schedules as schedule_service
 from autoapply_agent.services.job_search import as_utc
 from autoapply_agent.services.scheduler import RunScheduler
 from autoapply_agent.services.schedules import (
+    ScheduleConflictError,
     create_schedule,
     jitter_offset,
     pause_schedule,
@@ -33,6 +34,7 @@ from autoapply_agent.services.schedules import (
     resume_schedule,
     trigger_schedule,
     upcoming_fires,
+    update_schedule,
 )
 
 T0 = datetime(2030, 1, 7, 8, 0, tzinfo=UTC)
@@ -420,3 +422,46 @@ async def test_buffers_waiting_on_active_runs_do_not_starve_due_schedules(
     outcomes = await RunScheduler(factory, tick_seconds=60, batch_size=1).tick(T0)
 
     assert [outcome.schedule_id for outcome in outcomes] == [due_id]
+
+
+async def _change_in_another_session(
+    factory: Factory, schedule_id: int, changes: dict[str, Any]
+) -> None:
+    async with factory() as other:
+        schedule = await other.get(RunSchedule, schedule_id)
+        assert schedule is not None
+        await update_schedule(other, schedule, changes, now=T0 - HOUR)
+        await other.commit()
+
+
+async def test_a_trigger_decided_on_superseded_configuration_is_rolled_back(
+    factory: Factory,
+) -> None:
+    schedule_id = await _create(factory)
+    async with factory() as stale_session:
+        stale = await stale_session.get(RunSchedule, schedule_id)
+        assert stale is not None
+        await _change_in_another_session(factory, schedule_id, {"query": "rust embedded"})
+
+        with pytest.raises(ScheduleConflictError):
+            await trigger_schedule(stale_session, stale, now=T0 - HOUR)
+
+    assert await _runs(factory) == []
+
+
+async def test_a_fire_decided_on_superseded_configuration_is_rolled_back(
+    factory: Factory,
+) -> None:
+    schedule_id = await _create(factory)
+    async with factory() as stale_session:
+        stale = await stale_session.get(RunSchedule, schedule_id)
+        assert stale is not None
+        await _change_in_another_session(factory, schedule_id, {"source_config_ids": [7]})
+
+        outcome = await schedule_service._fire_due(stale_session, stale, T0)
+
+    retried = await _ticker(factory).tick(T0)
+
+    assert outcome is None
+    assert [outcome.kind for outcome in retried] == [ScheduleEventKind.FIRED]
+    assert [run.source_config_ids for run in await _runs(factory)] == [[7]]
