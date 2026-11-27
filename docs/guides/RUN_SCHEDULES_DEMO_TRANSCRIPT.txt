@@ -1,0 +1,67 @@
+$ export DATABASE_URL=sqlite+aiosqlite:///./schedules-demo.db
+$ python -m http.server 8766 --bind 127.0.0.1 --directory docs/guides/demo-board > /dev/null 2>&1 &
+$ SCHEDULER_TICK_SECONDS=2 uvicorn autoapply_agent.main:app --port 8765 --log-level warning & API_PID=$!
+$ export CT='content-type: application/json'
+$ curl -s localhost:8765/source-configs -H "$CT" -d '{"name": "demo-board", "source_type": "jsonld", "base_url": "http://127.0.0.1:8766/"}' | jq -c '{id, name, source_type}'
+{"id":1,"name":"demo-board","source_type":"jsonld"}
+$ curl -s 'localhost:8765/schedules/preview?cron=30+8+*+*+1-5&timezone=America/Los_Angeles&count=3' | jq -r '.upcoming[] | "\(.local)  =  \(.at)"'
+2026-11-30T08:30:00-08:00  =  2026-11-30T16:30:00Z
+2026-12-01T08:30:00-08:00  =  2026-12-01T16:30:00Z
+2026-12-02T08:30:00-08:00  =  2026-12-02T16:30:00Z
+$ curl -s 'localhost:8765/schedules/preview?cron=30+2+*+*+*&timezone=America/Los_Angeles&after=2027-03-12T12:00:00Z&count=3' | jq -r '.upcoming[].local'
+2027-03-13T02:30:00-08:00
+2027-03-15T02:30:00-07:00
+2027-03-16T02:30:00-07:00
+$ curl -s localhost:8765/schedules -H "$CT" -d '{"name": "too eager", "cron": "*/5 * * * *"}' | jq -c '.detail[0] | {type, loc, msg}'
+{"type":"cron_invalid","loc":["body","cron"],"msg":"invalid cron expression: fires 5 minute(s) apart; schedules fire at most every 15 minutes"}
+$ curl -s localhost:8765/schedules -H "$CT" -d '{"name": "weekday mornings", "cron": "30 8 * * 1-5", "timezone": "America/Los_Angeles", "query": "python platform", "source_config_ids": [1]}' | jq -c '{id, kind, next_run_at, local: .upcoming[0].local}'
+{"id":1,"kind":"cron","next_run_at":"2026-11-30T16:30:00Z","local":"2026-11-30T08:30:00-08:00"}
+$ curl -s localhost:8765/schedules -H "$CT" -d '{"name": "every 15 min", "interval_minutes": 15, "query": "python", "source_config_ids": [1]}' | jq -c '{id, kind, interval_minutes, next_run_at}'
+{"id":2,"kind":"interval","interval_minutes":15,"next_run_at":"2026-11-27T19:40:31Z"}
+$ sleep 3  # one scheduler tick later
+$ curl -s localhost:8765/schedules/2 | jq -c '{last_run_status, last_fired_at, next_run_at}'
+{"last_run_status":"completed","last_fired_at":"2026-11-27T19:40:32.089927Z","next_run_at":"2026-11-27T19:55:31Z"}
+$ RUN=$(curl -s localhost:8765/schedules/2 | jq -r .last_run_id); curl -s localhost:8765/runs/$RUN/events | jq -r '.[] | "\(.sequence) \(.event_type)  \(.message)"'
+1 run.created  Run queued by schedule 'every 15 min' (schedule)
+2 run.started  Run moved to running state
+3 source.started  Processing source config demo-board
+4 agent.decision  Decision created for Senior Python Platform Engineer
+5 agent.decision  Decision created for Staff Data Engineer (Python)
+6 agent.decision  Decision created for Frontend Engineer
+7 source.completed  Processed source demo-board
+8 run.completed  Run completed successfully
+$ for i in 1 2; do curl -s -X POST localhost:8765/schedules/2/trigger | jq -r '"\(.outcome): \(.reason)"'; done
+triggered: manual trigger queued a run
+skipped_overlap: manual trigger skipped: run 9811feae-513c-4aaf-bb95-37d006fecf41 is still queued (overlap_policy=skip)
+$ curl -s -X PATCH localhost:8765/schedules/2 -H "$CT" -d '{"overlap_policy": "buffer_one"}' | jq -c '{overlap_policy}'
+{"overlap_policy":"buffer_one"}
+$ sleep 2
+$ for i in 1 2 3; do curl -s -X POST localhost:8765/schedules/2/trigger | jq -r .outcome; done
+triggered
+buffered
+skipped_overlap
+$ sleep 5  # the run finishes; the next tick starts the buffered fire
+$ curl -s 'localhost:8765/schedules/2/history?limit=6' | jq -r '.[] | "\(.kind | . + " " * (16 - length)) \(.reason)"'
+fired            started the buffered fire after run 7f6d7186-c523-4f84-9106-3e2128f66782 finished
+skipped_overlap  manual trigger skipped: run 7f6d7186-c523-4f84-9106-3e2128f66782 is still queued (overlap_policy=buffer_one, a fire is already buffered)
+buffered         manual trigger: run 7f6d7186-c523-4f84-9106-3e2128f66782 is still queued; it starts when that run finishes
+triggered        manual trigger queued a run
+skipped_overlap  manual trigger skipped: run 9811feae-513c-4aaf-bb95-37d006fecf41 is still queued (overlap_policy=skip)
+triggered        manual trigger queued a run
+$ curl -s -X POST localhost:8765/schedules/2/pause -H "$CT" -d '{"note": "board maintenance until Monday"}' | jq -c '{paused, pause_note, next_run_at}'
+{"paused":true,"pause_note":"board maintenance until Monday","next_run_at":null}
+$ curl -s -X POST localhost:8765/schedules/2/resume | jq -c '{paused, next_run_at}'
+{"paused":false,"next_run_at":"2026-11-27T19:55:31Z"}
+$ kill $API_PID  # the API and its scheduler go offline
+$ sleep 1860  # 31 minutes later: the fires due at +15 and +30 minutes were missed
+$ SCHEDULER_TICK_SECONDS=2 uvicorn autoapply_agent.main:app --port 8765 --log-level warning & API_PID=$!
+$ sleep 3
+$ curl -s 'localhost:8765/schedules/2/history?limit=1' | jq -c '.[0] | {kind, reason, missed_fires: .details.missed_fires, late_seconds: .details.late_seconds}'
+{"kind":"coalesced_misfire","reason":"coalesced 2 missed fires into one run","missed_fires":2,"late_seconds":970}
+$ curl -s localhost:8765/schedules | jq -r '.[] | "#\(.id) \(.name): \(.cron // "every \(.interval_minutes) min") -> next \(.next_run_at), last run \(.last_run_id[:8] // "-")"'
+#2 every 15 min: every 15 min -> next 2026-11-27T20:25:31Z, last run 3b7e9483
+#1 weekday mornings: 30 8 * * 1-5 -> next 2026-11-30T16:30:00Z, last run -
+$ curl -s 'localhost:8765/jobs?dedupe=true&sort=score' | jq -r '.[] | "\(.score) \(.title) | \(.company) | \(.location)"'
+0.6312 Senior Python Platform Engineer | Acme Robotics | Remote
+0.6225 Staff Data Engineer (Python) | Globex | Berlin, DE
+0.4732 Frontend Engineer | Initech | Austin, TX

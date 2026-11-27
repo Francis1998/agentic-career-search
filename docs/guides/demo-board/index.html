@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Demo job board (offline schedule demo)</title>
+  <!-- Fictional postings for the run schedules guide; serve with python -m http.server. -->
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "JobPosting",
+      "title": "Senior Python Platform Engineer",
+      "identifier": {"@type": "PropertyValue", "value": "demo-101"},
+      "url": "https://jobs.example.com/acme/demo-101",
+      "hiringOrganization": {"@type": "Organization", "name": "Acme Robotics"},
+      "jobLocationType": "TELECOMMUTE",
+      "description": "Python, FastAPI and PostgreSQL services for the robot fleet platform."
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "JobPosting",
+      "title": "Staff Data Engineer (Python)",
+      "identifier": {"@type": "PropertyValue", "value": "demo-102"},
+      "url": "https://jobs.example.com/globex/demo-102",
+      "hiringOrganization": {"@type": "Organization", "name": "Globex"},
+      "jobLocation": {
+        "@type": "Place",
+        "address": {"@type": "PostalAddress", "addressLocality": "Berlin", "addressCountry": "DE"}
+      },
+      "description": "Batch and streaming pipelines in Python on Kubernetes."
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "JobPosting",
+      "title": "Frontend Engineer",
+      "identifier": {"@type": "PropertyValue", "value": "demo-103"},
+      "url": "https://jobs.example.com/initech/demo-103",
+      "hiringOrganization": {"@type": "Organization", "name": "Initech"},
+      "jobLocation": {
+        "@type": "Place",
+        "address": {"@type": "PostalAddress", "addressLocality": "Austin", "addressRegion": "TX"}
+      },
+      "description": "TypeScript and React for the reporting dashboard."
+    }
+  ]
+  </script>
+</head>
+<body>
+  <h1>Demo job board</h1>
+  <p>Three fictional postings published as schema.org JobPosting JSON-LD.</p>
+</body>
+</html>
