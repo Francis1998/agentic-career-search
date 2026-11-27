@@ -11,6 +11,8 @@ Configuration is environment-variable driven via `pydantic-settings`.
 | `MAX_JOBS_PER_SOURCE` | `50` | Per-source job cap |
 | `HTTP_USER_AGENT` | `agentic-career-search/0.2` | Outbound HTTP user agent |
 | `ENABLE_WORKER` | `true` | Start in-process worker on boot |
+| `ENABLE_SCHEDULER` | `true` | Start the run scheduler on boot: due [run schedules](docs/guides/RUN_SCHEDULES_GUIDE.md) queue normal runs (claims are exactly-once, so several processes may run it) |
+| `SCHEDULER_TICK_SECONDS` | `30` | Pause between scheduler ticks (`0 <` value `≤ 3600`); a fire starts at most this long after its planned time |
 | `LLM_ENABLE_ENRICHMENT` | `false` | Enable provider-based LLM decision enrichment |
 | `LLM_PROVIDER` | `gemini` | Active LLM provider: `gemini`, `kimi`, `claude`, `gpt` |
 | `LLM_TIMEOUT_SECONDS` | `12.0` | LLM API timeout in seconds |
@@ -40,6 +42,8 @@ WORKER_POLL_INTERVAL_SECONDS=0.5
 HTTP_TIMEOUT_SECONDS=12.0
 MAX_JOBS_PER_SOURCE=50
 ENABLE_WORKER=true
+ENABLE_SCHEDULER=true
+SCHEDULER_TICK_SECONDS=30
 ```
 
 ### CI and deterministic tests

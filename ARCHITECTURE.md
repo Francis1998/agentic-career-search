@@ -3,6 +3,9 @@
 ```mermaid
 flowchart TD
     API[FastAPI API] --> QUEUE[Run queue state in DB]
+    API --> SCHEDULES[Run schedules + history]
+    SCHEDULES --> SCHEDULER[RunScheduler tick]
+    SCHEDULER -->|claims due fires, queues runs| QUEUE
     QUEUE --> WORKER[InProcessWorker]
     WORKER --> ADAPTERS[Greenhouse/Lever/JSON-LD adapters]
     ADAPTERS --> ENGINE[AgentDecisionEngine]
@@ -18,12 +21,13 @@ flowchart TD
 
 ## Components
 
-- **API Layer** (`autoapply_agent.api`): FastAPI routes for health, source config, run lifecycle, and jobs search/detail/export/Atom feed.
+- **API Layer** (`autoapply_agent.api`): FastAPI routes for health, source config, run lifecycle, run schedules, applications, and jobs search/detail/export/Atom feed.
 - **Job Search & Export** (`autoapply_agent.services.job_search`, `job_export`): shared filter/sort/dedupe query builder plus streamed CSV (formula-injection safe), JSON Lines and Atom 1.0 renderers.
 - **Pay Transparency** (`autoapply_agent.services.compensation`): one deterministic extractor for the pay a posting states. `compensation_from_monetary_amount()` reads schema.org `baseSalary` (`source="structured"`), `compensation_from_text()` reads description text with currency, interval, pay-word and false-positive rules (`source="description"`); both return a typed `Compensation` (ISO 4217 currency, interval, stated and annualized range) or `None`, never a guess. Adapters set `JobCandidate.compensation` (today the `jsonld` adapter); the worker stores `raw.compensation` and the indexed `salary_*` columns; `job_search` filters (`min_salary`/`max_salary` overlap, `salary_currency`, `has_salary`) and sorts (`salary`, nulls-last keyset) on them for every surface. Pay never feeds the scorer or the decision engine. See [docs/guides/PAY_TRANSPARENCY_GUIDE.md](docs/guides/PAY_TRANSPARENCY_GUIDE.md).
 - **Resume Match** (`autoapply_agent.services.skill_extraction`, `resume_match`; route `POST /jobs/match` in `api/routes_match.py`): deterministic skill extraction with a curated 254-skill alias-aware lexicon (symbol-aware boundaries, case-sensitive ambiguous words, resume-side implied skills), coverage scoring through `ats_keyword_coverage.keyword_coverage()`, `match`/`blend` ranking over `job_search.iter_jobs` with a bounded top-k heap, and CSV through the export's hardening. The route reads and caps the body itself (1 MiB, `413`) so errors never echo the resume; resume text is never persisted or logged (SHA-256 digest only). See [docs/guides/RESUME_JOB_MATCH_GUIDE.md](docs/guides/RESUME_JOB_MATCH_GUIDE.md).
 - **Application Tracker** (`autoapply_agent.services.application_tracker`, `application_export`; routes in `api/routes_applications.py`): persistent pipeline over captured jobs. `applications` holds one card per job (stage, notes, `applied_at`, follow-up, archived); `application_events` is an append-only timeline numbered per application (unique `(application_id, sequence)`, so racing writers get a `409` instead of interleaving). Stage moves go through `application_stages.check_transition()`, the same state machine as the in-memory `ApplicationStageTracker`. Lists, the board, the CSV/JSONL export (job export's CSV hardening) and the iCalendar follow-up feed share one filter builder. Never submits applications. See [docs/guides/APPLICATION_TRACKER_GUIDE.md](docs/guides/APPLICATION_TRACKER_GUIDE.md).
-- **MCP Server** (`autoapply_agent.mcp`, console script `career-search-mcp`): read-only, stdlib-only Model Context Protocol server over stdio (2026-07-28 stateless + 2025-11-25/2025-06-18 handshake). Its nine tools reuse `job_search`, `DeterministicScoringService.breakdown()`, `priority_tier_for_score()`, `read_queries`, `resume_match` and `application_tracker`; SQLite connections run `PRAGMA query_only`. See [docs/guides/MCP_SERVER_GUIDE.md](docs/guides/MCP_SERVER_GUIDE.md).
+- **Run Schedules** (`autoapply_agent.services.cron`, `schedules`, `scheduler`; routes in `api/routes_schedules.py`): recurring discovery runs. `run_schedules` stores the run parameters of `POST /runs` plus a cadence (`interval_minutes` anchored at `start_at`, or a five-field cron evaluated with `zoneinfo` in an IANA time zone: nonexistent local times skipped, ambiguous ones fire once); `run_schedule_events` is the append-only history. `RunScheduler` (started from the lifespan next to the worker, injectable clock) lists due schedules every `SCHEDULER_TICK_SECONDS` and handles each in its own transaction: it queues the run through `services.runs.enqueue_run` (the code behind `POST /runs`) and claims the fire with one conditional `UPDATE` on `next_run_at` + `last_run_id`, so concurrent ticks, processes or manual triggers never double-fire. Overlap policies `skip` / `buffer_one`, missed fires coalesced into one run, pause / resume without catch-up, deterministic jitter. See [docs/guides/RUN_SCHEDULES_GUIDE.md](docs/guides/RUN_SCHEDULES_GUIDE.md).
+- **MCP Server** (`autoapply_agent.mcp`, console script `career-search-mcp`): read-only, stdlib-only Model Context Protocol server over stdio (2026-07-28 stateless + 2025-11-25/2025-06-18 handshake). Its eleven tools reuse `job_search`, `DeterministicScoringService.breakdown()`, `priority_tier_for_score()`, `read_queries`, `resume_match`, `application_tracker` and `schedules`; SQLite connections run `PRAGMA query_only`. See [docs/guides/MCP_SERVER_GUIDE.md](docs/guides/MCP_SERVER_GUIDE.md).
 - **Read queries** (`autoapply_agent.services.read_queries`): run, run-event and source-config listings shared by the HTTP routes and the MCP server.
 - **Worker** (`autoapply_agent.services.worker`): in-process async polling loop that claims queued runs.
 - **Adapters** (`autoapply_agent.adapters`): Greenhouse and Lever HTML parsers plus a vendor-neutral `schema.org/JobPosting` JSON-LD parser (`jsonld`).
@@ -42,7 +46,7 @@ The system follows an explicit Observe -> Decide -> Act loop:
 
 ## Run Lifecycle
 
-1. Client creates run (`POST /runs`) -> run status `queued`, event `run.created`.
+1. Client creates run (`POST /runs`), or a due schedule fires -> run status `queued`, event `run.created` (with `schedule_id`, `trigger` and `scheduled_for` in its payload for scheduled runs).
 2. Worker claims queued run -> status `running`, event `run.started`.
 3. Worker resolves source configs, fetches jobs per source, and evaluates each job with the agent decision engine.
 4. Worker persists source and summary events.
@@ -70,6 +74,20 @@ When no enabled source configs match a run, the worker sets `completed` and emit
 - `Job`: normalized job snapshot tied to run, including `agent_decision` trace in `raw`, the captured pay in `raw.compensation` and its annualized, indexed `salary_min_annual` / `salary_max_annual` / `salary_currency` / `salary_interval` columns (`NULL` without pay).
 - `Application`: one tracked job's pipeline card (stage, notes, applied date, follow-up, archived).
 - `ApplicationEvent`: append-only, per-application numbered timeline of stage moves, follow-up changes, notes and archiving.
+- `RunSchedule`: run parameters + cadence, `next_run_at` (planned fire, jitter included; `NULL` while paused), `buffered_at`, `last_run_id`, `paused` / `pause_note`.
+- `RunScheduleEvent`: append-only schedule history (`fired`, `coalesced_misfire`, `triggered`, `buffered`, `skipped_overlap`, `paused`, `resumed`) with `run_id`, `scheduled_for`, `reason`, `details`.
+
+## Schedule Fire Decisions
+
+| Situation when a fire is due | `overlap_policy` | Outcome (history kind) |
+|---|---|---|
+| Last run finished (or none) | any | Queue a run (`fired`; `coalesced_misfire` if several fires were missed) |
+| Last run `queued` / `running` / `cancel_requested` | `skip` | No run (`skipped_overlap`) |
+| Last run active, nothing buffered | `buffer_one` | Keep one fire (`buffered`), started by the first tick after the run ends (`fired`) |
+| Last run active, a fire already buffered | `buffer_one` | No run (`skipped_overlap`) |
+| Schedule paused | any | Not considered; resume plans the next fire after now |
+
+Every decision plans `next_run_at` as the first fire after the tick (no catch-up storm).
 
 ## Event Contracts
 
@@ -88,3 +106,4 @@ When no enabled source configs match a run, the worker sets `completed` and emit
 - Runtime creates tables for local simplicity; migrations are ready for incremental schema control.
 - `d3a9f1c4b7e2` adds `applications` and `application_events` (`alembic upgrade head`; downgrade to `c41f2a7d9e60` drops them).
 - `e5b8c2a7f913` adds the nullable `jobs.salary_*` columns and `ix_jobs_salary_currency_max_annual_created_at_id` (idempotent; downgrade to `d3a9f1c4b7e2` drops them). Startup `create_all` cannot add columns to an existing table, so existing databases must run `alembic upgrade head`.
+- `f5c8a2d71b39` adds `run_schedules` and `run_schedule_events` (downgrade to `e5b8c2a7f913` drops them; runs and jobs are untouched).

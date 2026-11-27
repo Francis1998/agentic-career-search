@@ -115,6 +115,31 @@ before that get pay when a run captures them again. See
 curl -s -X POST "http://127.0.0.1:8000/runs/$RUN_ID/cancel"
 ```
 
+## 6b) Optional: re-run discovery on a schedule
+
+Save the same run parameters as a schedule and the API's scheduler (`ENABLE_SCHEDULER=true`,
+the default) queues a normal run whenever it is due — every N minutes (at least 15) or on a
+cron expression in your time zone:
+
+```bash
+# Dry-run the expression first: weekdays at 08:30 Los Angeles time.
+curl -s "http://127.0.0.1:8000/schedules/preview?cron=30+8+*+*+1-5&timezone=America/Los_Angeles" \
+  | jq -r '.upcoming[].local'
+
+curl -s -X POST "http://127.0.0.1:8000/schedules" \
+  -H "content-type: application/json" \
+  -d '{"name": "weekday mornings", "cron": "30 8 * * 1-5",
+       "timezone": "America/Los_Angeles", "query": "python backend"}'
+
+curl -s "http://127.0.0.1:8000/schedules/1" | jq '{next_run_at, upcoming}'
+curl -s -X POST "http://127.0.0.1:8000/schedules/1/trigger"    # run it now
+curl -s "http://127.0.0.1:8000/schedules/1/history"
+```
+
+While a scheduled run is still active the next fire is skipped (`overlap_policy=skip`) or
+kept for later (`buffer_one`); fires missed while the API was down become one run.
+Details: [docs/guides/RUN_SCHEDULES_GUIDE.md](docs/guides/RUN_SCHEDULES_GUIDE.md).
+
 ## 7) Optional: enable LLM provider enrichment
 
 Add to `.env` before starting the API:

@@ -6,6 +6,10 @@
 - No login, account handling, CAPTCHA bypass, or anti-bot evasion is implemented.
 - No browser credential automation is included.
 - No hidden background submission behavior is implemented.
+- Run schedules (`/schedules`) are the only thing that starts work in the background, and
+  only on a cadence the user created and can list, pause or delete: each fire queues an
+  ordinary discovery run that fetches and scores public postings. Schedules never apply to
+  jobs, fill in forms, contact employers or recruiters, or submit anything.
 
 ## Operational Controls
 
@@ -13,8 +17,15 @@
 - Source-level and run-level failures are persisted as events.
 - Runs support cancellation and surface cancellation events.
 - Per-source result volume is bounded by configuration (`MAX_JOBS_PER_SOURCE`).
+- Scheduled discovery is rate-limited by design: no schedule fires more often than every 15
+  minutes (interval floor, and cron expressions that could fire closer together are
+  rejected), at most one run per schedule is active at a time (`skip` / `buffer_one`),
+  fires missed during downtime are coalesced into one run instead of a catch-up burst, and
+  optional jitter (≤ 600 s) spreads schedules apart. Every fire, skip and pause is recorded
+  in the schedule's append-only history.
 - The MCP server (`career-search-mcp`) is read-only: its tools search and explain stored
-  jobs and runs but cannot start or cancel runs, edit sources or apply; SQLite connections
+  jobs, runs and schedules but cannot start or cancel runs, create, pause or trigger
+  schedules, edit sources or apply; SQLite connections
   run `PRAGMA query_only`, and logs/audit records never contain tool arguments or results.
 - Resume matching (`POST /jobs/match`, MCP `match_resume_to_jobs`) is bounded: request
   bodies are capped at 1 MiB while they stream in (`413`), `resume_text` at 50,000
@@ -34,7 +45,9 @@
 ## Responsible Use
 
 - Respect career-site terms of service and robots policies.
-- Keep request rates conservative to avoid degrading target systems.
+- Keep request rates conservative to avoid degrading target systems; for public boards
+  prefer daily or weekday cron schedules over the 15-minute minimum, since postings rarely
+  change that often.
 - Treat agent decisions as assistive triage, not automatic truth.
 - Manually review high-priority postings before downstream actions.
 - Skills-profile fit scores are assistive triage signals, not auto-apply triggers.
