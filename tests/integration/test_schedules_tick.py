@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 from collections.abc import AsyncIterator
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -465,3 +466,21 @@ async def test_a_fire_decided_on_superseded_configuration_is_rolled_back(
     assert outcome is None
     assert [outcome.kind for outcome in retried] == [ScheduleEventKind.FIRED]
     assert [run.source_config_ids for run in await _runs(factory)] == [[7]]
+
+
+async def test_tick_failures_are_logged_without_exception_text(
+    factory: Factory, monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
+) -> None:
+    schedule_id = await _create(factory)
+
+    async def fail(*_: object, **__: object) -> None:
+        # SQLAlchemy errors render their bound parameters (query terms, schedule names).
+        raise RuntimeError("[SQL: INSERT INTO runs ...] [parameters: ('python platform',)]")
+
+    monkeypatch.setattr("autoapply_agent.services.scheduler.process_due_schedule", fail)
+    with caplog.at_level(logging.INFO, logger="autoapply_agent.services.scheduler"):
+        outcomes = await _ticker(factory).tick(T0)
+
+    assert outcomes == []
+    assert "python platform" not in caplog.text
+    assert f"schedule_tick_failed schedule_id={schedule_id} error=RuntimeError" in caplog.text
