@@ -24,6 +24,9 @@ Job-search automation usually fails in practice because it:
   feed for Slack, Teams or any feed reader;
 - **can't tell what fits *you*** → `POST /jobs/match` ranks the captured feed against your
   resume text with matched and missing skills — deterministic, and the resume is never stored;
+- **needs your own cron job to stay fresh** → recurring schedules (every N minutes or a
+  cron expression in your time zone) re-run discovery with overlap, misfire and pause
+  semantics, so a laptop waking up never triggers a burst of catch-up runs;
 - **can't be asked about** → a read-only MCP server lets Claude Desktop, Claude Code,
   VS Code or Cursor search your feed and explain any score;
 - **depends on one LLM** → enrichment is optional and works with the current OpenAI,
@@ -34,6 +37,7 @@ Job-search automation usually fails in practice because it:
 ```mermaid
 flowchart LR
     SC["Source configs<br/>POST /source-configs"] --> RUN["Runs<br/>POST /runs"]
+    SCHED["Run schedules<br/>interval · cron + time zone"] -->|"scheduler tick<br/>claims due fires"| RUN
     RUN --> W["InProcessWorker<br/>claims queued runs"]
     W --> AD["119 source adapters<br/>Greenhouse · Lever · Workday · JSON-LD …"]
     AD --> SCORE["Deterministic scoring<br/>+ planning"]
@@ -119,6 +123,24 @@ curl -sS 'localhost:8000/jobs?has_salary=false' | jq -r '.[].title'   # postings
 rules and false-positive guards, annualization, currency handling, every parameter, the
 CSV/feed/MCP output and upgrading an existing database.
 
+Keep the feed fresh without an external cron job: save a run as a schedule (every N
+minutes, or a cron expression evaluated in your time zone) and the agent re-runs it, with
+overlap, misfire and pause semantics and an append-only history:
+
+```bash
+curl -sS 'localhost:8000/schedules/preview?cron=30+8+*+*+1-5&timezone=America/Los_Angeles' \
+  | jq -r '.upcoming[].local'                                         # dry-run the expression
+curl -sS localhost:8000/schedules -H 'content-type: application/json' \
+  -d '{"name": "weekday mornings", "cron": "30 8 * * 1-5", "timezone": "America/Los_Angeles", "query": "python platform"}'
+curl -sS localhost:8000/schedules/1/history | jq -r '.[] | "\(.kind) \(.reason)"'
+```
+
+![Run schedules — real terminal session](assets/demo/run-schedules.gif)
+
+[RUN_SCHEDULES_GUIDE.md](docs/guides/RUN_SCHEDULES_GUIDE.md) covers interval and cron
+cadences, DST rules, `skip` / `buffer_one`, misfire coalescing, pause / resume / trigger,
+every endpoint and the MCP tools.
+
 For live data, start the API with the worker enabled (omit `ENABLE_WORKER=false`), then
 register a public board and start a run:
 
@@ -136,8 +158,9 @@ end to end, and [QUICKSTART.md](QUICKSTART.md) covers setup details.
 
 `career-search-mcp` is a read-only [Model Context Protocol](https://modelcontextprotocol.io)
 server (stdio; protocol 2026-07-28 plus the 2025-11-25 / 2025-06-18 handshake). Assistants
-get nine tools — `search_jobs`, `get_job`, `explain_job_score`, `list_runs`, `get_run`,
-`list_sources`, `match_resume_to_jobs`, `list_applications`, `get_application` — over the jobs your runs already captured, scored
+get eleven tools — `search_jobs`, `get_job`, `explain_job_score`, `list_runs`, `get_run`,
+`list_sources`, `match_resume_to_jobs`, `list_applications`, `get_application`,
+`list_schedules`, `get_schedule` — over the jobs your runs already captured, scored
 and deduplicated, so *"show me this week's best-fit remote roles and why the top one ranks
 first"* needs no scraping, keys or writes. For example, in Claude Code:
 
@@ -161,6 +184,7 @@ Cursor configuration examples, every tool, the audit log and a recorded session.
 | Resume match | `POST /jobs/match` and MCP `match_resume_to_jobs`: rank jobs against resume text with a 254-skill alias-aware lexicon (`k8s` → `kubernetes`); match score, matched/missing skills, explanation, `sort=match\|blend`, CSV; resume never stored or logged | [Resume match guide](docs/guides/RESUME_JOB_MATCH_GUIDE.md) |
 | Pay transparency | Stated pay per job from schema.org `baseSalary` or description text ("$120k–$150k", "$45/hr", "€60.000"), typed and annualized (hour ×2080, day ×260, week ×52, month ×12) in ISO 4217 currencies; `min_salary` / `max_salary` (overlap), `salary_currency`, `has_salary`, `sort=salary` on list, export, feed, match and MCP; false positives such as "$5M Series A" or "$50 stipend" rejected; informational only | [Pay transparency guide](docs/guides/PAY_TRANSPARENCY_GUIDE.md) |
 | Application tracker | `/applications`: persistent pipeline `saved → applied → interview → offer → accepted/rejected` on one state machine (illegal moves `409`), append-only timeline, follow-ups (overdue/due), board, CSV/JSONL export, iCalendar follow-up feed; MCP `list_applications` / `get_application`; never submits anything | [Application tracker guide](docs/guides/APPLICATION_TRACKER_GUIDE.md) |
+| Run schedules | `/schedules`: recurring discovery runs every N minutes (≥ 15) or on a 5-field cron in an IANA time zone (DST gaps skipped, repeated hours fire once); overlap `skip` / `buffer_one`, missed fires coalesced into one run, pause with a note, trigger now, deterministic jitter, exactly-once claims, append-only history, cron preview; MCP `list_schedules` / `get_schedule`; discovery only | [Run schedules guide](docs/guides/RUN_SCHEDULES_GUIDE.md) |
 | AI assistants (MCP) | Read-only stdio MCP server: search, decision traces, plain-language score explanations, runs and events; audit log with hashed arguments | [MCP server guide](docs/guides/MCP_SERVER_GUIDE.md) |
 | LLM enrichment | Optional summaries from GPT-6 / 6.2, Claude 5.5 / Fable 5.2, Gemini 3.8 / 4 or Kimi K3.1 models | [CONFIGURATION.md](CONFIGURATION.md) |
 | Alerts | Fail-soft webhook for high-priority jobs (Slack, Discord, custom) | [CONFIGURATION.md](CONFIGURATION.md) |
@@ -233,6 +257,9 @@ Then set matching API keys in `.env` (see `CONFIGURATION.md`).
 - `GET /applications/board` pipeline grouped by stage with counts; `GET /applications/{id}`; `PATCH /applications/{id}` move stage (`409` on illegal moves), notes, follow-up
 - `GET /applications/{id}/events` append-only timeline; `POST /applications/{id}/archive` / `unarchive`
 - `GET /applications/export?format=csv|jsonl` spreadsheet-safe export; `GET /applications/calendar.ics` follow-up calendar feed
+- `POST /schedules` save a recurring run (`interval_minutes` ≥ 15 or `cron` + `timezone`, `overlap_policy=skip|buffer_one`, `jitter_seconds`); `GET /schedules` list (`paused`, `kind`, `q`, `limit`/`offset`)
+- `GET /schedules/{id}` with the next five fires; `PATCH` / `DELETE /schedules/{id}`; `POST /schedules/{id}/pause` (note) / `resume` / `trigger`
+- `GET /schedules/{id}/history` fired / coalesced_misfire / triggered / buffered / skipped_overlap / paused / resumed; `GET /schedules/preview?cron=…&timezone=…` dry run
 - `GET /health/live` and `GET /health/ready`
 
 MCP (stdio, read-only): `career-search-mcp` / `python -m autoapply_agent.mcp` — see the
@@ -249,6 +276,7 @@ MCP (stdio, read-only): `career-search-mcp` / `python -m autoapply_agent.mcp` �
 | [docs/guides/RESUME_JOB_MATCH_GUIDE.md](docs/guides/RESUME_JOB_MATCH_GUIDE.md) | Resume-to-job match: API + MCP reference, skill lexicon, ranking, privacy |
 | [docs/guides/APPLICATION_TRACKER_GUIDE.md](docs/guides/APPLICATION_TRACKER_GUIDE.md) | Application tracker: pipeline stages, timeline, follow-ups, board, CSV and calendar exports, MCP |
 | [docs/guides/PAY_TRANSPARENCY_GUIDE.md](docs/guides/PAY_TRANSPARENCY_GUIDE.md) | Pay transparency: captured pay ranges, annualization, currency rules, salary filters and sort, exports, MCP |
+| [docs/guides/RUN_SCHEDULES_GUIDE.md](docs/guides/RUN_SCHEDULES_GUIDE.md) | Run schedules: interval / cron cadences, time zones and DST, overlap and misfire semantics, pause / resume / trigger, history, MCP |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Components, run lifecycle, events |
 | [docs/API.md](docs/API.md) | HTTP API reference |
 | [CONFIGURATION.md](CONFIGURATION.md) | Environment variables and provider profiles |

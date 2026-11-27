@@ -140,6 +140,42 @@ offset are UTC. Errors are `{"detail": ...}`.
 
 Details: [Application Tracker Guide](guides/APPLICATION_TRACKER_GUIDE.md).
 
+## Schedules
+
+Recurring discovery runs: the run parameters of `POST /runs` plus a cadence. The in-process
+scheduler (`ENABLE_SCHEDULER`, `SCHEDULER_TICK_SECONDS`) queues a normal run when one is
+due, applies the overlap policy and coalesces missed fires into one run. Schedules only
+discover and score jobs. Errors are `{"detail": ...}`; invalid input is the standard `422`
+list with types such as `cron_invalid`, `timezone_invalid` and `schedule_cadence`.
+
+| Method | Path | Description |
+|---|---|---|
+| `POST` | `/schedules` | Create a schedule → `201` + `Location`; `409` name taken |
+| `GET` | `/schedules` | List (`paused`, `kind`, `q`, `limit` 1–200 / `offset`; `X-Total-Count`), soonest next fire first |
+| `GET` | `/schedules/preview` | Dry-run `cron` in `timezone` (`count` 1–20, `after`): next fires in UTC and local time |
+| `GET` | `/schedules/{schedule_id}` | One schedule + `last_run_status` + next five fires (`upcoming`) |
+| `PATCH` | `/schedules/{schedule_id}` | Change name, `query`, `source_config_ids`, cadence, `overlap_policy`, `jitter_seconds` |
+| `DELETE` | `/schedules/{schedule_id}` | Delete it and its history (`204`); its runs and jobs stay |
+| `POST` | `/schedules/{schedule_id}/pause` | Pause, optional body `{note}` (idempotent; drops a buffered fire) |
+| `POST` | `/schedules/{schedule_id}/resume` | Resume from the next fire after now (no catch-up) |
+| `POST` | `/schedules/{schedule_id}/trigger` | Run now honouring the overlap policy: `outcome` `triggered` / `buffered` / `skipped_overlap` (`409` on a concurrent fire) |
+| `GET` | `/schedules/{schedule_id}/history` | Append-only history newest first (`kind` repeatable, `limit` 1–500 / `offset`; `X-Total-Count`) |
+
+- `POST /schedules` body `{name, query?, source_config_ids?, interval_minutes | cron, kind?,
+  timezone?, start_at?, overlap_policy?, jitter_seconds?, paused?, pause_note?}`:
+  `interval_minutes` 15–43,200 (anchored at `start_at`, default the next second, so it fires
+  on the next tick); `cron` five fields or `@hourly`/`@daily`/`@weekly`/`@monthly`/`@yearly`,
+  at least 15 minutes between fires, evaluated in the IANA `timezone` (default `UTC`;
+  nonexistent local times are skipped, repeated ones fire once); `overlap_policy`
+  `skip` (default) or `buffer_one`; `jitter_seconds` 0–600; `query` and
+  `source_config_ids` are validated exactly like `POST /runs`; unknown fields are `422`.
+- History kinds: `fired`, `coalesced_misfire` (`details.missed_fires`), `triggered`,
+  `buffered`, `skipped_overlap`, `paused`, `resumed`; each has `scheduled_for`, `run_id`,
+  `reason` and `details`. Runs a schedule queues carry `run.created` with
+  `{schedule_id, schedule_name, trigger, scheduled_for}`.
+
+Details: [Run Schedules Guide](guides/RUN_SCHEDULES_GUIDE.md).
+
 ## MCP (stdio)
 
 The same data is available read-only to AI assistants through the Model Context Protocol:
@@ -158,9 +194,11 @@ handshake.
 | `match_resume_to_jobs` | `POST /jobs/match` (same ranking; `limit` ≤ 50) |
 | `list_applications` | `GET /applications` (same filters; `limit` ≤ 50) + board and follow-up counts |
 | `get_application` | `GET /applications/{id}` + its most recent `GET /applications/{id}/events` |
+| `list_schedules` | `GET /schedules` (`paused`, `kind`; `limit` ≤ 50) |
+| `get_schedule` | `GET /schedules/{id}` (next five fires) + its most recent `GET /schedules/{id}/history` |
 
 There are no MCP tools for the routes that change state (`POST /source-configs`, `PATCH`,
-`POST /runs`, `POST /runs/{run_id}/cancel`, `POST`/`PATCH /applications...`); `POST /jobs/match`
+`POST /runs`, `POST /runs/{run_id}/cancel`, `POST`/`PATCH /applications...`, `POST`/`PATCH`/`DELETE /schedules...`); `POST /jobs/match`
 only reads. Reference, client
 configuration and privacy notes: [MCP Server Guide](guides/MCP_SERVER_GUIDE.md).
 

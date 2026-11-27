@@ -21,6 +21,10 @@ class Settings(BaseSettings):
     max_jobs_per_source: int = Field(default=50, alias="MAX_JOBS_PER_SOURCE")
     http_user_agent: str = Field(default="agentic-career-search/0.2", alias="HTTP_USER_AGENT")
     enable_worker: bool = Field(default=True, alias="ENABLE_WORKER")
+    enable_scheduler: bool = Field(default=True, alias="ENABLE_SCHEDULER")
+    scheduler_tick_seconds: float = Field(
+        default=30.0, gt=0, le=3600, alias="SCHEDULER_TICK_SECONDS"
+    )
     environment: Literal["dev", "test", "prod"] = Field(default="dev", alias="ENVIRONMENT")
     llm_enable_enrichment: bool = Field(default=False, alias="LLM_ENABLE_ENRICHMENT")
     llm_provider: Literal["gemini", "kimi", "claude", "gpt"] = Field(

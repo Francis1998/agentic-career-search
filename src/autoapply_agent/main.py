@@ -132,6 +132,7 @@ from autoapply_agent.api.routes_health import router as health_router
 from autoapply_agent.api.routes_jobs import router as jobs_router
 from autoapply_agent.api.routes_match import router as match_router
 from autoapply_agent.api.routes_runs import router as runs_router
+from autoapply_agent.api.routes_schedules import router as schedules_router
 from autoapply_agent.api.routes_source_configs import router as source_configs_router
 from autoapply_agent.core.config import Settings
 from autoapply_agent.core.config import settings as default_settings
@@ -140,6 +141,7 @@ from autoapply_agent.db.models import SourceType
 from autoapply_agent.db.session import create_engine, create_session_factory
 from autoapply_agent.services.llm_enrichment import LLMEnrichmentService
 from autoapply_agent.services.planning import DeterministicPlanningService
+from autoapply_agent.services.scheduler import RunScheduler
 from autoapply_agent.services.scoring import DeterministicScoringService
 from autoapply_agent.services.worker import InProcessWorker
 
@@ -158,6 +160,7 @@ def _create_api_router() -> APIRouter:
     router.include_router(jobs_router)
     router.include_router(match_router)
     router.include_router(applications_router)
+    router.include_router(schedules_router)
     return router
 
 
@@ -321,13 +324,20 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
             max_jobs_per_source=active_settings.max_jobs_per_source,
         )
         app.state.worker = worker
+        scheduler = RunScheduler(
+            session_factory, tick_seconds=active_settings.scheduler_tick_seconds
+        )
+        app.state.scheduler = scheduler
 
         if active_settings.enable_worker:
             await worker.start()
+        if active_settings.enable_scheduler:
+            await scheduler.start()
 
         try:
             yield
         finally:
+            await scheduler.stop()
             await worker.stop()
             await engine.dispose()
 

@@ -38,6 +38,7 @@ Minimum production settings:
 ENVIRONMENT=prod
 DATABASE_URL=sqlite+aiosqlite:///./data/autoapply_agent.db
 ENABLE_WORKER=true
+ENABLE_SCHEDULER=true
 HTTP_TIMEOUT_SECONDS=12.0
 MAX_JOBS_PER_SOURCE=50
 ```
@@ -84,6 +85,9 @@ when discovery captures them again (no backfill).
 
 - The in-process worker polls queued runs; for higher throughput, run a dedicated worker process pattern in future releases.
 - Cancellation is cooperative: active runs finish the current source step before stopping.
+- The in-process scheduler (`ENABLE_SCHEDULER`, `SCHEDULER_TICK_SECONDS`) queues the runs of due
+  [run schedules](guides/RUN_SCHEDULES_GUIDE.md). Each fire is claimed exactly once, so it is safe
+  in every replica; fires missed while the service is down become one run when it restarts.
 - LLM provider failures degrade to deterministic-only output; runs still complete.
 
 ## See also

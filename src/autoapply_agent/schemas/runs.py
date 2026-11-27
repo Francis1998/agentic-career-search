@@ -10,11 +10,15 @@ from pydantic import BaseModel, ConfigDict, Field
 from autoapply_agent.db.models import SQLITE_MAX_INTEGER, RunStatus
 
 
-class RunCreate(BaseModel):
-    """Payload used to queue a new run."""
+class RunParameters(BaseModel):
+    """What a run discovers: shared by ``POST /runs`` and run schedules."""
 
     query: str | None = Field(default=None, max_length=256)
     source_config_ids: list[Annotated[int, Field(ge=1, le=SQLITE_MAX_INTEGER)]] | None = None
+
+
+class RunCreate(RunParameters):
+    """Payload used to queue a new run."""
 
 
 class RunRead(BaseModel):

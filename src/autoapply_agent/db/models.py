@@ -1,4 +1,4 @@
-"""Database models for runs, events, sources, jobs and tracked applications."""
+"""Database models for runs, events, sources, jobs, applications and run schedules."""
 
 from __future__ import annotations
 
@@ -332,6 +332,100 @@ class ApplicationEvent(Base):
     to_stage: Mapped[str | None] = mapped_column(String(16), nullable=True)
     note: Mapped[str | None] = mapped_column(Text, nullable=True)
     changes: Mapped[dict[str, object] | None] = mapped_column(JSON, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, default=utc_now
+    )
+
+
+class ScheduleKind(StrEnum):
+    """How a run schedule computes its fire times."""
+
+    INTERVAL = "interval"
+    CRON = "cron"
+
+
+class OverlapPolicy(StrEnum):
+    """What a schedule does when it fires while its previous run is still active."""
+
+    SKIP = "skip"
+    BUFFER_ONE = "buffer_one"
+
+
+class ScheduleEventKind(StrEnum):
+    """Kinds of entries in a schedule's append-only history."""
+
+    FIRED = "fired"
+    COALESCED_MISFIRE = "coalesced_misfire"
+    TRIGGERED = "triggered"
+    BUFFERED = "buffered"
+    SKIPPED_OVERLAP = "skipped_overlap"
+    PAUSED = "paused"
+    RESUMED = "resumed"
+
+
+class RunSchedule(Base):
+    """A recurring discovery run: the parameters of ``POST /runs`` plus when to queue them.
+
+    ``next_run_at`` is the planned fire instant (jitter included; ``NULL`` while paused).
+    The scheduler claims a due schedule with a conditional ``UPDATE`` on it, so a fire is
+    never taken twice. ``last_run_id`` is the run the overlap policy checks, and
+    ``buffered_at`` holds the one fire that ``buffer_one`` keeps waiting behind it.
+    Schedules only queue discovery runs: nothing here applies to jobs.
+    """
+
+    __tablename__ = "run_schedules"
+    __table_args__ = (
+        UniqueConstraint("name", name="uq_run_schedules_name"),
+        Index("ix_run_schedules_next_run_at", "next_run_at"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    name: Mapped[str] = mapped_column(String(120), nullable=False)
+    query: Mapped[str | None] = mapped_column(String(256), nullable=True)
+    source_config_ids: Mapped[list[int] | None] = mapped_column(JSON, nullable=True)
+    kind: Mapped[str] = mapped_column(String(16), nullable=False)
+    interval_minutes: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    cron: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    timezone: Mapped[str] = mapped_column(String(64), nullable=False, default="UTC")
+    start_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    overlap_policy: Mapped[str] = mapped_column(
+        String(16), nullable=False, default=OverlapPolicy.SKIP.value
+    )
+    jitter_seconds: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    paused: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    pause_note: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    next_run_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    buffered_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    last_fired_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    last_run_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("runs.id"), nullable=True
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, default=utc_now
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=utc_now,
+        onupdate=utc_now,
+    )
+
+
+class RunScheduleEvent(Base):
+    """Append-only history of one schedule: fires, coalesced misfires, skips and pauses."""
+
+    __tablename__ = "run_schedule_events"
+    __table_args__ = (Index("ix_run_schedule_events_schedule_id_id", "schedule_id", "id"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    schedule_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("run_schedules.id"), nullable=False
+    )
+    kind: Mapped[str] = mapped_column(String(24), nullable=False)
+    run_id: Mapped[str | None] = mapped_column(String(36), ForeignKey("runs.id"), nullable=True)
+    scheduled_for: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    reason: Mapped[str | None] = mapped_column(String(512), nullable=True)
+    details: Mapped[dict[str, object] | None] = mapped_column(JSON, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, default=utc_now
     )

@@ -66,8 +66,10 @@ LLM inside the server, and nothing written back.
 | `match_resume_to_jobs` | The feed ranked against resume text the user provides: match score, matched and missing skills, explanation (`sort=match\|blend`, `limit` ≤ 50); the resume is never stored or logged | `services/resume_match.py` (`POST /jobs/match`) |
 | `list_applications` | The user's tracked applications with the `GET /applications` filters (stage, company, q, overdue/due follow-ups, archived), sort and paging (`limit` ≤ 50), per-stage board counts and follow-up counts; notes as a 280-character preview | `services/application_tracker.py` (`GET /applications`) |
 | `get_application` | One tracked application: stage, legal next stages, follow-up, full notes, job summary and its most recent timeline events (`event_limit` ≤ 200) | `services/application_tracker.py` (`GET /applications/{id}/events`) |
+| `list_schedules` | Recurring discovery schedules (interval or cron + time zone, query, sources, overlap policy, paused state and note, next planned fire, last run), soonest next fire first; `paused` / `kind` filters, paging (`limit` ≤ 50) | `services/schedules.py` (`GET /schedules`) |
+| `get_schedule` | One schedule with its last run's status, next five planned fires (UTC and local time) and its most recent history events with reasons (`history_limit` ≤ 200) | `services/schedules.py` (`GET /schedules/{id}/history`) |
 
-All nine tools are annotated `readOnlyHint: true`, `destructiveHint: false`,
+All eleven tools are annotated `readOnlyHint: true`, `destructiveHint: false`,
 `idempotentHint: true`, `openWorldHint: false`, validate their arguments against the
 advertised `inputSchema`, return `structuredContent` that conforms to their `outputSchema`,
 and are listed in a deterministic (alphabetical) order. Write tools are **intentionally out
@@ -518,6 +520,33 @@ recent timeline events. Unknown ids are `not_found` tool errors. Neither tool ca
 move or archive an application. See the
 [application tracker guide](APPLICATION_TRACKER_GUIDE.md#mcp-tools).
 
+### `list_schedules` and `get_schedule`
+
+Read the recurring discovery schedules the user keeps with the HTTP API (`/schedules`):
+`list_schedules` takes `paused` (boolean), `kind` (`interval` | `cron`), `limit` (default
+10, max 50) and `offset`, and lists schedules soonest next fire first (paused ones last)
+with their cadence, run parameters, overlap policy, jitter, `next_run_at` and last run.
+`get_schedule` takes `schedule_id` and `history_limit` (default 20, max 200) and adds
+`last_run_status`, `upcoming` (the next five planned fires as `{at, local}`; empty while
+paused) and the most recent history events (`fired`, `coalesced_misfire`, `triggered`,
+`buffered`, `skipped_overlap`, `paused`, `resumed`) with their `reason` and `details`,
+newest first. Unknown ids are `not_found` tool errors. Neither tool can create, pause,
+resume, trigger or delete a schedule. See the
+[run schedules guide](RUN_SCHEDULES_GUIDE.md#mcp-tools).
+
+`get_schedule` text content for a paused cron schedule that was triggered three times
+(`buffer_one`: triggered, buffered, skipped):
+
+```text
+Schedule #1 weekday mornings · cron "30 8 * * 1-5" America/Los_Angeles · paused · query "python platform" · overlap buffer_one
+Paused: on vacation until Monday
+Last run 0f4e14f3-fd6a-4736-a568-756e3fee1fa6 (queued) queued 2026-11-27T19:45:04Z
+Last 3 of 4 history events, newest first:
+2026-11-27T19:45:04Z paused            on vacation until Monday
+2026-11-27T19:45:04Z skipped_overlap   manual trigger skipped: run 0f4e14f3-fd6a-4736-a568-756e3fee1fa6 is still queued (overlap_policy=buffer_one, a fire is already buffered)
+2026-11-27T19:45:04Z buffered          manual trigger: run 0f4e14f3-fd6a-4736-a568-756e3fee1fa6 is still queued; it starts when that run finishes
+```
+
 ### `match_resume_to_jobs`
 
 Input: `resume_text` (required, plain text, 1–50,000 characters), the `search_jobs` filters (pay included),
@@ -560,8 +589,9 @@ get a response. Requests are handled one at a time; the server exits when stdin 
 
 ## Privacy, safety and the audit log
 
-**Read-only by design.** The nine tools above are the whole surface: no tool queues or
-cancels runs, edits source configs, tracks or moves applications, or touches the network, and
+**Read-only by design.** The eleven tools above are the whole surface: no tool queues or
+cancels runs, edits source configs, tracks or moves applications, creates, pauses or
+triggers schedules, or touches the network, and
 `tools/call` for any other name is a `-32602` protocol error. Writes are intentionally out of
 scope for this release: starting a run makes the worker fetch third-party career pages,
 and cancelling runs or editing sources changes what you see later — decisions that stay with

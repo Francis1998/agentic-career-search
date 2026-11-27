@@ -256,6 +256,33 @@ def _transcript_decks() -> Sequence[TranscriptDeck]:
                 "4 matching",
             ),
         ),
+        TranscriptDeck(
+            output_filename="run-schedules.gif",
+            transcript=Path("docs/guides/RUN_SCHEDULES_DEMO_TRANSCRIPT.txt"),
+            title="agentic-career-search: /schedules - recurring runs, overlap and misfires",
+            highlights=(
+                ('{"type":"cron_invalid"', (255, 123, 114)),
+                ("skipped_overlap", (255, 166, 87)),
+                ("buffered", (121, 192, 255)),
+                ("triggered", (126, 231, 135)),
+                ("fired", (126, 231, 135)),
+                ('{"kind":"coalesced_misfire"', (255, 166, 87)),
+                ("2027-03-15", (255, 166, 87)),
+                ("#", (121, 192, 255)),
+            ),
+            pause_before=(
+                "2026-11-30T08:30",
+                "2027-03-13",
+                '{"type":"cron_invalid"',
+                '{"last_run_status"',
+                "1 run.created",
+                "triggered: ",
+                "fired ",
+                '{"paused":true',
+                '{"kind":"coalesced_misfire"',
+                "#2 ",
+            ),
+        ),
     )
 
 
