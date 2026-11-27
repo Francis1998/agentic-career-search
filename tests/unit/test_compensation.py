@@ -281,3 +281,47 @@ def test_a_list_of_quantitative_values_uses_its_first_usable_entry() -> None:
 
     assert found is not None
     assert (found.min_amount, found.interval) == (120_000, PayInterval.YEAR)
+
+
+# Review regressions (PR #355): posting text.
+
+REVIEW_REJECTED: list[str] = [
+    "Salary: R$100,000 per year",  # Brazilian real: an unsupported prefix, not USD
+    "Salary: NT$100,000 per year",  # New Taiwan dollar
+    "$45/hr+",  # open-ended
+    "Salary: $120k +",
+    "Salary: $120k-$150k+",
+    "Salary: $100k - $120k EUR",  # inconsistent range, not a USD 100,000 salary
+]
+
+
+@pytest.mark.parametrize("text", REVIEW_REJECTED)
+def test_review_ambiguous_figures_are_rejected(text: str) -> None:
+    assert compensation_from_text(text) is None
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        (
+            # The stipend is beyond the first four words after the amount.
+            "Benefits: $100 per month for your home office stipend. Salary: $120k-$150k per year.",
+            (120_000, 150_000, "USD", "year"),
+        ),
+        (
+            # An interval word elsewhere in the clause does not describe the pay.
+            "We have weekly team meetings and a salary of $120k\u2013$150k",
+            (120_000, 150_000, "USD", "year"),
+        ),
+        # A "+" that adds something is not an open upper bound.
+        ("Salary: $120k-$150k + equity", (120_000, 150_000, "USD", "year")),
+        ("The hourly pay range for this position is $25 - $30", (25, 30, "USD", "hour")),
+    ],
+)
+def test_review_pay_is_read_from_its_own_phrase(
+    text: str, expected: tuple[float, float, str, str]
+) -> None:
+    found = compensation_from_text(text)
+
+    assert found is not None
+    assert (found.min_amount, found.max_amount, found.currency, found.interval.value) == expected
