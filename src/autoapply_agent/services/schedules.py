@@ -561,9 +561,11 @@ async def _claim(
 ) -> bool:
     """Apply ``values`` only if the row still holds what this decision was based on.
 
-    The ``last_run_id`` the overlap check read is always part of the condition; callers
-    add ``next_run_at`` / ``buffered_at`` / ``paused``. ``updated_at`` is kept: it
-    records configuration changes, not fires.
+    The ``last_run_id`` the overlap check read and the ``updated_at`` of the
+    configuration it used (query, sources, overlap policy, cadence) are always part of
+    the condition, so a decision superseded by a concurrent change rolls back; callers
+    add ``next_run_at`` / ``buffered_at`` / ``paused``. ``updated_at`` itself is kept:
+    it records configuration changes, not fires.
     """
 
     claimed = await session.scalar(
@@ -571,6 +573,7 @@ async def _claim(
         .where(
             RunSchedule.id == schedule.id,
             RunSchedule.last_run_id.is_not_distinct_from(schedule.last_run_id),
+            RunSchedule.updated_at == schedule.updated_at,
             *conditions,
         )
         .values(**values, updated_at=RunSchedule.updated_at)
