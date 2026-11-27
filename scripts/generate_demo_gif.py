@@ -235,6 +235,27 @@ def _transcript_decks() -> Sequence[TranscriptDeck]:
                 "DTSTART",
             ),
         ),
+        TranscriptDeck(
+            output_filename="pay-transparency.gif",
+            transcript=Path("docs/guides/PAY_TRANSPARENCY_DEMO_TRANSCRIPT.txt"),
+            title="agentic-career-search: pay transparency - salary filters, sort and exports",
+            highlights=(
+                ("#", (121, 192, 255)),
+                ('{"min_amount"', (126, 231, 135)),
+                ('{"detail"', (255, 123, 114)),
+                ("Company:", (255, 166, 87)),
+                ("4 matching", (255, 166, 87)),
+            ),
+            pause_before=(
+                "#3 USD",
+                "#3 Staff",
+                '{"min_amount"',
+                '{"detail"',
+                "Company:",
+                "Staff Platform",
+                "4 matching",
+            ),
+        ),
     )
 
 

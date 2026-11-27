@@ -41,6 +41,7 @@ class JobSort(StrEnum):
 
     NEWEST = "newest"
     SCORE = "score"
+    SALARY = "salary"
 
 
 @dataclass(slots=True, frozen=True)
@@ -57,7 +58,13 @@ class JobSearchFilters:
         source_config_id: Only jobs captured from this source config.
         run_id: Only jobs captured by this run.
         created_after: Only jobs captured at or after this instant.
-        sort: Result ordering.
+        min_salary: Only jobs whose annualized pay reaches it (``salary_max_annual >=``);
+            needs ``salary_currency``.
+        max_salary: Only jobs whose annualized pay starts at or below it
+            (``salary_min_annual <=``); needs ``salary_currency``.
+        salary_currency: Only jobs paying in this ISO 4217 currency.
+        has_salary: ``True``/``False`` to keep only jobs with/without captured pay.
+        sort: Result ordering (``salary`` needs ``salary_currency``).
         dedupe: Collapse repeated captures and cross-source mirrors.
     """
 
@@ -69,6 +76,10 @@ class JobSearchFilters:
     source_config_id: int | None = None
     run_id: str | None = None
     created_after: datetime | None = None
+    min_salary: int | None = None
+    max_salary: int | None = None
+    salary_currency: str | None = None
+    has_salary: bool | None = None
     sort: JobSort = JobSort.NEWEST
     dedupe: bool = False
 
@@ -139,6 +150,41 @@ def capture_window_start(
     if hours_old is not None:
         bounds.append(now - timedelta(hours=hours_old))
     return max(bounds) if bounds else None
+
+
+def salary_filter_error(filters: JobSearchFilters) -> tuple[str, str] | None:
+    """Explain why the salary filters cannot run, so each surface reports it its way.
+
+    Pay is only compared within one currency: ``min_salary``, ``max_salary`` and
+    ``sort=salary`` need ``salary_currency`` (amounts are never converted).
+
+    Args:
+        filters: Requested filters.
+
+    Returns:
+        ``(parameter, message)`` for the first problem, or None when the filters are valid.
+    """
+
+    if filters.salary_currency is None:
+        for name, used in (
+            ("min_salary", filters.min_salary is not None),
+            ("max_salary", filters.max_salary is not None),
+            ("sort", filters.sort == JobSort.SALARY),
+        ):
+            if used:
+                label = "sort=salary" if name == "sort" else name
+                return (
+                    "salary_currency",
+                    f"{label} needs salary_currency (an ISO 4217 code such as USD): pay is "
+                    "only compared within one currency",
+                )
+    if (
+        filters.min_salary is not None
+        and filters.max_salary is not None
+        and filters.min_salary > filters.max_salary
+    ):
+        return ("max_salary", "max_salary must be greater than or equal to min_salary")
+    return None
 
 
 def is_remote_location(location: str | None) -> bool:
@@ -241,6 +287,19 @@ def build_conditions(filters: JobSearchFilters) -> list[ColumnElement[bool]]:
         conditions.append(Job.run_id == filters.run_id)
     if filters.created_after is not None:
         conditions.append(Job.created_at >= as_utc(filters.created_after))
+    if filters.salary_currency is not None:
+        conditions.append(Job.salary_currency == filters.salary_currency)
+    if filters.has_salary is not None:
+        conditions.append(
+            Job.salary_currency.is_not(None)
+            if filters.has_salary
+            else Job.salary_currency.is_(None)
+        )
+    # Overlap semantics: the job's range [min, max] reaches into [min_salary, max_salary].
+    if filters.min_salary is not None:
+        conditions.append(Job.salary_max_annual >= filters.min_salary)
+    if filters.max_salary is not None:
+        conditions.append(Job.salary_min_annual <= filters.max_salary)
     return conditions
 
 
@@ -249,6 +308,8 @@ def _order_by(sort: JobSort) -> tuple[ColumnElement[Any], ...]:
 
     if sort == JobSort.SCORE:
         return (Job.score.desc(), Job.created_at.desc(), Job.id.desc())
+    if sort == JobSort.SALARY:
+        return (Job.salary_max_annual.desc().nulls_last(), Job.created_at.desc(), Job.id.desc())
     return (Job.created_at.desc(), Job.id.desc())
 
 
@@ -262,6 +323,19 @@ def _after(job: Job, sort: JobSort) -> ColumnElement[bool]:
 
     if sort == JobSort.SCORE:
         return tuple_(Job.score, Job.created_at, Job.id) < (job.score, job.created_at, job.id)
+    if sort == JobSort.SALARY:
+        # NULLS LAST: after a row without pay come only older rows without pay; after a
+        # row with pay come lower pay, then every row without pay.
+        if job.salary_max_annual is None:
+            return and_(
+                Job.salary_max_annual.is_(None),
+                tuple_(Job.created_at, Job.id) < (job.created_at, job.id),
+            )
+        return or_(
+            Job.salary_max_annual.is_(None),
+            tuple_(Job.salary_max_annual, Job.created_at, Job.id)
+            < (job.salary_max_annual, job.created_at, job.id),
+        )
     return tuple_(Job.created_at, Job.id) < (job.created_at, job.id)
 
 
@@ -285,21 +359,30 @@ async def _distinct_postings(
 
     Returns:
         ``(representative job id, posting identity)`` pairs; ``newest`` orders by
-        first capture time, ``score`` by the representative's score.
+        first capture time, ``score`` by the representative's score and ``salary`` by
+        its annualized maximum (no pay last).
     """
 
     conditions = build_conditions(filters)
     matches = and_(*conditions) if conditions else true()
     statement = select(
-        Job.id, Job.url, Job.title, Job.company, Job.location, Job.score, Job.created_at, matches
+        Job.id,
+        Job.url,
+        Job.title,
+        Job.company,
+        Job.location,
+        Job.score,
+        Job.salary_max_annual,
+        Job.created_at,
+        matches,
     ).order_by(Job.created_at.asc(), Job.id.asc())
     by_url: dict[str, PostingIdentity] = {}
     by_key: dict[str, PostingIdentity] = {}
     first_seen_order: dict[PostingIdentity, int] = {}
-    representatives: dict[PostingIdentity, tuple[int, float]] = {}
+    representatives: dict[PostingIdentity, tuple[int, float, int | None]] = {}
     rows = (await session.execute(statement)).all()
     for position, row in enumerate(rows):
-        job_id, url, title, company, location, score, created_at, matched = row
+        job_id, url, title, company, location, score, salary, created_at, matched = row
         url_key = url.strip().lower()
         key = posting_key(title, company, location)
         known = [found for found in (by_url.get(url_key), by_key.get(key)) if found is not None]
@@ -311,12 +394,23 @@ async def _distinct_postings(
         by_url.setdefault(url_key, identity)
         by_key.setdefault(key, identity)
         if matched and identity not in representatives:
-            representatives[identity] = (job_id, score)
+            representatives[identity] = (job_id, score, salary)
 
     if filters.sort == JobSort.SCORE:
         order = sorted(
             representatives.items(),
             key=lambda item: (item[1][1], item[0].first_seen, item[1][0]),
+            reverse=True,
+        )
+    elif filters.sort == JobSort.SALARY:
+        order = sorted(
+            representatives.items(),
+            key=lambda item: (
+                item[1][2] is not None,
+                item[1][2] or 0,
+                item[0].first_seen,
+                item[1][0],
+            ),
             reverse=True,
         )
     else:
@@ -325,7 +419,7 @@ async def _distinct_postings(
             key=lambda item: (item[0].first_seen, item[1][0]),
             reverse=True,
         )
-    return [(job_id, identity) for identity, (job_id, _) in order]
+    return [(job_id, identity) for identity, (job_id, _, _) in order]
 
 
 async def _load_in_order(session: AsyncSession, job_ids: Sequence[int]) -> list[Job]:

@@ -229,6 +229,10 @@ async def test_search_jobs_input_schema_mirrors_the_http_filters(
             "run_id",
             "created_after",
             "hours_old",
+            "min_salary",
+            "max_salary",
+            "salary_currency",
+            "has_salary",
             "sort",
             "dedupe",
             "limit",
@@ -236,7 +240,7 @@ async def test_search_jobs_input_schema_mirrors_the_http_filters(
         ]
     )
     assert properties["limit"]["maximum"] == 50
-    assert properties["sort"]["enum"] == ["newest", "score"]
+    assert properties["sort"]["enum"] == ["newest", "score", "salary"]
     assert tools["get_job"]["inputSchema"]["required"] == ["job_id"]
     assert tools["get_run"]["inputSchema"]["required"] == ["run_id"]
 
@@ -264,7 +268,7 @@ async def test_invalid_arguments_are_tool_errors_without_echoing_unknown_names(
     server: CareerSearchMcpServer,
 ) -> None:
     response = await server.handle_message(
-        call("search_jobs", {"limit": 500, "sort": "salary", "CANARY-secret-note": "x"})
+        call("search_jobs", {"limit": 500, "sort": "relevance", "CANARY-secret-note": "x"})
     )
 
     assert response is not None
@@ -273,7 +277,7 @@ async def test_invalid_arguments_are_tool_errors_without_echoing_unknown_names(
     assert "structuredContent" not in result
     message = result["content"][0]["text"]
     assert "arguments.limit must be <= 50" in message
-    assert "arguments.sort must be one of ['newest', 'score']" in message
+    assert "arguments.sort must be one of ['newest', 'score', 'salary']" in message
     assert "arguments has unexpected properties (allowed: company, created_after" in message
     assert "CANARY" not in message
 

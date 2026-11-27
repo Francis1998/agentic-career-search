@@ -17,6 +17,11 @@ from urllib.parse import urljoin
 from bs4 import BeautifulSoup
 
 from autoapply_agent.adapters.base import CareerSourceAdapter, JobCandidate, company_from_url
+from autoapply_agent.services.compensation import (
+    Compensation,
+    compensation_from_monetary_amount,
+    compensation_from_text,
+)
 
 _JOB_POSTING_TYPE = "JobPosting"
 _TELECOMMUTE = "TELECOMMUTE"
@@ -225,7 +230,32 @@ class JsonLdAdapter(CareerSourceAdapter):
             company=company,
             url=absolute_url,
             raw={"source": "jsonld"},
+            compensation=cls._extract_compensation(node),
         )
+
+    @classmethod
+    def _extract_compensation(cls, node: dict[str, object]) -> Compensation | None:
+        """Read the posting's pay: ``baseSalary`` first, else a range in ``description``.
+
+        ``baseSalary`` is a schema.org ``MonetaryAmount``; its currency falls back to
+        the posting's ``salaryCurrency``. ``estimatedSalary`` is a third-party estimate,
+        not the employer's pay, so it is ignored. The description is HTML (often
+        entity-escaped) and is reduced to text by the extractor.
+
+        Args:
+            node: Decoded JobPosting object.
+
+        Returns:
+            The pay range, or None when the posting states none unambiguously.
+        """
+
+        structured = compensation_from_monetary_amount(
+            node.get("baseSalary"), default_currency=node.get("salaryCurrency")
+        )
+        if structured is not None:
+            return structured
+        descriptions = cls._texts(node.get("description"))
+        return compensation_from_text("\n".join(descriptions)) if descriptions else None
 
     @classmethod
     def _is_remote_posting(cls, node: dict[str, object], regions: list[str]) -> bool:

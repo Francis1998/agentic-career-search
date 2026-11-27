@@ -61,13 +61,15 @@ from autoapply_agent.services.application_tracker import (
     list_applications,
     stage_counts,
 )
-from autoapply_agent.services.job_export import rfc3339, safe_http_url
+from autoapply_agent.services.compensation import describe_pay, normalize_currency
+from autoapply_agent.services.job_export import job_pay, rfc3339, safe_http_url
 from autoapply_agent.services.job_search import (
     JobSearchFilters,
     JobSort,
     PostingIdentity,
     capture_window_start,
     is_remote_location,
+    salary_filter_error,
     search_jobs,
 )
 from autoapply_agent.services.read_queries import (
@@ -209,6 +211,31 @@ def _parse_instant(value: str) -> datetime:
         ) from exc
 
 
+def _salary_arguments(arguments: dict[str, Any]) -> dict[str, Any]:
+    """The validated pay filters of a search or match call (``JobSearchFilters`` fields)."""
+
+    raw_currency = arguments.get("salary_currency")
+    currency = normalize_currency(raw_currency)
+    if raw_currency is not None and currency is None:
+        raise ToolError(f"salary_currency {raw_currency!r} is not an ISO 4217 currency code.")
+    has_salary = arguments.get("has_salary")
+    return {
+        "min_salary": _optional_int_argument(arguments, "min_salary"),
+        "max_salary": _optional_int_argument(arguments, "max_salary"),
+        "salary_currency": currency,
+        "has_salary": None if has_salary is None else bool(has_salary),
+    }
+
+
+def _checked(filters: JobSearchFilters) -> JobSearchFilters:
+    """Return ``filters`` or raise the salary-filter problem as a tool error."""
+
+    problem = salary_filter_error(filters)
+    if problem is not None:
+        raise ToolError(f"{problem[1]}.")
+    return filters
+
+
 def _strings(value: Any) -> list[str]:
     """Keep the string items of a JSON list (anything else becomes empty)."""
 
@@ -255,6 +282,27 @@ def _decision_trace(job: Job) -> dict[str, Any]:
     }
 
 
+def _pay_record(job: Job) -> dict[str, Any] | None:
+    """Captured pay of a job (stated range plus the annualized columns), or None."""
+
+    pay = job_pay(job)
+    if pay is None:
+        return None
+    payload = pay.to_payload()
+    return {
+        key: payload[key]
+        for key in (
+            "min_amount",
+            "max_amount",
+            "currency",
+            "interval",
+            "annual_min",
+            "annual_max",
+            "source",
+        )
+    }
+
+
 def _job_summary(job: Job, posting: PostingIdentity | None = None) -> dict[str, Any]:
     """Compact job record used in search results."""
 
@@ -271,6 +319,7 @@ def _job_summary(job: Job, posting: PostingIdentity | None = None) -> dict[str, 
         "run_id": job.run_id,
         "captured_at": rfc3339(job.created_at),
         "first_seen_at": _timestamp(posting.first_seen) if posting is not None else None,
+        "pay": _pay_record(job),
     }
 
 
@@ -352,9 +401,11 @@ async def _search_jobs(session: AsyncSession, arguments: dict[str, Any]) -> Tool
         source_config_id=_optional_int_argument(arguments, "source_config_id"),
         run_id=arguments.get("run_id"),
         created_after=window_start,
+        **_salary_arguments(arguments),
         sort=JobSort(arguments.get("sort", JobSort.NEWEST.value)),
         dedupe=bool(arguments.get("dedupe", False)),
     )
+    _checked(filters)
     limit = _int_argument(arguments, "limit", DEFAULT_PAGE_SIZE)
     offset = _int_argument(arguments, "offset", 0)
     page = await search_jobs(session, filters, limit=limit, offset=offset)
@@ -370,6 +421,16 @@ async def _search_jobs(session: AsyncSession, arguments: dict[str, Any]) -> Tool
         "jobs": jobs,
     }
     return ToolOutput(structured, _search_summary(structured), len(jobs))
+
+
+def _pay_suffix(pay: dict[str, Any] | None) -> str:
+    """`` · USD 120,000-150,000/yr`` (annualized) for a search line; empty without pay."""
+
+    if pay is None:
+        return ""
+    low, high = pay["annual_min"], pay["annual_max"]
+    amount = f"{low:,}" if low == high else f"{low:,}-{high:,}"
+    return f" · {pay['currency']} {amount}/yr"
 
 
 def _search_summary(result: dict[str, Any]) -> str:
@@ -392,6 +453,7 @@ def _search_summary(result: dict[str, Any]) -> str:
         lines.append(
             f"#{job['id']} {job['score']:.4f} {tier:<6} {job['title']}"
             + (f" — {place}" if place else "")
+            + _pay_suffix(job["pay"])
         )
     if result["next_offset"] is not None:
         lines.append(f"More: call search_jobs again with offset={result['next_offset']}.")
@@ -449,6 +511,12 @@ def _job_detail_summary(job: Job, result: dict[str, Any]) -> str:
         provenance.append(f"source {source['name']} ({source['source_type']})")
     lines.append("From " + " · ".join(provenance))
     lines.append(f"URL: {record['url'] or 'not an http(s) link (withheld)'}")
+    pay = job_pay(job)
+    lines.append(
+        f"Pay: {describe_pay(pay)} (from the posting's {pay.source.value} data; informational)"
+        if pay is not None
+        else "Pay: not stated in the captured posting"
+    )
     if decision["rationale"]:
         lines.append("Rationale:")
         lines.extend(f"- {line}" for line in decision["rationale"])
@@ -722,16 +790,19 @@ def _match_filters(arguments: dict[str, Any]) -> JobSearchFilters:
     except OverflowError as exc:
         raise ToolError("created_after is outside the supported UTC range") from exc
     min_score = arguments.get("min_score")
-    return JobSearchFilters(
-        q=arguments.get("q"),
-        company=arguments.get("company"),
-        location=arguments.get("location"),
-        remote=arguments.get("remote"),
-        min_score=None if min_score is None else float(min_score),
-        source_config_id=_optional_int_argument(arguments, "source_config_id"),
-        run_id=arguments.get("run_id"),
-        created_after=window_start,
-        dedupe=bool(arguments.get("dedupe", True)),
+    return _checked(
+        JobSearchFilters(
+            q=arguments.get("q"),
+            company=arguments.get("company"),
+            location=arguments.get("location"),
+            remote=arguments.get("remote"),
+            min_score=None if min_score is None else float(min_score),
+            source_config_id=_optional_int_argument(arguments, "source_config_id"),
+            run_id=arguments.get("run_id"),
+            created_after=window_start,
+            **_salary_arguments(arguments),
+            dedupe=bool(arguments.get("dedupe", True)),
+        )
     )
 
 
@@ -1086,6 +1157,21 @@ _JOB_SUMMARY_PROPERTIES: dict[str, Any] = {
     "first_seen_at": _nullable(
         _STRING, "With dedupe: RFC 3339 time of the posting's first capture; otherwise null."
     ),
+    "pay": _nullable(
+        _closed_object(
+            {
+                "min_amount": {"type": "number"},
+                "max_amount": {"type": "number"},
+                "currency": _STRING,
+                "interval": {"type": "string", "enum": ["hour", "day", "week", "month", "year"]},
+                "annual_min": {"type": "integer"},
+                "annual_max": {"type": "integer"},
+                "source": {"type": "string", "enum": ["structured", "description"]},
+            }
+        ),
+        "Pay the posting states (ISO 4217 currency; annual_* use hour x2080, day x260, "
+        "week x52, month x12); null when none was captured. Informational only.",
+    ),
 }
 _RUN_OUTPUT: dict[str, Any] = _closed_object(
     {
@@ -1154,12 +1240,36 @@ _SEARCH_INPUT: dict[str, Any] = {
             "maximum": 8760,
             "description": "Only jobs captured within the last N hours (JobSpy hours_old).",
         },
+        "min_salary": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": SQLITE_MAX_INTEGER,
+            "description": "Annualized pay floor: jobs whose range reaches it "
+            "(annual_max >= min_salary). Needs salary_currency.",
+        },
+        "max_salary": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": SQLITE_MAX_INTEGER,
+            "description": "Annualized pay ceiling: jobs whose range starts at or below it "
+            "(annual_min <= max_salary). Needs salary_currency.",
+        },
+        "salary_currency": {
+            "type": "string",
+            "pattern": "^[A-Za-z]{3}$",
+            "description": "ISO 4217 code such as USD, EUR or GBP: only jobs paying in it. "
+            "Required by min_salary, max_salary and sort=salary (no conversion).",
+        },
+        "has_salary": {
+            "type": "boolean",
+            "description": "true: only jobs with captured pay; false: only jobs without.",
+        },
         "sort": {
             "type": "string",
             "enum": [sort.value for sort in JobSort],
             "default": JobSort.NEWEST.value,
-            "description": "newest: most recently captured first; score: highest score first "
-            "(ties: newest first).",
+            "description": "newest: most recently captured first; score: highest score first; "
+            "salary: highest annualized pay first, needs salary_currency (ties: newest first).",
         },
         "dedupe": {
             "type": "boolean",
@@ -1354,6 +1464,10 @@ _MATCH_INPUT: dict[str, Any] = {
                 "run_id",
                 "created_after",
                 "hours_old",
+                "min_salary",
+                "max_salary",
+                "salary_currency",
+                "has_salary",
             )
         },
         "dedupe": {
@@ -1629,8 +1743,9 @@ TOOLS: tuple[ToolSpec, ...] = (
         title="Get one job with its decision trace",
         description=(
             "Return one captured job by id: title, company, location, remote flag, http(s) "
-            "link, score, priority tier, matched query terms, rationale, plan steps, optional "
-            "LLM enrichment summary, and the run and source that captured it. Read-only."
+            "link, score, priority tier, stated pay (currency, interval, annualized range), "
+            "matched query terms, rationale, plan steps, optional LLM enrichment summary, and "
+            "the run and source that captured it. Read-only."
         ),
         input_schema=_JOB_ID_INPUT,
         output_schema=_GET_JOB_OUTPUT,
@@ -1709,9 +1824,10 @@ TOOLS: tuple[ToolSpec, ...] = (
         description=(
             "Search jobs your discovery runs captured, with the same filters as the HTTP API "
             "(GET /jobs): free-text q, company, location, remote, min_score, source_config_id, "
-            "run_id, created_after, hours_old; sort=newest|score; dedupe collapses re-captures "
-            f"and cross-board mirrors; limit (max {MAX_PAGE_SIZE}) and offset paging with the "
-            "total match count. Read-only; never scrapes or applies."
+            "run_id, created_after, hours_old, pay (min_salary/max_salary annualized, "
+            "salary_currency, has_salary); sort=newest|score|salary; dedupe collapses "
+            f"re-captures and cross-board mirrors; limit (max {MAX_PAGE_SIZE}) and offset "
+            "paging with the total match count. Read-only; never scrapes or applies."
         ),
         input_schema=_SEARCH_INPUT,
         output_schema=_SEARCH_OUTPUT,

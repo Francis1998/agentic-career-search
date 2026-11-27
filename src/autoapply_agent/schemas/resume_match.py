@@ -10,6 +10,7 @@ from pydantic_core import PydanticCustomError
 
 from autoapply_agent.db.models import SQLITE_MAX_INTEGER
 from autoapply_agent.schemas.jobs import JobRead
+from autoapply_agent.services.compensation import normalize_currency
 from autoapply_agent.services.resume_match import MAX_RESUME_CHARS
 
 
@@ -62,6 +63,28 @@ class ResumeMatchRequest(BaseModel):
         le=8760,
         description="Only jobs captured within the last N hours (like JobSpy hours_old).",
     )
+    min_salary: int | None = Field(
+        default=None,
+        ge=0,
+        le=SQLITE_MAX_INTEGER,
+        description="Annualized pay floor (salary_max_annual >= min_salary); needs "
+        "salary_currency.",
+    )
+    max_salary: int | None = Field(
+        default=None,
+        ge=0,
+        le=SQLITE_MAX_INTEGER,
+        description="Annualized pay ceiling (salary_min_annual <= max_salary); needs "
+        "salary_currency.",
+    )
+    salary_currency: str | None = Field(
+        default=None,
+        pattern="^[A-Za-z]{3}$",
+        description="ISO 4217 code (case-insensitive): only jobs paying in this currency.",
+    )
+    has_salary: bool | None = Field(
+        default=None, description="true: only jobs with captured pay; false: only without."
+    )
     dedupe: bool = Field(
         default=True,
         description="Rank each posting once: collapse re-captures of one URL and "
@@ -80,6 +103,18 @@ class ResumeMatchRequest(BaseModel):
         default=False,
         description="Also list, per job, the resume skills the posting does not mention.",
     )
+
+    @field_validator("salary_currency")
+    @classmethod
+    def _iso_currency(cls, value: str | None) -> str | None:
+        """Upper-case the currency and require an ISO 4217 code."""
+
+        if value is None:
+            return None
+        code = normalize_currency(value)
+        if code is None:
+            raise PydanticCustomError("currency_code", "Unknown ISO 4217 currency code")
+        return code
 
     @field_validator("resume_text")
     @classmethod

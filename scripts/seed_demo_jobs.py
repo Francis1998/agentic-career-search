@@ -9,7 +9,10 @@ running it twice simulates a second run re-capturing the same postings (try
 ``GET /jobs?dedupe=true``). The last row is deliberately hostile to show the CSV
 formula-injection and URL hardening of ``GET /jobs/export``. Every other row carries a
 short ``raw.description`` (the field a schema.org ``JobPosting`` calls ``description``)
-so that ``POST /jobs/match`` has posting text to match a resume against.
+so that ``POST /jobs/match`` has posting text to match a resume against. Most
+descriptions state pay the way US pay-transparency postings do; it is captured with
+the same extractor discovery uses (``raw.compensation`` plus the ``salary_*`` columns)
+for the pay filters of ``GET /jobs?salary_currency=USD&min_salary=...``.
 """
 
 from __future__ import annotations
@@ -26,6 +29,7 @@ from autoapply_agent.core.time import utc_now
 from autoapply_agent.db.base import Base
 from autoapply_agent.db.models import Job, Run, RunStatus, SourceConfig, SourceType
 from autoapply_agent.db.session import create_engine, create_session_factory
+from autoapply_agent.services.compensation import compensation_columns, compensation_from_text
 
 DEMO_SOURCES: tuple[tuple[str, SourceType, str], ...] = (
     ("demo-greenhouse", SourceType.GREENHOUSE, "https://boards.greenhouse.io/demo"),
@@ -126,7 +130,9 @@ DEMO_JOBS: tuple[tuple[int, str, str, str, str, str, float, str, int], ...] = (
 
 _ACME_DESCRIPTION = (
     "Build the fleet telemetry backend in Python with FastAPI and PostgreSQL. Ship services "
-    "on AWS with Docker and Kubernetes, CI/CD in GitHub Actions. Nice to have: Go, Kafka."
+    "on AWS with Docker and Kubernetes, CI/CD in GitHub Actions. Nice to have: Go, Kafka. "
+    "The base salary range for this role is $165,000 - $195,000 per year, plus equity and "
+    "a $1,000 home office stipend."
 )
 # External id -> raw.description (the hostile row has none).
 DEMO_DESCRIPTIONS: dict[str, str] = {
@@ -135,23 +141,25 @@ DEMO_DESCRIPTIONS: dict[str, str] = {
     "gh-5202": (
         "Own the internal developer platform: Kubernetes (EKS), Terraform, Helm and Argo CD "
         "on AWS. Write Python and Go tooling, run observability with Prometheus and Grafana "
-        "and lead system design reviews."
+        "and lead system design reviews. Pay range: $180k\u2013$220k base, depending on level."
     ),
     "lv-payments": (
         "Design payment APIs in Java and Spring Boot on PostgreSQL and Kafka. You know "
-        "microservices, distributed systems and PCI DSS."
+        "microservices, distributed systems and PCI DSS. NYC pay transparency: the hiring "
+        "range is $150,000 to $175,000. We raised a $40M Series B last spring."
     ),
     "gh-6303": (
         "Keep production healthy on Linux and Kubernetes with Terraform, Prometheus and "
-        "Grafana; join the incident response rotation. Automate in Python or Bash."
+        "Grafana; join the incident response rotation. Automate in Python or Bash. "
+        "Salary: \u20ac70.000\u2013\u20ac85.000 per year."
     ),
     "lv-ml": (
         "Train and ship models with PyTorch and scikit-learn; MLOps with MLflow and Docker on "
-        "AWS SageMaker. Strong SQL and statistics."
+        "AWS SageMaker. Strong SQL and statistics. Contract role at $85 - $95 per hour."
     ),
     "gh-7404": (
         "Build batch and streaming pipelines with Spark, Airflow, dbt and Kafka on GCP "
-        "(BigQuery). SQL and Python required."
+        "(BigQuery). SQL and Python required. Competitive salary and 30 days of vacation."
     ),
 }
 
@@ -198,8 +206,11 @@ async def seed_demo_jobs() -> tuple[str, int]:
                 "source": source.source_type,
                 "agent_decision": {"priority_tier": tier},
             }
+            compensation = compensation_from_text(DEMO_DESCRIPTIONS.get(external_id))
             if external_id in DEMO_DESCRIPTIONS:
                 raw["description"] = DEMO_DESCRIPTIONS[external_id]
+            if compensation is not None:
+                raw["compensation"] = compensation.to_payload()
             session.add(
                 Job(
                     run_id=run.id,
@@ -213,6 +224,7 @@ async def seed_demo_jobs() -> tuple[str, int]:
                     plan_steps=["Review fit with the decision trace", "Tailor resume bullets"],
                     raw=raw,
                     created_at=now - timedelta(hours=hours_ago),
+                    **compensation_columns(compensation),
                 )
             )
         await session.commit()

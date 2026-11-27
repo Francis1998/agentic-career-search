@@ -41,6 +41,13 @@
 - Resume match scores are keyword-coverage evidence for triage, not predictions of hiring
   outcomes; matching never applies, contacts employers or edits the resume.
 - Salary-band estimates are assistive triage signals, not offers, market truth, or legal advice.
+- Captured pay (`raw.compensation`, `salary_*` columns) is **informational**: it is the
+  range the posting states, read deterministically from structured data or description text,
+  never estimated or guessed (unknown currency, interval or bounds stay `null`). It is never
+  an input to the score, priority tier, decision trace, alerts or any action taken on the
+  user's behalf; it only filters, sorts and annotates results when the user asks. Pay
+  comparisons stay within one ISO 4217 currency (no conversion), equity, bonus and benefits
+  are not added, and the values are not offers or legal advice.
 - Application stage tracking is local pipeline state only; it never submits applications or contacts employers.
   The persistent tracker (`/applications`) records decisions the user made: stage moves follow
   one state machine (illegal moves are `409`), the timeline is append-only, MCP access is

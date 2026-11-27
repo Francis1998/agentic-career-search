@@ -17,12 +17,14 @@ from autoapply_agent.core.config import Settings
 from autoapply_agent.core.time import utc_now
 from autoapply_agent.db.models import SQLITE_MAX_INTEGER, Job
 from autoapply_agent.schemas.jobs import JobRead
+from autoapply_agent.services.compensation import normalize_currency
 from autoapply_agent.services.job_export import iter_csv, iter_jsonl, render_atom_feed
 from autoapply_agent.services.job_search import (
     JobSearchFilters,
     JobSort,
     capture_window_start,
     iter_jobs,
+    salary_filter_error,
     search_jobs,
 )
 
@@ -40,7 +42,20 @@ FEED_FILTER_PARAMS: tuple[str, ...] = (
     "run_id",
     "created_after",
     "hours_old",
+    "min_salary",
+    "max_salary",
+    "salary_currency",
+    "has_salary",
 )
+SALARY_CURRENCY_PATTERN = "^[A-Za-z]{3}$"
+
+
+def _invalid_query(name: str, message: str, value: object) -> RequestValidationError:
+    """A 422 error for one query parameter, in FastAPI's usual error-list shape."""
+
+    return RequestValidationError(
+        [{"type": "value_error", "loc": ("query", name), "msg": message, "input": value}]
+    )
 
 
 def get_job_search_filters(
@@ -81,6 +96,30 @@ def get_job_search_filters(
         le=8760,
         description="Only jobs captured within the last N hours (like JobSpy hours_old).",
     ),
+    min_salary: int | None = Query(
+        default=None,
+        ge=0,
+        le=SQLITE_MAX_INTEGER,
+        description="Annualized pay floor: jobs whose range reaches it (salary_max_annual "
+        ">= min_salary). Needs salary_currency.",
+    ),
+    max_salary: int | None = Query(
+        default=None,
+        ge=0,
+        le=SQLITE_MAX_INTEGER,
+        description="Annualized pay ceiling: jobs whose range starts at or below it "
+        "(salary_min_annual <= max_salary). Needs salary_currency.",
+    ),
+    salary_currency: str | None = Query(
+        default=None,
+        pattern=SALARY_CURRENCY_PATTERN,
+        description="ISO 4217 code (case-insensitive): only jobs paying in this currency. "
+        "Required by min_salary, max_salary and sort=salary.",
+    ),
+    has_salary: bool | None = Query(
+        default=None,
+        description="true: only jobs with captured pay; false: only jobs without.",
+    ),
 ) -> JobSearchFilters:
     """Parse the filter query parameters shared by list, export and feed.
 
@@ -94,12 +133,18 @@ def get_job_search_filters(
         run_id: Run filter.
         created_after: Capture-time lower bound.
         hours_old: Capture-age upper bound in hours.
+        min_salary: Annualized pay floor.
+        max_salary: Annualized pay ceiling.
+        salary_currency: ISO 4217 currency of the pay filters.
+        has_salary: Pay presence filter.
 
     Returns:
         Filters; ``created_after`` and ``hours_old`` combine into the later bound.
 
     Raises:
-        RequestValidationError: If ``created_after`` falls outside the UTC range.
+        RequestValidationError: If ``created_after`` falls outside the UTC range, the
+            currency is not ISO 4217, a pay bound comes without ``salary_currency`` or
+            ``min_salary`` exceeds ``max_salary``.
     """
 
     try:
@@ -116,7 +161,10 @@ def get_job_search_filters(
                 }
             ]
         ) from exc
-    return JobSearchFilters(
+    currency = normalize_currency(salary_currency)
+    if salary_currency is not None and currency is None:
+        raise _invalid_query("salary_currency", "Unknown ISO 4217 currency code", salary_currency)
+    filters = JobSearchFilters(
         q=q,
         company=company,
         location=location,
@@ -125,14 +173,23 @@ def get_job_search_filters(
         source_config_id=source_config_id,
         run_id=run_id,
         created_after=window_start,
+        min_salary=min_salary,
+        max_salary=max_salary,
+        salary_currency=currency,
+        has_salary=has_salary,
     )
+    problem = salary_filter_error(filters)
+    if problem is not None:
+        raise _invalid_query(*problem, getattr(filters, problem[0]))
+    return filters
 
 
 def get_sorted_job_search_filters(
     filters: JobSearchFilters = Depends(get_job_search_filters),
     sort: JobSort = Query(
         default=JobSort.NEWEST,
-        description="newest: most recently captured first; score: highest score first "
+        description="newest: most recently captured first; score: highest score first; "
+        "salary: highest annualized pay (salary_max_annual) first, needs salary_currency "
         "(ties: newest first).",
     ),
     dedupe: bool = Query(
@@ -150,9 +207,16 @@ def get_sorted_job_search_filters(
 
     Returns:
         Filters including sort and dedupe mode.
+
+    Raises:
+        RequestValidationError: If ``sort=salary`` comes without ``salary_currency``.
     """
 
-    return replace(filters, sort=sort, dedupe=dedupe)
+    sorted_filters = replace(filters, sort=sort, dedupe=dedupe)
+    problem = salary_filter_error(sorted_filters)
+    if problem is not None:
+        raise _invalid_query(*problem, None)
+    return sorted_filters
 
 
 @router.get("", response_model=list[JobRead])

@@ -95,7 +95,10 @@ are literal characters; SQLite only case-folds ASCII).
 | `run_id` | string | Captured by this run (the original filter) | — |
 | `created_after` | ISO-8601 instant | Captured at or after this time; naive values are UTC | — |
 | `hours_old` | int `1`–`8760` | Captured within the last N hours (with `created_after`, the later bound wins) | `hours_old` |
-| `sort` | `newest` (default) / `score` | `newest`: capture time, then id, descending (with `dedupe`: when the posting was first seen). `score`: highest score first, ties newest first | — |
+| `min_salary` / `max_salary` | int ≥ 0 | Annualized pay overlap (`salary_max_annual >= min_salary`, `salary_min_annual <= max_salary`); need `salary_currency` — see the [Pay Transparency Guide](PAY_TRANSPARENCY_GUIDE.md) | `min_amount` / `max_amount` (output only) |
+| `salary_currency` | ISO 4217 code | Only jobs paying in this currency | `currency` |
+| `has_salary` | `true` / `false` | Only jobs with / without captured pay | — |
+| `sort` | `newest` (default) / `score` / `salary` | `newest`: capture time, then id, descending (with `dedupe`: when the posting was first seen). `score`: highest score first, ties newest first. `salary`: highest annualized pay first (needs `salary_currency`), ties newest first | — |
 | `dedupe` | `true` / `false` (default) | Collapse duplicates, see below (feed: always on) | — |
 | `limit` | `/jobs`: 1–500 (50) · export: 1–100000 (all) · feed: 1–200 (50) | Page size / row cap / entry count | `results_wanted` |
 | `offset` | int `0`–`2^63-1` (0), `/jobs` only | Matches to skip | `offset` |
@@ -250,14 +253,15 @@ channel* action.
 |---|---|---|
 | Interface | Python library, CLI, MCP server | HTTP API over a database |
 | Data | Scrapes boards live on every call (Indeed, Glassdoor, ZipRecruiter, …) | Jobs captured by runs from configured ATS/board sources, kept with their history |
-| Filters | `search_term`, `location`, `distance`, `is_remote`, `job_type`, `hours_old`, `easy_apply`, `results_wanted`, `offset` | `q`, `company`, `location`, `remote`, `min_score`, `source_config_id`, `run_id`, `created_after`, `hours_old`, `limit`, `offset` |
+| Filters | `search_term`, `location`, `distance`, `is_remote`, `job_type`, `hours_old`, `easy_apply`, `results_wanted`, `offset` | `q`, `company`, `location`, `remote`, `min_score`, `source_config_id`, `run_id`, `created_after`, `hours_old`, `min_salary`, `max_salary`, `salary_currency`, `has_salary`, `limit`, `offset` |
+| Pay | `min_amount`, `max_amount`, `interval`, `currency`, `salary_source`; `enforce_annual_salary` | Same fields plus annualized `salary_*` columns, pay filters and `sort=salary` ([guide](PAY_TRANSPARENCY_GUIDE.md)) |
 | Ranking | Board order | Deterministic score + decision trace; `sort=score` |
 | Duplicates | Per-board results | `dedupe=true` collapses re-captures and cross-board mirrors |
 | Export | DataFrame → `to_csv`, CLI `-o jobs.jsonl` | Streamed CSV (formula-injection safe) and JSON Lines |
 | Notifications | — | Atom feed for Slack, Teams and feed readers |
 
-Not covered here: `job_type`, salary ranges and distance radius — the `Job` model does
-not store them yet. `hours_old` measures time since capture, which approximates
+Not covered here: `job_type` and distance radius — the `Job` model does not store them
+yet. Pay ranges are covered by the [Pay Transparency Guide](PAY_TRANSPARENCY_GUIDE.md). `hours_old` measures time since capture, which approximates
 posting age when runs are scheduled regularly.
 
 ## How this demo was recorded

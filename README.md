@@ -103,6 +103,22 @@ curl -sS localhost:8000/applications/board | jq -c '.columns[] | [.stage, .count
 [APPLICATION_TRACKER_GUIDE.md](docs/guides/APPLICATION_TRACKER_GUIDE.md) covers the state
 machine, every endpoint, the MCP tools, the CSV and calendar exports and troubleshooting.
 
+See what each job pays: discovery captures the range a posting states (schema.org
+`baseSalary`, or text such as "$120k–$150k" or "$45/hr"), annualized in one ISO 4217
+currency, never guessed. Filter, sort and export by it:
+
+```bash
+curl -sS 'localhost:8000/jobs?salary_currency=USD&min_salary=180000&sort=salary' \
+  | jq -c '.[] | [.title, .salary_min_annual, .salary_max_annual, .salary_interval]'
+curl -sS 'localhost:8000/jobs?has_salary=false' | jq -r '.[].title'   # postings without pay
+```
+
+![Pay transparency — real terminal session](assets/demo/pay-transparency.gif)
+
+[PAY_TRANSPARENCY_GUIDE.md](docs/guides/PAY_TRANSPARENCY_GUIDE.md) covers the extractor's
+rules and false-positive guards, annualization, currency handling, every parameter, the
+CSV/feed/MCP output and upgrading an existing database.
+
 For live data, start the API with the worker enabled (omit `ENABLE_WORKER=false`), then
 register a public board and start a run:
 
@@ -143,6 +159,7 @@ Cursor configuration examples, every tool, the audit log and a recorded session.
 | Decisions | Deterministic score, priority tier, matched terms, rationale, plan steps per job | [ARCHITECTURE.md](ARCHITECTURE.md) |
 | Search & export | Filters, `X-Total-Count` paging, cross-board dedupe, OWASP-safe CSV, JSON Lines, Atom 1.0 | [Search & export guide](docs/guides/JOB_SEARCH_EXPORT_GUIDE.md) |
 | Resume match | `POST /jobs/match` and MCP `match_resume_to_jobs`: rank jobs against resume text with a 254-skill alias-aware lexicon (`k8s` → `kubernetes`); match score, matched/missing skills, explanation, `sort=match\|blend`, CSV; resume never stored or logged | [Resume match guide](docs/guides/RESUME_JOB_MATCH_GUIDE.md) |
+| Pay transparency | Stated pay per job from schema.org `baseSalary` or description text ("$120k–$150k", "$45/hr", "€60.000"), typed and annualized (hour ×2080, day ×260, week ×52, month ×12) in ISO 4217 currencies; `min_salary` / `max_salary` (overlap), `salary_currency`, `has_salary`, `sort=salary` on list, export, feed, match and MCP; false positives such as "$5M Series A" or "$50 stipend" rejected; informational only | [Pay transparency guide](docs/guides/PAY_TRANSPARENCY_GUIDE.md) |
 | Application tracker | `/applications`: persistent pipeline `saved → applied → interview → offer → accepted/rejected` on one state machine (illegal moves `409`), append-only timeline, follow-ups (overdue/due), board, CSV/JSONL export, iCalendar follow-up feed; MCP `list_applications` / `get_application`; never submits anything | [Application tracker guide](docs/guides/APPLICATION_TRACKER_GUIDE.md) |
 | AI assistants (MCP) | Read-only stdio MCP server: search, decision traces, plain-language score explanations, runs and events; audit log with hashed arguments | [MCP server guide](docs/guides/MCP_SERVER_GUIDE.md) |
 | LLM enrichment | Optional summaries from GPT-6 / 6.2, Claude 5.5 / Fable 5.2, Gemini 3.8 / 4 or Kimi K3.1 models | [CONFIGURATION.md](CONFIGURATION.md) |
@@ -207,10 +224,10 @@ Then set matching API keys in `.env` (see `CONFIGURATION.md`).
 - `GET /runs/{run_id}` inspect run state
 - `GET /runs/{run_id}/events` inspect event timeline
 - `POST /runs/{run_id}/cancel` request cancellation
-- `GET /jobs` search normalized, scored, and enriched outputs (`q`, `company`, `location`, `remote`, `min_score`, `source_config_id`, `run_id`, `created_after`, `hours_old`, `sort`, `dedupe`, `limit`/`offset`)
+- `GET /jobs` search normalized, scored, and enriched outputs (`q`, `company`, `location`, `remote`, `min_score`, `source_config_id`, `run_id`, `created_after`, `hours_old`, `min_salary`/`max_salary` with `salary_currency`, `has_salary`, `sort=newest|score|salary`, `dedupe`, `limit`/`offset`); each job has `salary_min_annual`, `salary_max_annual`, `salary_currency`, `salary_interval`
 - `GET /jobs/{job_id}` inspect one job
-- `GET /jobs/export?format=csv|jsonl` stream filtered results as a download
-- `GET /jobs/feed.atom` subscribe to new matches (Atom 1.0)
+- `GET /jobs/export?format=csv|jsonl` stream filtered results as a download (CSV includes the stated and annualized pay columns)
+- `GET /jobs/feed.atom` subscribe to new matches (Atom 1.0; entry summaries state the pay range)
 - `POST /jobs/match` rank jobs against resume text (JSON body: `resume_text` + the `GET /jobs` filters, `sort=match|blend`, `limit`, `min_match`); matched/missing skills; `?format=csv`
 - `POST /applications` track a captured job (`404` unknown job, `409` already tracked); `GET /applications` list (`stage`, `company`, `q`, `follow_up=overdue|due|scheduled|none`, `due_within_days`, `include_archived`, `job_id`, `sort`, `limit`/`offset`)
 - `GET /applications/board` pipeline grouped by stage with counts; `GET /applications/{id}`; `PATCH /applications/{id}` move stage (`409` on illegal moves), notes, follow-up
@@ -231,6 +248,7 @@ MCP (stdio, read-only): `career-search-mcp` / `python -m autoapply_agent.mcp` �
 | [docs/guides/MCP_SERVER_GUIDE.md](docs/guides/MCP_SERVER_GUIDE.md) | Read-only MCP server for AI assistants: client setup, tools, privacy |
 | [docs/guides/RESUME_JOB_MATCH_GUIDE.md](docs/guides/RESUME_JOB_MATCH_GUIDE.md) | Resume-to-job match: API + MCP reference, skill lexicon, ranking, privacy |
 | [docs/guides/APPLICATION_TRACKER_GUIDE.md](docs/guides/APPLICATION_TRACKER_GUIDE.md) | Application tracker: pipeline stages, timeline, follow-ups, board, CSV and calendar exports, MCP |
+| [docs/guides/PAY_TRANSPARENCY_GUIDE.md](docs/guides/PAY_TRANSPARENCY_GUIDE.md) | Pay transparency: captured pay ranges, annualization, currency rules, salary filters and sort, exports, MCP |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Components, run lifecycle, events |
 | [docs/API.md](docs/API.md) | HTTP API reference |
 | [CONFIGURATION.md](CONFIGURATION.md) | Environment variables and provider profiles |

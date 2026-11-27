@@ -25,7 +25,11 @@ from autoapply_agent.schemas.resume_match import (
     ResumeMatchRequest,
     ResumeMatchResponse,
 )
-from autoapply_agent.services.job_search import JobSearchFilters, capture_window_start
+from autoapply_agent.services.job_search import (
+    JobSearchFilters,
+    capture_window_start,
+    salary_filter_error,
+)
 from autoapply_agent.services.resume_match import (
     MAX_RESUME_CHARS,
     MatchPage,
@@ -122,7 +126,7 @@ def _filters(payload: ResumeMatchRequest) -> JobSearchFilters:
                 }
             ]
         ) from exc
-    return JobSearchFilters(
+    filters = JobSearchFilters(
         q=payload.q,
         company=payload.company,
         location=payload.location,
@@ -131,8 +135,19 @@ def _filters(payload: ResumeMatchRequest) -> JobSearchFilters:
         source_config_id=payload.source_config_id,
         run_id=payload.run_id,
         created_after=window_start,
+        min_salary=payload.min_salary,
+        max_salary=payload.max_salary,
+        salary_currency=payload.salary_currency,
+        has_salary=payload.has_salary,
         dedupe=payload.dedupe,
     )
+    problem = salary_filter_error(filters)
+    if problem is not None:
+        field, message = problem
+        raise RequestValidationError(
+            [{"type": "value_error", "loc": ("body", field), "msg": message}]
+        )
+    return filters
 
 
 def _response(

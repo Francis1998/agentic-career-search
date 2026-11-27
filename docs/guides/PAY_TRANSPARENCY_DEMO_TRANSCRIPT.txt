@@ -1,0 +1,38 @@
+$ export DATABASE_URL=sqlite+aiosqlite:///./pay-demo.db
+$ python scripts/seed_demo_jobs.py
+seeded 8 jobs (run e7dd92e1-ba42-467e-aacf-eb8b438a215d) into sqlite+aiosqlite:///./pay-demo.db
+$ ENABLE_WORKER=false uvicorn autoapply_agent.main:app --port 8731 --log-level warning &
+$ curl -s "localhost:8731/jobs?salary_currency=USD&sort=salary" | jq -r '.[] | "#\(.id) \(.salary_currency) \(.salary_min_annual)-\(.salary_max_annual)/yr (stated per \(.salary_interval))  \(.title) | \(.company)"'
+#3 USD 180000-220000/yr (stated per year)  Staff Platform Engineer (Python, Kubernetes) | Globex
+#6 USD 176800-197600/yr (stated per hour)  Machine Learning Engineer | Umbrella Health
+#2 USD 165000-195000/yr (stated per year)  Senior Python Engineer | Acme Robotics, Inc.
+#1 USD 165000-195000/yr (stated per year)  Senior Python Engineer | Acme Robotics
+#4 USD 150000-175000/yr (stated per year)  Backend Engineer, Payments | Initech
+$ curl -s "localhost:8731/jobs?salary_currency=USD&min_salary=196000" | jq -r '.[] | "#\(.id) \(.title): \(.raw.compensation.snippet) [\(.raw.compensation.source)]"'
+#3 Staff Platform Engineer (Python, Kubernetes): $180k–$220k [description]
+#6 Machine Learning Engineer: $85 - $95 per hour [description]
+$ curl -s localhost:8731/jobs/6 | jq -c .raw.compensation
+{"min_amount":85,"max_amount":95,"currency":"USD","interval":"hour","annual_min":176800,"annual_max":197600,"source":"description","snippet":"$85 - $95 per hour"}
+$ curl -s "localhost:8731/jobs?salary_currency=EUR" | jq -r '.[] | "#\(.id) \(.title) | \(.company): EUR \(.salary_min_annual)-\(.salary_max_annual)/yr"'
+#5 Site Reliability Engineer | Vandelay Industries: EUR 70000-85000/yr
+$ curl -s "localhost:8731/jobs?has_salary=false" | jq -r '.[] | "#\(.id) no pay stated: \(.title) | \(.company)"'
+#7 no pay stated: Data Engineer | Hooli
+#8 no pay stated: =HYPERLINK("https://evil.example","Apply here") | Injected Co
+$ curl -s "localhost:8731/jobs?min_salary=150000" -w '  HTTP %{http_code}\n'
+{"detail":[{"type":"value_error","loc":["query","salary_currency"],"msg":"min_salary needs salary_currency (an ISO 4217 code such as USD): pay is only compared within one currency","input":null}]}  HTTP 422
+$ curl -s "localhost:8731/jobs/feed.atom?salary_currency=USD&min_salary=190000" | grep -o '<summary>[^<]*' | cut -c10-
+Company: Acme Robotics | Location: Remote - US | Remote: yes | Pay: USD 165,000–195,000 per year | Score: 0.92 | Priority: high
+Company: Globex | Location: Anywhere | Remote: yes | Pay: USD 180,000–220,000 per year | Score: 0.88 | Priority: high
+Company: Umbrella Health | Location: Boston, MA (Hybrid) | Remote: no | Pay: USD 85–95 per hour (USD 176,800–197,600 per year) | Score: 0.62 | Priority: medium
+$ curl -s "localhost:8731/jobs/export?format=csv&salary_currency=USD&sort=salary" | python -c 'import csv, sys; [print(r["title"][:30].ljust(31), *(r[k] for k in ("salary_min", "salary_max", "salary_interval", "salary_min_annual", "salary_max_annual", "salary_source"))) for r in csv.DictReader(sys.stdin)]'
+Staff Platform Engineer (Pytho  180000 220000 year 180000 220000 description
+Machine Learning Engineer       85 95 hour 176800 197600 description
+Senior Python Engineer          165000 195000 year 165000 195000 description
+Senior Python Engineer          165000 195000 year 165000 195000 description
+Backend Engineer, Payments      150000 175000 year 150000 175000 description
+$ echo '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"search_jobs","arguments":{"salary_currency":"USD","min_salary":190000,"sort":"salary"},"_meta":{"io.modelcontextprotocol/protocolVersion":"2026-07-28","io.modelcontextprotocol/clientCapabilities":{}}}}' | python -m autoapply_agent.mcp | jq -r '.result.content[0].text'
+4 matching jobs (sort=salary, dedupe=off); showing 1-4:
+#3 0.8800 high   Staff Platform Engineer (Python, Kubernetes) — Globex · Anywhere · USD 180,000-220,000/yr
+#6 0.6200 medium Machine Learning Engineer — Umbrella Health · Boston, MA (Hybrid) · USD 176,800-197,600/yr
+#2 0.9000 high   Senior Python Engineer — Acme Robotics, Inc. · Remote - US · USD 165,000-195,000/yr
+#1 0.9200 high   Senior Python Engineer — Acme Robotics · Remote - US · USD 165,000-195,000/yr
