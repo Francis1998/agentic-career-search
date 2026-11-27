@@ -292,6 +292,7 @@ REVIEW_REJECTED: list[str] = [
     "Salary: $120k +",
     "Salary: $120k-$150k+",
     "Salary: $100k - $120k EUR",  # inconsistent range, not a USD 100,000 salary
+    "Salary: $120k+ base",
 ]
 
 
@@ -315,6 +316,8 @@ def test_review_ambiguous_figures_are_rejected(text: str) -> None:
         ),
         # A "+" that adds something is not an open upper bound.
         ("Salary: $120k-$150k + equity", (120_000, 150_000, "USD", "year")),
+        ("Salary: $120k + $10k signing bonus", (120_000, 120_000, "USD", "year")),
+        ("Salary: $120k+10% bonus", (120_000, 120_000, "USD", "year")),
         ("The hourly pay range for this position is $25 - $30", (25, 30, "USD", "hour")),
     ],
 )

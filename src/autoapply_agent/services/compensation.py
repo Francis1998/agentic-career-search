@@ -421,12 +421,13 @@ MAX_TEXT_CHARS = 50_000
 """Characters of plain description text that are scanned."""
 
 _DOLLAR = "$"
+_CONFLICT = "conflict"
 _DOLLAR_CODES = frozenset({"USD", *_DOLLAR_PREFIXES.values()})
 _CODES = "|".join(TEXT_CURRENCY_CODES)
 _PREFIX = (
     r"(?<![A-Za-z])(?:"
     + "|".join(re.escape(p) for p in sorted(_DOLLAR_PREFIXES, key=len, reverse=True))
-    + r")|\$|"
+    + r")|(?<![A-Za-z])\$|"
     + "|".join(_SYMBOLS)
 )
 _NUMBER = r"\d{1,3}(?:[,.' ]\d{3})+(?:[.,]\d{1,2})?|\d+(?:[.,]\d{1,2})?"
@@ -466,6 +467,11 @@ _ONE_SIDED = re.compile(
     r"|\bover|\bmore\s+than|\bin\s+excess\s+of|\bexceeding|\babove|\bnorth\s+of)\s*:?\s*\Z",
     re.IGNORECASE,
 )
+_OPEN_ENDED = re.compile(
+    r"\+(?!\s*[\d$\u00a3\u20ac\u20b9])|\s+\+\s*(?:\Z|[^\w\s$\u00a3\u20ac\u20b9])"
+)
+"""No upper bound: ``$120k+`` / ``$120k+ base`` or a lone ``$120k +``. A ``+`` before a word
+or another amount (``+ equity``, ``+ $10k bonus``, ``+10%``) adds something instead."""
 _PAY_WORD = re.compile(
     r"\b(?:salary|salaries|pay|paid|pays|compensation|comp|wage|wages|rate|rates|base"
     r"|earn|earns|earning|earnings|income|remuneration|range|band)\b",
@@ -473,9 +479,12 @@ _PAY_WORD = re.compile(
 )
 _PHRASE_TOKEN = re.compile(r"[A-Za-z][A-Za-z'-]*|[+&(),]")
 _PHRASE_STOPS = frozenset(
-    {"+", "&", "(", ")", ",", "plus", "and", "with", "or", "including", "includes", "but"}
+    """
+    + & ( ) , plus and with or but which that include includes including exclude excludes
+    excluding addition besides except
+    """.split()
 )
-_PHRASE_WORDS = 4
+_PHRASE_WORDS = 8
 _NOT_PAY_WORDS = frozenset(
     """
     stipend stipends allowance allowances bonus bonuses reimburse reimburses reimbursed
@@ -537,9 +546,9 @@ def _token(match: re.Match[str]) -> _Token | None:
     if len(specific) == 1:
         currency = specific.pop()
         if _DOLLAR in markers and currency not in _DOLLAR_CODES:
-            return None
+            currency = _CONFLICT
     elif len(specific) > 1:
-        return None
+        currency = _CONFLICT
     elif markers:
         currency = _DOLLAR
     return _Token(match.start(), match.end(), value, bool(match.group("k")), currency)
@@ -636,7 +645,11 @@ def _currency(tokens: tuple[_Token, ...]) -> str | None:
 
     markers = {token.currency for token in tokens if token.currency}
     specific = markers - {_DOLLAR}
-    if len(specific) > 1 or (_DOLLAR in markers and specific - _DOLLAR_CODES):
+    if (
+        _CONFLICT in markers
+        or len(specific) > 1
+        or (_DOLLAR in markers and specific - _DOLLAR_CODES)
+    ):
         return None
     if specific:
         return specific.pop()
@@ -651,14 +664,19 @@ def _evaluate(text: str, tokens: tuple[_Token, ...]) -> Compensation | None:
     currency = _currency(tokens)
     if currency is None or _MAGNITUDE_WORD.match(after):
         return None
-    if len(tokens) == 1 and (_ONE_SIDED.search(before) or after.startswith("+")):
+    if len(tokens) == 1 and _ONE_SIDED.search(before):
+        return None
+    cue = _FOLLOWING_INTERVAL.match(after)
+    if _OPEN_ENDED.match(after[cue.end() if cue else 0 :]):
         return None
     words_after = _phrase(_PHRASE_TOKEN.findall(after))
     words_before = _phrase(_PHRASE_TOKEN.findall(before)[::-1])
     if _NOT_PAY_WORDS.intersection([*words_after, *words_before]):
         return None
-    cue = _FOLLOWING_INTERVAL.match(after)
-    interval = _interval(cue) or _interval(([None, *_PRECEDING_INTERVAL.finditer(before)])[-1])
+    # An interval lead-in counts only in the phrase right before the amount ("Hourly
+    # rate: $25"), not anywhere in the clause ("weekly meetings and a salary of $120k").
+    lead_in = " ".join(reversed(words_before))
+    interval = _interval(cue) or _interval(([None, *_PRECEDING_INTERVAL.finditer(lead_in)])[-1])
     low, high = _range_values(tokens)
     if interval is None:
         has_pay_word = _PAY_WORD.search(before) or _PAY_WORD.search(" ".join(words_after[:3]))

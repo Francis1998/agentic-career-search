@@ -119,8 +119,10 @@ for filtering and sorting, in four nullable, indexed `jobs` columns:
 
 1. **Structured data.** The `jsonld` adapter reads the posting's `baseSalary`
    (`MonetaryAmount`). The currency is `baseSalary.currency`, else the posting's
-   `salaryCurrency`. Lists, numeric strings and IRI-style `unitText`
-   (`https://schema.org/YEAR`) are accepted; the first usable entry wins.
+   `salaryCurrency`. Lists (of `MonetaryAmount`s or of `QuantitativeValue`s), numeric
+   strings read as plain numbers (`"50000.000"` is 50,000) and IRI-style `unitText`
+   (`https://schema.org/YEAR`) are accepted; the first usable entry wins. Stated amounts
+   are kept at full precision (`BHD 40.125`).
    `estimatedSalary` is a third-party estimate, not the employer's pay, so it is ignored.
 2. **Description text.** When there is no usable structured pay, the posting's
    `description` (HTML or text) goes through the text extractor below.
@@ -158,8 +160,10 @@ CAD, AUD, NZD, SGD, HKD, MXN, GBP, EUR, CHF, INR, JPY, SEK, NOK, DKK, PLN) **and
 
 - an explicit interval right after it (`/hr`, `per hour`, `an hour`, `hourly`, `/day`,
   `daily`, `/wk`, `weekly`, `/mo`, `monthly`, `/yr`, `per year`, `per annum`, `annually`,
-  `annual`, `yearly`, `p.a.`) or an interval lead-in in the same clause (`Hourly rate:`,
-  `Annual base salary:`, `Monthly salary:`); or
+  `annual`, `yearly`, `p.a.`) or an interval lead-in in the phrase right before it
+  (`Hourly rate:`, `Annual base salary:`, `The hourly pay range for this position is`) —
+  an interval word elsewhere in the clause ("weekly team meetings and a salary of ...")
+  does not count; or
 - a pay word earlier in the same clause or right after it (salary, pay, compensation, comp,
   wage, rate, base, earn, earnings, income, remuneration, range, band). Without an explicit
   interval, the amount is read as **yearly** only when it is at least 10,000 in USD, CAD,
@@ -167,14 +171,19 @@ CAD, AUD, NZD, SGD, HKD, MXN, GBP, EUR, CHF, INR, JPY, SEK, NOK, DKK, PLN) **and
   monthly).
 
 **Rejected** (all tested): millions and billions (`$5M Series A`, `$1B revenue`, `$5
-million`), amounts next to non-pay words (stipend, allowance, bonus, budget, credit,
+million`), amounts whose phrase (up to eight words on either side, stopping at `and`,
+`plus`, `with`, `which`, `including`, commas and similar) holds a non-pay word (stipend,
+allowance, bonus, budget, credit,
 equity, stock, funding, raised, revenue, valuation, Series, match, 401(k), reimbursement,
 relocation, signing, commission, tips, internet, phone, gym, meals, travel and similar:
-`$50 stipend`, `$2,000 signing bonus`, `$100 monthly internet stipend`), numbers without
-a currency (`401(k)`, years such as 2026, `Salary 120,000 - 150,000`), one-sided figures
-(`up to $150k`, `starting at $20/hr`, `from`, `minimum`, `over`, `$150k+`), mixed
-currencies (`US$100k - CA$120k`), inverted ranges, Indian lakh grouping (`₹12,00,000`) and
-the ambiguous `¥` and `kr` symbols.
+`$50 stipend`, `$2,000 signing bonus`, `$100 per month for your home office stipend`),
+numbers without a currency (`401(k)`, years such as 2026, `Salary 120,000 - 150,000`),
+one-sided figures (`up to $150k`, `starting at $20/hr`, `from`, `minimum`, `over`, and an
+open upper bound `$150k+`, `$45/hr+`, `$120k-$150k+`, `$120k +`; a `+` that adds something,
+`+ equity` or `+ $10k bonus`, is fine), mixed or conflicting currencies
+(`US$100k - CA$120k`, `$100k - $120k EUR`: the whole range is dropped, never one end),
+unsupported dollar prefixes (`R$`, `NT$`), inverted ranges, Indian lakh grouping
+(`₹12,00,000`) and the ambiguous `¥` and `kr` symbols.
 
 **Several ranges.** Postings often list one range per location ("NYC $150k-$180k, SF
 $160k-$200k, Remote $130k-$170k"). The extractor keeps every accepted range in the
