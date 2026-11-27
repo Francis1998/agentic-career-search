@@ -48,7 +48,10 @@ def _salary_diff(database_url: str) -> list[object]:
 def test_there_is_exactly_one_head(tmp_path: Path) -> None:
     script = ScriptDirectory.from_config(_alembic_config(f"sqlite:///{tmp_path / 'x.db'}"))
 
-    assert script.get_heads() == ["e5b8c2a7f913"]
+    [head] = script.get_heads()
+    assert "e5b8c2a7f913" in {
+        revision.revision for revision in script.iterate_revisions(head, "base")
+    }
 
 
 def test_upgrade_adds_the_indexed_salary_columns_matching_the_models(tmp_path: Path) -> None:

@@ -1,7 +1,5 @@
 """Run lifecycle routes."""
 
-import uuid
-
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -12,6 +10,7 @@ from autoapply_agent.db.models import Run, RunEvent, RunStatus
 from autoapply_agent.schemas.runs import RunCreate, RunEventRead, RunRead
 from autoapply_agent.services.events import append_run_event
 from autoapply_agent.services.read_queries import run_events
+from autoapply_agent.services.runs import enqueue_run
 
 router = APIRouter(prefix="/runs", tags=["runs"])
 
@@ -28,14 +27,9 @@ async def create_run(payload: RunCreate, session: AsyncSession = Depends(get_ses
         Created queued run.
     """
 
-    run = Run(
-        id=str(uuid.uuid4()),
-        status=RunStatus.QUEUED.value,
-        query=payload.query,
-        source_config_ids=payload.source_config_ids,
+    run = await enqueue_run(
+        session, query=payload.query, source_config_ids=payload.source_config_ids
     )
-    session.add(run)
-    await append_run_event(session, run.id, "run.created", "Run queued for processing")
     await session.commit()
     await session.refresh(run)
     return run

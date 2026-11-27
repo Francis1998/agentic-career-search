@@ -11,10 +11,12 @@ Every tool reuses the services behind the HTTP API instead of re-implementing qu
 * :mod:`~autoapply_agent.services.resume_match` to rank jobs against resume text (the
   ranking of ``POST /jobs/match``);
 * :mod:`~autoapply_agent.services.application_tracker` for the application pipeline
-  (the queries behind ``GET /applications`` and ``GET /applications/{id}/events``).
+  (the queries behind ``GET /applications`` and ``GET /applications/{id}/events``);
+* :mod:`~autoapply_agent.services.schedules` for recurring discovery schedules (the
+  queries behind ``GET /schedules`` and ``GET /schedules/{id}/history``).
 
 No tool writes: none can start or cancel runs, edit source configs, track or move
-applications, or apply to jobs.
+applications, create, pause or trigger schedules, or apply to jobs.
 Results carry ``structuredContent`` that conforms to each tool's ``outputSchema`` plus a
 short text rendering. Captured text (titles, companies, locations, rationale) comes from
 public career pages and is returned as data.
@@ -36,7 +38,10 @@ from autoapply_agent.db.models import (
     Application,
     Job,
     Run,
+    RunSchedule,
     RunStatus,
+    ScheduleEventKind,
+    ScheduleKind,
     SourceConfig,
 )
 from autoapply_agent.schemas.applications import ApplicationEventRead, ApplicationRead
@@ -62,6 +67,7 @@ from autoapply_agent.services.application_tracker import (
     stage_counts,
 )
 from autoapply_agent.services.compensation import describe_pay, normalize_currency
+from autoapply_agent.services.cron import CronError, load_zone
 from autoapply_agent.services.job_export import job_pay, rfc3339, safe_http_url
 from autoapply_agent.services.job_search import (
     JobSearchFilters,
@@ -86,6 +92,15 @@ from autoapply_agent.services.resume_match import (
     RankedJob,
     ResumeProfile,
     rank_jobs,
+)
+from autoapply_agent.services.schedules import (
+    DEFAULT_PREVIEW_COUNT,
+    ScheduleFilters,
+    last_run_status,
+    list_schedules,
+    local_time,
+    schedule_events,
+    upcoming_fires,
 )
 from autoapply_agent.services.scoring import (
     KEYWORD_BONUS_CAP,
@@ -1073,6 +1088,159 @@ def _application_detail_summary(result: dict[str, Any]) -> str:
 
 
 # ---------------------------------------------------------------------------
+# list_schedules / get_schedule
+# ---------------------------------------------------------------------------
+
+
+def _schedule_record(schedule: RunSchedule) -> dict[str, Any]:
+    """Serializable schedule record."""
+
+    source_ids = (
+        schedule.source_config_ids if isinstance(schedule.source_config_ids, list) else None
+    )
+    return {
+        "id": schedule.id,
+        "name": schedule.name,
+        "kind": schedule.kind,
+        "interval_minutes": schedule.interval_minutes,
+        "cron": schedule.cron,
+        "timezone": schedule.timezone,
+        "query": schedule.query,
+        "source_config_ids": (
+            None
+            if source_ids is None
+            else [
+                item for item in source_ids if isinstance(item, int) and not isinstance(item, bool)
+            ]
+        ),
+        "overlap_policy": schedule.overlap_policy,
+        "jitter_seconds": schedule.jitter_seconds,
+        "paused": schedule.paused,
+        "pause_note": schedule.pause_note,
+        "next_run_at": _timestamp(schedule.next_run_at),
+        "buffered_fire_at": _timestamp(schedule.buffered_at),
+        "last_fired_at": _timestamp(schedule.last_fired_at),
+        "last_run_id": schedule.last_run_id,
+        "created_at": rfc3339(schedule.created_at),
+        "updated_at": rfc3339(schedule.updated_at),
+    }
+
+
+def _schedule_line(record: dict[str, Any]) -> str:
+    """One-line schedule summary used by list_schedules and get_schedule."""
+
+    cadence = (
+        f'cron "{record["cron"]}" {record["timezone"]}'
+        if record["kind"] == "cron"
+        else f"every {record['interval_minutes']} min"
+    )
+    state = "paused" if record["paused"] else f"next {record['next_run_at']}"
+    query = f'query "{record["query"]}"' if record["query"] else "no query"
+    return (
+        f"#{record['id']} {record['name']} · {cadence} · {state} · {query}"
+        f" · overlap {record['overlap_policy']}"
+    )
+
+
+async def _list_schedules(session: AsyncSession, arguments: dict[str, Any]) -> ToolOutput:
+    """List recurring discovery schedules, soonest next fire first."""
+
+    limit = _int_argument(arguments, "limit", DEFAULT_PAGE_SIZE)
+    offset = _int_argument(arguments, "offset", 0)
+    kind = arguments.get("kind")
+    filters = ScheduleFilters(
+        paused=arguments.get("paused"), kind=ScheduleKind(kind) if kind else None
+    )
+    total, schedules = await list_schedules(session, filters, limit=limit, offset=offset)
+    records = [_schedule_record(schedule) for schedule in schedules]
+    structured: dict[str, Any] = {
+        "total": total,
+        "offset": offset,
+        "limit": limit,
+        "next_offset": _next_offset(offset, len(records), total),
+        "schedules": records,
+    }
+    if records:
+        noun = "schedule" if total == 1 else "schedules"
+        lines = [
+            f"{total} {noun}, soonest next fire first; showing "
+            f"{offset + 1}-{offset + len(records)}:"
+        ]
+        lines.extend(_schedule_line(record) for record in records)
+        if structured["next_offset"] is not None:
+            lines.append(
+                f"More: call list_schedules again with offset={structured['next_offset']}."
+            )
+        summary = "\n".join(lines)
+    else:
+        summary = (
+            "No schedules match." if not total else f"{total} schedules; offset is past the end."
+        )
+    return ToolOutput(structured, summary, len(records))
+
+
+def _upcoming_records(schedule: RunSchedule) -> list[dict[str, str]]:
+    """Next planned fires (empty when paused or the stored cadence is unusable here)."""
+
+    try:
+        zone = load_zone(schedule.timezone)
+        fires = upcoming_fires(schedule, DEFAULT_PREVIEW_COUNT)
+    except CronError:
+        return []
+    return [{"at": rfc3339(at), "local": local_time(at, zone)} for at in fires]
+
+
+async def _get_schedule(session: AsyncSession, arguments: dict[str, Any]) -> ToolOutput:
+    """Return one schedule with its next fires and most recent history."""
+
+    schedule = await session.get(RunSchedule, int(arguments["schedule_id"]))
+    if schedule is None:
+        raise ToolError(
+            "No schedule with this id. Use list_schedules to find schedule ids.",
+            kind="not_found",
+        )
+    history_limit = _int_argument(arguments, "history_limit", DEFAULT_EVENT_LIMIT)
+    total, events = await schedule_events(session, schedule.id, limit=history_limit)
+    record = _schedule_record(schedule)
+    structured: dict[str, Any] = {
+        "schedule": record,
+        "last_run_status": await last_run_status(session, schedule),
+        "upcoming": _upcoming_records(schedule),
+        "history_count": total,
+        "history_truncated": len(events) < total,
+        "history": [
+            {
+                "id": event.id,
+                "kind": event.kind,
+                "run_id": event.run_id,
+                "scheduled_for": _timestamp(event.scheduled_for),
+                "reason": event.reason,
+                "details": event.details if isinstance(event.details, dict) else None,
+                "created_at": rfc3339(event.created_at),
+            }
+            for event in events
+        ],
+    }
+    lines = [f"Schedule {_schedule_line(record)}"]
+    if record["paused"] and record["pause_note"]:
+        lines.append(f"Paused: {record['pause_note']}")
+    if record["last_run_id"]:
+        lines.append(
+            f"Last run {record['last_run_id']} ({structured['last_run_status']}) queued "
+            f"{record['last_fired_at']}"
+        )
+    if structured["upcoming"]:
+        lines.append("Next fires: " + ", ".join(item["local"] for item in structured["upcoming"]))
+    shown = "Last" if structured["history_truncated"] else "All"
+    lines.append(f"{shown} {len(events)} of {total} history events, newest first:")
+    lines.extend(
+        f"{item['created_at']} {item['kind']:<17} {item['reason'] or ''}".rstrip()
+        for item in structured["history"]
+    )
+    return ToolOutput(structured, "\n".join(lines), len(events))
+
+
+# ---------------------------------------------------------------------------
 # Schemas
 # ---------------------------------------------------------------------------
 
@@ -1710,6 +1878,84 @@ _GET_APPLICATION_OUTPUT: dict[str, Any] = _closed_object(
     }
 )
 
+_SCHEDULE_KINDS = [kind.value for kind in ScheduleKind]
+_SCHEDULE_EVENT_KINDS = [kind.value for kind in ScheduleEventKind]
+_SCHEDULE_OUTPUT: dict[str, Any] = _closed_object(
+    {
+        "id": {"type": "integer"},
+        "name": _STRING,
+        "kind": {"type": "string", "enum": _SCHEDULE_KINDS},
+        "interval_minutes": _NULLABLE_INTEGER,
+        "cron": _NULLABLE_STRING,
+        "timezone": _STRING,
+        "query": _NULLABLE_STRING,
+        "source_config_ids": _nullable({"type": "array", "items": {"type": "integer"}}),
+        "overlap_policy": _STRING,
+        "jitter_seconds": _COUNT,
+        "paused": {"type": "boolean"},
+        "pause_note": _NULLABLE_STRING,
+        "next_run_at": _nullable(_STRING, "Planned next fire (RFC 3339 UTC); null while paused."),
+        "buffered_fire_at": _NULLABLE_TIMESTAMP,
+        "last_fired_at": _NULLABLE_TIMESTAMP,
+        "last_run_id": _NULLABLE_STRING,
+        "created_at": _TIMESTAMP,
+        "updated_at": _TIMESTAMP,
+    }
+)
+_LIST_SCHEDULES_INPUT: dict[str, Any] = {
+    "type": "object",
+    "properties": {
+        "paused": {"type": "boolean", "description": "true/false keeps paused/active schedules."},
+        "kind": {"type": "string", "enum": _SCHEDULE_KINDS, "description": "interval or cron."},
+        **_PAGE_ARGUMENTS,
+    },
+    "additionalProperties": False,
+}
+_LIST_SCHEDULES_OUTPUT: dict[str, Any] = _closed_object(
+    {**_PAGE_FIELDS, "schedules": {"type": "array", "items": _SCHEDULE_OUTPUT}}
+)
+_GET_SCHEDULE_INPUT: dict[str, Any] = {
+    "type": "object",
+    "properties": {
+        "schedule_id": {**_ID_ARGUMENT, "description": "Schedule id from list_schedules."},
+        "history_limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": MAX_EVENT_LIMIT,
+            "default": DEFAULT_EVENT_LIMIT,
+            "description": "How many of the most recent history events to return.",
+        },
+    },
+    "required": ["schedule_id"],
+    "additionalProperties": False,
+}
+_GET_SCHEDULE_OUTPUT: dict[str, Any] = _closed_object(
+    {
+        "schedule": _SCHEDULE_OUTPUT,
+        "last_run_status": _nullable({"type": "string", "enum": _RUN_STATUSES}),
+        "upcoming": {
+            "type": "array",
+            "items": _closed_object({"at": _TIMESTAMP, "local": _STRING}),
+        },
+        "history_count": _COUNT,
+        "history_truncated": {"type": "boolean"},
+        "history": {
+            "type": "array",
+            "items": _closed_object(
+                {
+                    "id": {"type": "integer"},
+                    "kind": {"type": "string", "enum": _SCHEDULE_EVENT_KINDS},
+                    "run_id": _NULLABLE_STRING,
+                    "scheduled_for": _NULLABLE_TIMESTAMP,
+                    "reason": _NULLABLE_STRING,
+                    "details": _nullable({"type": "object"}),
+                    "created_at": _TIMESTAMP,
+                }
+            ),
+        },
+    }
+)
+
 TOOLS: tuple[ToolSpec, ...] = (
     ToolSpec(
         name="explain_job_score",
@@ -1764,6 +2010,21 @@ TOOLS: tuple[ToolSpec, ...] = (
         handler=_get_run,
     ),
     ToolSpec(
+        name="get_schedule",
+        title="Get a discovery schedule and its history",
+        description=(
+            "Return one recurring discovery schedule: cadence (interval or cron with time "
+            "zone), run parameters, overlap policy, jitter, paused state and note, the status "
+            "of its last run, its next five planned fire times (UTC and local) and its most "
+            "recent history events (fired, coalesced_misfire, triggered, buffered, "
+            "skipped_overlap, paused, resumed) with reasons. Read-only: schedules are created, "
+            "paused or triggered through the HTTP API, never from here."
+        ),
+        input_schema=_GET_SCHEDULE_INPUT,
+        output_schema=_GET_SCHEDULE_OUTPUT,
+        handler=_get_schedule,
+    ),
+    ToolSpec(
         name="list_applications",
         title="List tracked job applications",
         description=(
@@ -1788,6 +2049,20 @@ TOOLS: tuple[ToolSpec, ...] = (
         input_schema=_LIST_RUNS_INPUT,
         output_schema=_LIST_RUNS_OUTPUT,
         handler=_list_runs,
+    ),
+    ToolSpec(
+        name="list_schedules",
+        title="List recurring discovery schedules",
+        description=(
+            "List the schedules that re-run discovery automatically (GET /schedules): name, "
+            "interval or cron cadence with time zone, query terms, source configs, overlap "
+            "policy, paused state, next planned fire and last run; filter by paused and kind, "
+            f"page with limit (max {MAX_PAGE_SIZE}) and offset. Soonest next fire first. "
+            "Read-only."
+        ),
+        input_schema=_LIST_SCHEDULES_INPUT,
+        output_schema=_LIST_SCHEDULES_OUTPUT,
+        handler=_list_schedules,
     ),
     ToolSpec(
         name="list_sources",

@@ -42,8 +42,10 @@ READ_ONLY_TOOLS = [
     "get_application",
     "get_job",
     "get_run",
+    "get_schedule",
     "list_applications",
     "list_runs",
+    "list_schedules",
     "list_sources",
     "match_resume_to_jobs",
     "search_jobs",
@@ -181,7 +183,19 @@ async def test_tools_list_exposes_no_write_paths(server: CareerSearchMcpServer) 
     assert response is not None
     names = {tool["name"] for tool in response["result"]["tools"]}
     assert names == set(READ_ONLY_TOOLS)
-    write_verbs = ("create", "cancel", "update", "delete", "apply", "edit", "patch", "start")
+    write_verbs = (
+        "create",
+        "cancel",
+        "update",
+        "delete",
+        "apply",
+        "edit",
+        "patch",
+        "start",
+        "pause",
+        "resume",
+        "trigger",
+    )
     assert not [name for name in names if name.startswith(write_verbs)]
     assert set(mcp_server.TOOLS_BY_NAME) == names
 
