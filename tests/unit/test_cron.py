@@ -227,3 +227,11 @@ def test_sparse_day_of_month_and_weekday_intersections_keep_firing(
     fire = expression.next_fire(datetime.fromisoformat(after), load_zone("UTC"))
 
     assert fire == datetime.fromisoformat(expected)
+
+
+def test_fire_search_stops_at_the_end_of_the_calendar() -> None:
+    late = datetime(9999, 12, 30, tzinfo=UTC)
+
+    fires = list(parse_cron("@daily").iter_fires(late, LOS_ANGELES))
+
+    assert [fire.date().isoformat() for fire in fires] == ["9999-12-30", "9999-12-31"]

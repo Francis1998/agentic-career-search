@@ -98,7 +98,7 @@ def validate_cron(text: str) -> CronExpression:
             f"{MIN_INTERVAL_MINUTES} minutes"
         )
     if expression.next_fire(utc_now(), load_zone("UTC")) is None:
-        raise CronError("never fires within ten years")
+        raise CronError("never fires")
     return expression
 
 

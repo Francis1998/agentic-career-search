@@ -31,8 +31,12 @@ from itertools import pairwise
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 MINUTES_PER_DAY = 24 * 60
-SEARCH_HORIZON_DAYS = 3660
-"""How far ahead to look for a fire time (ten years: Feb 29 can be eight years apart)."""
+SEARCH_HORIZON_DAYS = 146_097
+"""How far ahead to look for a fire time: one full 400-year Gregorian cycle.
+
+The calendar repeats every 400 years, so a date / weekday combination that ever happens
+(29 February on a Sunday: 2032, 2060, 2088, then 2128) recurs within this window.
+"""
 MAX_ZONE_NAME_CHARS = 64
 
 MACROS: dict[str, str] = {
@@ -178,7 +182,8 @@ class CronExpression:
             inclusive: Whether a fire exactly at ``after`` counts.
 
         Yields:
-            Increasing aware UTC instants, for at most ten years after ``after``.
+            Increasing aware UTC instants, for at most one 400-year calendar cycle after
+            ``after`` (and never past the end of year 9999).
         """
 
         last = _as_utc(after)
@@ -187,11 +192,17 @@ class CronExpression:
         # One day earlier: a fall-back transition at midnight can move the local date back.
         first_day = last.astimezone(zone).date() - timedelta(days=1)
         for offset in range(SEARCH_HORIZON_DAYS + 2):
-            day = first_day + timedelta(days=offset)
+            try:
+                day = first_day + timedelta(days=offset)
+            except OverflowError:
+                return
             if not self.matches_day(day):
                 continue
             for minute_of_day in self.minutes_of_day:
-                instant = resolve_local(day, minute_of_day, zone)
+                try:
+                    instant = resolve_local(day, minute_of_day, zone)
+                except OverflowError:
+                    return
                 if instant is not None and instant > last:
                     yield instant
                     last = instant
@@ -202,7 +213,7 @@ class CronExpression:
         """Return the first fire instant after ``after`` (or at it when ``inclusive``).
 
         Returns:
-            Aware UTC instant, or None when nothing fires within ten years.
+            Aware UTC instant, or None when nothing fires within a 400-year cycle.
         """
 
         return next(self.iter_fires(after, zone, inclusive=inclusive), None)
