@@ -650,3 +650,16 @@ def test_jsonld_without_stated_pay_has_no_compensation(fields: dict[str, object]
     (job,) = adapter._parse_html("https://acme.example.com", _posting_html(**fields), 10)
 
     assert job.compensation is None
+
+
+def test_jsonld_oversized_base_salary_leaves_pay_null_and_keeps_the_job() -> None:
+    adapter = JsonLdAdapter(user_agent="test-agent")
+    base_salary = '{"currency": "USD", "value": {"value": 1' + "0" * 400 + ', "unitText": "YEAR"}}'
+    page = (
+        '<script type="application/ld+json">{"@type": "JobPosting", "title": "Engineer", '
+        f'"url": "/jobs/1", "baseSalary": {base_salary}}}</script>'
+    )
+
+    (job,) = adapter._parse_html("https://acme.example.com", page, 10)
+
+    assert job.compensation is None

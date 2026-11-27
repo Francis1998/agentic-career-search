@@ -239,3 +239,45 @@ def test_currency_codes_are_validated_against_iso_4217() -> None:
     assert normalize_currency(" eur ") == "EUR"
     assert normalize_currency("ABC") is None
     assert normalize_currency(42) is None
+
+
+# Review regressions (PR #355): structured amounts.
+
+
+def test_structured_numeric_strings_are_plain_numbers_not_grouped_text() -> None:
+    found = compensation_from_monetary_amount(
+        {
+            "currency": "USD",
+            "value": {"minValue": "50000.000", "maxValue": "60000.5", "unitText": "YEAR"},
+        }
+    )
+
+    assert found is not None
+    assert (found.min_amount, found.max_amount) == (50_000, 60_000.5)
+
+
+def test_oversized_structured_amounts_are_unusable_not_an_error() -> None:
+    huge = {"currency": "USD", "value": {"value": 10**400, "unitText": "YEAR"}}
+
+    assert compensation_from_monetary_amount(huge) is None
+
+
+def test_payload_keeps_full_precision_so_outputs_match_the_columns() -> None:
+    found = make_compensation(
+        40.125, 40.125, "BHD", PayInterval.HOUR, CompensationSource.STRUCTURED, "BHD 40.125/h"
+    )
+    assert found is not None
+
+    restored = Compensation.from_payload(found.to_payload())
+
+    assert restored == found
+    assert restored is not None and restored.annual_max == found.annual_max == 83_460
+
+
+def test_a_list_of_quantitative_values_uses_its_first_usable_entry() -> None:
+    found = compensation_from_monetary_amount(
+        {"currency": "USD", "value": [{}, {"value": 120000, "unitText": "YEAR"}]}
+    )
+
+    assert found is not None
+    assert (found.min_amount, found.interval) == (120_000, PayInterval.YEAR)
