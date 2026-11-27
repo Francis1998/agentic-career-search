@@ -259,32 +259,44 @@ def _same_instant(left: datetime | None, right: datetime | None) -> bool:
 # ---------------------------------------------------------------------------
 
 
+async def _reload_for_write(session: AsyncSession, application: Application) -> int:
+    """Reload ``application`` and return its revision (latest event sequence, 0 if none).
+
+    The revision is read before the row, so the state a write is validated against is
+    at least as recent as the revision. The write's event then takes ``revision + 1``:
+    if another request appended an event in the meantime, the unique
+    ``(application_id, sequence)`` constraint rejects this one when it is flushed
+    (``IntegrityError``), so two racing writes can never both be recorded. Reading the
+    sequence inside the write instead would wait for the other writer's commit and
+    then extend its event, recording a move validated against a stage that is gone.
+    """
+
+    revision = (await latest_sequences(session, [application.id])).get(application.id, 0)
+    await session.refresh(application)
+    return revision
+
+
 async def _append_event(
     session: AsyncSession,
     application: Application,
     event_type: ApplicationEventType,
     *,
+    sequence: int,
     now: datetime,
     from_stage: ApplicationStage | None = None,
     to_stage: ApplicationStage | None = None,
     note: str | None = None,
     changes: dict[str, Any] | None = None,
 ) -> ApplicationEvent:
-    """Append the next event of ``application`` (sequence numbers start at 1).
+    """Append event ``sequence`` (one past the revision the write was validated against).
 
-    Two concurrent writers compute the same sequence; the unique
-    ``(application_id, sequence)`` constraint then rejects the second one, so a
-    timeline can never interleave two racing stage moves.
+    See :func:`_reload_for_write`: the flush raises ``IntegrityError`` when another
+    request has taken that sequence.
     """
 
-    current = await session.scalar(
-        select(func.coalesce(func.max(ApplicationEvent.sequence), 0)).where(
-            ApplicationEvent.application_id == application.id
-        )
-    )
     event = ApplicationEvent(
         application_id=application.id,
-        sequence=int(current or 0) + 1,
+        sequence=sequence,
         event_type=event_type.value,
         from_stage=from_stage.value if from_stage is not None else None,
         to_stage=to_stage.value if to_stage is not None else None,
@@ -337,9 +349,9 @@ async def track_job(
     job = await session.get(Job, job_id)
     if job is None:
         raise JobNotFoundError(job_id)
-    existing = await session.scalar(select(Application).where(Application.job_id == job_id))
+    existing = await tracked_application_id(session, job_id)
     if existing is not None:
-        raise AlreadyTrackedError(existing.id, job_id, same_posting=False)
+        raise AlreadyTrackedError(existing, job_id, same_posting=False)
     # A later run re-captures a posting as a new job row; the posting URL (compared the
     # way GET /jobs?dedupe=true compares it) keeps it from being tracked twice.
     same_posting = (
@@ -381,6 +393,7 @@ async def track_job(
         session,
         application,
         ApplicationEventType.TRACKED,
+        sequence=1,
         now=now,
         to_stage=stage,
         note=note,
@@ -404,11 +417,12 @@ async def update_application(
 ) -> ApplicationEvent | None:
     """Apply ``patch`` and append one timeline event describing it (the caller commits).
 
-    The stage move is validated before anything changes, so an illegal move leaves
-    the application untouched. Moving to the current stage is not a move. The event
-    is ``stage_changed`` when the stage moves, ``updated`` when only the follow-up or
-    applied time change, ``note_added`` when only a timeline note is given; editing
-    ``notes`` (the scratchpad) alone records no event.
+    ``application`` is reloaded first and the stage move is validated before anything
+    changes, so an illegal move leaves the application untouched. Moving to the
+    current stage is not a move. The event is ``stage_changed`` when the stage moves,
+    ``updated`` when only the follow-up or applied time change, ``note_added`` when
+    only a timeline note is given; editing ``notes`` (the scratchpad) alone records no
+    event.
 
     Args:
         session: Active async DB session.
@@ -421,8 +435,11 @@ async def update_application(
 
     Raises:
         ApplicationStageError: If the stage move is not allowed.
+        sqlalchemy.exc.IntegrityError: When the event is flushed, if another request
+            changed the application after it was reloaded (roll back and retry).
     """
 
+    revision = await _reload_for_write(session, application)
     current = ApplicationStage(application.stage)
     target = patch.stage if patch.stage is not None and patch.stage != current else None
     if target is not None:
@@ -472,6 +489,7 @@ async def update_application(
             session,
             application,
             ApplicationEventType.STAGE_CHANGED,
+            sequence=revision + 1,
             now=now,
             from_stage=current,
             to_stage=target,
@@ -483,13 +501,19 @@ async def update_application(
             session,
             application,
             ApplicationEventType.UPDATED,
+            sequence=revision + 1,
             now=now,
             note=patch.note,
             changes=changes,
         )
     elif patch.note is not None:
         event = await _append_event(
-            session, application, ApplicationEventType.NOTE_ADDED, now=now, note=patch.note
+            session,
+            application,
+            ApplicationEventType.NOTE_ADDED,
+            sequence=revision + 1,
+            now=now,
+            note=patch.note,
         )
     if touched or event is not None:
         application.updated_at = now
@@ -519,13 +543,23 @@ async def set_archived(
 
     Returns:
         The appended event, or None when nothing was recorded.
+
+    Raises:
+        sqlalchemy.exc.IntegrityError: When the event is flushed, if another request
+            changed the application after it was reloaded (roll back and retry).
     """
 
+    revision = await _reload_for_write(session, application)
     if application.archived == archived:
         if note is None:
             return None
         event = await _append_event(
-            session, application, ApplicationEventType.NOTE_ADDED, now=now, note=note
+            session,
+            application,
+            ApplicationEventType.NOTE_ADDED,
+            sequence=revision + 1,
+            now=now,
+            note=note,
         )
     else:
         application.archived = archived
@@ -533,6 +567,7 @@ async def set_archived(
             session,
             application,
             ApplicationEventType.ARCHIVED if archived else ApplicationEventType.UNARCHIVED,
+            sequence=revision + 1,
             now=now,
             note=note,
             changes={"archived": {"from": not archived, "to": archived}},
@@ -625,6 +660,12 @@ async def get_tracked(session: AsyncSession, application_id: int) -> tuple[Appli
 
     row = (await session.execute(_select([Application.id == application_id]))).first()
     return None if row is None else (row[0], row[1])
+
+
+async def tracked_application_id(session: AsyncSession, job_id: int) -> int | None:
+    """Return the id of the application tracking ``job_id``, or None."""
+
+    return await session.scalar(select(Application.id).where(Application.job_id == job_id))
 
 
 async def list_applications(

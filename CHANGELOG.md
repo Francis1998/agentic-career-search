@@ -793,6 +793,18 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `reasoning_effort: none`.
 
 ### Fixed
+- Application tracker: writes that lose a race to another request are now the documented
+  `409 application was changed by another request; retry` and change nothing. Each
+  event's sequence was read inside the writer's own transaction, after its `UPDATE` had
+  waited for the other writer's commit, so two simultaneous stage moves both returned
+  `200`: the second was validated against a stage that was gone (a `rejected`, final
+  application could end up `applied`, with `saved → rejected` then `saved → applied` in
+  its timeline), and a racing archive recorded a second `archived` event. Races that did
+  collide on the unique constraints were `500`s, because the constraint fails when the
+  write is flushed, before the commit the routes guarded: two timeline notes at once, or a
+  double-submitted `POST /applications` (now the usual `409` with `Location`). The event
+  now takes one past the revision read before the application is reloaded and validated,
+  and the routes map the collision to `409` wherever it is raised.
 - LLM enrichment: GPT models that always reason no longer receive
   `reasoning_effort: none`. With `OPENAI_MODEL` set to `gpt-6.2-sol` or `gpt-6.2-astra`
   (released 2026-11-17), or to `gpt-6.1-sol` or `gpt-6-astra`, the default

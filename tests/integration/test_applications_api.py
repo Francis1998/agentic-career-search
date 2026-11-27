@@ -5,14 +5,17 @@ from __future__ import annotations
 import csv
 import io
 import json
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from datetime import timedelta
 from typing import Any
 
 import pytest
 from fastapi.testclient import TestClient
+from sqlalchemy import create_engine, event
+from sqlalchemy.orm import Session
 
 from autoapply_agent.core.time import utc_now
+from autoapply_agent.db.models import Application, ApplicationEvent
 from autoapply_agent.services.application_export import APPLICATION_CSV_COLUMNS
 from tests.integration.test_jobs_match_api import (
     HOSTILE_JOBS,
@@ -498,3 +501,133 @@ def test_calendar_feed_lists_follow_ups_with_escaped_text(client: TestClient) ->
     assert "URL:https://boards.greenhouse.io/acme/jobs/1" in unfolded
     assert all(len(line.encode()) <= 75 for line in body.split("\r\n"))
     assert "\n" not in body.replace("\r\n", "")
+
+
+# Lost races: another request commits between this request's reads and its write.
+
+RivalWrite = Callable[[Session], None]
+CONCURRENT_UPDATE = {"detail": "application was changed by another request; retry"}
+
+
+@pytest.fixture()
+def rival(sqlite_database_url: str) -> Iterator[Callable[[RivalWrite], None]]:
+    """Arm a write that another request commits just before the next request writes.
+
+    ``rival(write)`` runs ``write`` in a session of its own and commits it when the next
+    flush starts: the request under test has read and validated everything and is about
+    to send its first ``INSERT`` / ``UPDATE``. That is the narrowest lost race, made
+    deterministic.
+    """
+
+    engine = create_engine(sqlite_database_url.replace("+aiosqlite", ""))
+    armed: list[RivalWrite] = []
+
+    def commit_rival_write(*_: object) -> None:
+        while armed:
+            write = armed.pop()
+            with Session(engine) as other, other.begin():
+                write(other)
+
+    event.listen(Session, "before_flush", commit_rival_write)
+    try:
+        yield armed.append
+    finally:
+        event.remove(Session, "before_flush", commit_rival_write)
+        engine.dispose()
+
+
+def rival_event(
+    application_id: int, sequence: int, event_type: str, **fields: Any
+) -> ApplicationEvent:
+    """A timeline event recorded by the rival request."""
+
+    return ApplicationEvent(
+        application_id=application_id,
+        sequence=sequence,
+        event_type=event_type,
+        created_at=utc_now(),
+        **fields,
+    )
+
+
+def test_a_stage_move_that_loses_a_race_is_409_and_changes_nothing(
+    client: TestClient, rival: Callable[[RivalWrite], None]
+) -> None:
+    acme = track(client, ACME)["id"]
+
+    def reject(other: Session) -> None:
+        application = other.get(Application, acme)
+        assert application is not None
+        application.stage, application.stage_changed_at = "rejected", utc_now()
+        other.add(rival_event(acme, 2, "stage_changed", from_stage="saved", to_stage="rejected"))
+
+    rival(reject)
+    response = client.patch(f"/applications/{acme}", json={"stage": "applied"})
+
+    assert response.status_code == 409, response.text
+    assert response.json() == CONCURRENT_UPDATE
+    current = client.get(f"/applications/{acme}").json()
+    assert (current["stage"], current["applied_at"]) == ("rejected", None)
+    assert [(e["sequence"], e["from_stage"], e["to_stage"]) for e in events(client, acme)] == [
+        (1, None, "saved"),
+        (2, "saved", "rejected"),
+    ]
+    retried = client.patch(f"/applications/{acme}", json={"stage": "applied"})
+    assert retried.status_code == 409
+    assert "rejected is a final stage" in retried.json()["detail"]
+
+
+def test_a_note_that_loses_the_timeline_slot_is_409_not_500(
+    client: TestClient, rival: Callable[[RivalWrite], None]
+) -> None:
+    acme = track(client, ACME)["id"]
+
+    rival(lambda other: other.add(rival_event(acme, 2, "note_added", note="theirs")))
+    response = client.patch(f"/applications/{acme}", json={"note": "mine"})
+
+    assert response.status_code == 409, response.text
+    assert response.json() == CONCURRENT_UPDATE
+    assert [e["note"] for e in events(client, acme)] == [None, "theirs"]
+    patch(client, acme, note="mine")
+    assert [e["note"] for e in events(client, acme)] == [None, "theirs", "mine"]
+
+
+def test_an_archive_that_loses_a_race_is_409_and_its_retry_is_a_no_op(
+    client: TestClient, rival: Callable[[RivalWrite], None]
+) -> None:
+    acme = track(client, ACME)["id"]
+
+    def archive(other: Session) -> None:
+        application = other.get(Application, acme)
+        assert application is not None
+        application.archived = True
+        changes = {"archived": {"from": False, "to": True}}
+        other.add(rival_event(acme, 2, "archived", changes=changes))
+
+    rival(archive)
+    response = client.post(f"/applications/{acme}/archive")
+
+    assert response.status_code == 409, response.text
+    assert response.json() == CONCURRENT_UPDATE
+    retried = client.post(f"/applications/{acme}/archive")
+    assert retried.status_code == 200
+    assert retried.json()["archived"] is True
+    assert [e["event_type"] for e in events(client, acme)] == ["tracked", "archived"]
+
+
+def test_tracking_a_job_another_request_just_tracked_is_409_not_500(
+    client: TestClient, rival: Callable[[RivalWrite], None]
+) -> None:
+    def track_acme(other: Session) -> None:
+        application = Application(job_id=ACME)
+        other.add(application)
+        other.flush()
+        other.add(rival_event(application.id, 1, "tracked", to_stage="saved"))
+
+    rival(track_acme)
+    response = client.post("/applications", json={"job_id": ACME})
+
+    assert response.status_code == 409, response.text
+    assert response.json() == {"detail": f"job {ACME} is already tracked as application 1"}
+    assert response.headers["location"].endswith("/applications/1")
+    assert client.get("/applications").headers["x-total-count"] == "1"

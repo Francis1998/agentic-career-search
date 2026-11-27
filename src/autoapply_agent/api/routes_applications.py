@@ -12,6 +12,8 @@ route submits an application or contacts an employer.
 from __future__ import annotations
 
 import logging
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from typing import Annotated, Any, Literal
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, Request, Response, status
@@ -52,6 +54,7 @@ from autoapply_agent.services.application_tracker import (
     list_applications,
     set_archived,
     track_job,
+    tracked_application_id,
     update_application,
 )
 
@@ -65,6 +68,10 @@ EXPORT_MEDIA_TYPES: dict[str, str] = {
 }
 ICS_MEDIA_TYPE = "text/calendar; charset=utf-8"
 _NOT_FOUND: dict[int | str, dict[str, Any]] = {404: {"description": "Application not found"}}
+_WRITE_RESPONSES: dict[int | str, dict[str, Any]] = {
+    **_NOT_FOUND,
+    409: {"description": "Another request changed the application meanwhile; retry"},
+}
 _CONCURRENT_UPDATE = "application was changed by another request; retry"
 
 
@@ -125,16 +132,31 @@ async def _load(session: AsyncSession, application_id: int) -> tuple[Application
     return tracked
 
 
-async def _commit(session: AsyncSession) -> None:
-    """Commit, turning a lost race on the timeline sequence into a 409."""
+@asynccontextmanager
+async def _write(session: AsyncSession) -> AsyncIterator[None]:
+    """Commit the block's writes, turning a write that lost a race into a 409.
+
+    The losing write's event collides on the unique ``(application_id, sequence)``
+    constraint when it is flushed inside the block, not only at commit.
+    """
 
     try:
+        yield
         await session.commit()
     except IntegrityError as exc:
         await session.rollback()
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT, detail=_CONCURRENT_UPDATE
         ) from exc
+
+
+def _already_tracked(request: Request, exc: AlreadyTrackedError) -> HTTPException:
+    """The ``409`` for a job that is already tracked, pointing at its application."""
+
+    location = str(request.url_for("get_application", application_id=exc.application_id))
+    return HTTPException(
+        status_code=status.HTTP_409_CONFLICT, detail=str(exc), headers={"Location": location}
+    )
 
 
 @router.post(
@@ -181,20 +203,20 @@ async def create_application(
             next_action_at=payload.next_action_at,
             next_action=payload.next_action,
         )
+        await session.commit()
     except JobNotFoundError:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="job not found") from None
     except AlreadyTrackedError as exc:
-        location = str(request.url_for("get_application", application_id=exc.application_id))
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT, detail=str(exc), headers={"Location": location}
-        ) from None
-    try:
-        await session.commit()
+        raise _already_tracked(request, exc) from None
     except IntegrityError as exc:
+        # Another request tracked the job after track_job checked for it (a double
+        # submit): answer like that check does.
         await session.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail=f"job {payload.job_id} is already tracked",
+        existing = await tracked_application_id(session, payload.job_id)
+        if existing is None:
+            raise
+        raise _already_tracked(
+            request, AlreadyTrackedError(existing, payload.job_id, same_posting=False)
         ) from exc
     logger.info(
         "application_tracked application_id=%d job_id=%d stage=%s",
@@ -441,10 +463,10 @@ async def update_tracked_application(
     application, job = await _load(session, application_id)
     now = utc_now()
     try:
-        event = await update_application(session, application, payload.to_patch(), now=now)
+        async with _write(session):
+            event = await update_application(session, application, payload.to_patch(), now=now)
     except ApplicationStageError as exc:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from None
-    await _commit(session)
     if event is not None:
         logger.info(
             "application_updated application_id=%d event=%s sequence=%d",
@@ -487,14 +509,14 @@ async def _set_archived(
 
     application, job = await _load(session, application_id)
     now = utc_now()
-    event = await set_archived(
-        session,
-        application,
-        archived,
-        now=now,
-        note=payload.note if payload is not None else None,
-    )
-    await _commit(session)
+    async with _write(session):
+        event = await set_archived(
+            session,
+            application,
+            archived,
+            now=now,
+            note=payload.note if payload is not None else None,
+        )
     if event is not None:
         logger.info(
             "application_updated application_id=%d event=%s sequence=%d",
@@ -505,7 +527,9 @@ async def _set_archived(
     return ApplicationRead.from_records(application, job, now=now)
 
 
-@router.post("/{application_id}/archive", response_model=ApplicationRead, responses=_NOT_FOUND)
+@router.post(
+    "/{application_id}/archive", response_model=ApplicationRead, responses=_WRITE_RESPONSES
+)
 async def archive_application(
     application_id: ApplicationId,
     payload: ApplicationArchiveRequest | None = Body(default=None),
@@ -525,7 +549,9 @@ async def archive_application(
     return await _set_archived(session, application_id, True, payload)
 
 
-@router.post("/{application_id}/unarchive", response_model=ApplicationRead, responses=_NOT_FOUND)
+@router.post(
+    "/{application_id}/unarchive", response_model=ApplicationRead, responses=_WRITE_RESPONSES
+)
 async def unarchive_application(
     application_id: ApplicationId,
     payload: ApplicationArchiveRequest | None = Body(default=None),
