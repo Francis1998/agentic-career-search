@@ -207,3 +207,23 @@ def test_min_gap_minutes_includes_the_wrap_to_the_next_day(expression: str, gap:
 def test_load_zone_rejects_names_outside_the_iana_database(name: str) -> None:
     with pytest.raises(CronError, match="unknown time zone"):
         load_zone(name)
+
+
+@pytest.mark.parametrize(
+    ("after", "expected"),
+    [
+        ("2026-11-27T00:00:00+00:00", "2032-02-29T00:00:00+00:00"),
+        ("2032-03-01T00:00:00+00:00", "2060-02-29T00:00:00+00:00"),
+        # 2100 is not a leap year: the next Sunday, 29 February is 40 years later.
+        ("2088-03-01T00:00:00+00:00", "2128-02-29T00:00:00+00:00"),
+    ],
+)
+def test_sparse_day_of_month_and_weekday_intersections_keep_firing(
+    after: str, expected: str
+) -> None:
+    # "*/7" starts with "*", so both day fields must match: 29 February on a Sunday.
+    expression = parse_cron("0 0 29 2 */7")
+
+    fire = expression.next_fire(datetime.fromisoformat(after), load_zone("UTC"))
+
+    assert fire == datetime.fromisoformat(expected)
