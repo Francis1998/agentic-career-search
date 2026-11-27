@@ -102,8 +102,14 @@ class RunScheduler:
             try:
                 async with self._session_factory() as session:
                     outcome = await process_due_schedule(session, schedule_id, now=instant)
-            except Exception:
-                logger.exception("schedule tick failed", extra={"schedule_id": schedule_id})
+            except Exception as exc:
+                # Type only, no text or traceback: SQLAlchemy errors render their bound
+                # parameters, which hold query terms and schedule names.
+                logger.error(
+                    "schedule_tick_failed schedule_id=%d error=%s",
+                    schedule_id,
+                    type(exc).__name__,
+                )
                 continue
             if outcome is None:
                 continue
