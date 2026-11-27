@@ -9,12 +9,18 @@ from urllib.parse import urlparse
 
 import httpx
 
+from autoapply_agent.services.compensation import Compensation
+
 _LOCATION_CLASS_TOKEN = re.compile(r"(?:^|[-_])location", re.IGNORECASE)
 
 
 @dataclass(slots=True, frozen=True)
 class JobCandidate:
-    """Normalized job candidate returned by source adapters."""
+    """Normalized job candidate returned by source adapters.
+
+    ``compensation`` is the pay range the adapter read from the posting (structured
+    data first, else its description), or None when the source states no pay.
+    """
 
     external_id: str | None
     title: str
@@ -22,6 +28,7 @@ class JobCandidate:
     company: str | None
     url: str
     raw: dict[str, object] | None
+    compensation: Compensation | None = None
 
 
 class SourceAdapterError(RuntimeError):

@@ -5,6 +5,8 @@
   prefixed with ``'`` so spreadsheets show them as text instead of formulas.
 * Only absolute ``http``/``https`` job URLs are emitted as links (CSV + Atom).
 * JSON Lines rows use the ``JobRead`` API schema, so they round-trip losslessly.
+* Pay appears as the stated range, its interval and source plus the annualized,
+  filterable ``salary_*`` columns (CSV), and as a ``Pay:`` part of each Atom summary.
 * The Atom feed (RFC 4287) is built with :mod:`xml.etree.ElementTree`, which
   escapes markup; characters that XML 1.0 forbids are stripped first.
 """
@@ -24,6 +26,7 @@ from urllib.parse import urlsplit
 
 from autoapply_agent.db.models import Job
 from autoapply_agent.schemas.jobs import JobRead
+from autoapply_agent.services.compensation import Compensation, describe_pay
 from autoapply_agent.services.job_search import PostingIdentity, as_utc, is_remote_location
 
 CSV_COLUMNS: tuple[str, ...] = (
@@ -40,6 +43,13 @@ CSV_COLUMNS: tuple[str, ...] = (
     "run_id",
     "external_id",
     "created_at",
+    "salary_min",
+    "salary_max",
+    "salary_interval",
+    "salary_currency",
+    "salary_min_annual",
+    "salary_max_annual",
+    "salary_source",
 )
 ATOM_NAMESPACE = "http://www.w3.org/2005/Atom"
 PROJECT_URL = "https://github.com/Francis1998/agentic-career-search"
@@ -101,6 +111,22 @@ def _raw_text(job: Job, *path: str) -> str:
     return node if isinstance(node, str) else ""
 
 
+def job_pay(job: Job) -> Compensation | None:
+    """The captured pay of a job (``raw["compensation"]``), or None without pay columns."""
+
+    if job.salary_currency is None or not isinstance(job.raw, dict):
+        return None
+    return Compensation.from_payload(job.raw.get("compensation"))
+
+
+def _cell(value: int | float | str | None) -> str:
+    """Render an optional number or code; text is neutralized like every other cell."""
+
+    if value is None:
+        return ""
+    return neutralize_csv_cell(value) if isinstance(value, str) else str(value)
+
+
 def job_csv_row(job: Job) -> list[str]:
     """Flatten one job into a CSV row matching :data:`CSV_COLUMNS`.
 
@@ -125,6 +151,23 @@ def job_csv_row(job: Job) -> list[str]:
         neutralize_csv_cell(job.run_id),
         neutralize_csv_cell(job.external_id or ""),
         rfc3339(job.created_at),
+        *_pay_cells(job),
+    ]
+
+
+def _pay_cells(job: Job) -> list[str]:
+    """The ``salary_*`` cells: stated range and source from ``raw``, annualized columns."""
+
+    pay = job_pay(job)
+    payload = pay.to_payload() if pay is not None else {}
+    stated = [payload.get(key) for key in ("min_amount", "max_amount")]
+    return [
+        *(_cell(value) if isinstance(value, (int, float)) else "" for value in stated),
+        _cell(job.salary_interval),
+        _cell(job.salary_currency),
+        _cell(job.salary_min_annual),
+        _cell(job.salary_max_annual),
+        _cell(pay.source.value if pay is not None else None),
     ]
 
 
@@ -207,9 +250,11 @@ def entry_summary(job: Job) -> str:
     """Build the plain-text Atom entry summary."""
 
     priority = _raw_text(job, "agent_decision", "priority_tier") or "n/a"
+    pay = job_pay(job)
     return (
         f"Company: {job.company or 'n/a'} | Location: {job.location or 'n/a'} | "
         f"Remote: {'yes' if is_remote_location(job.location) else 'no'} | "
+        f"Pay: {describe_pay(pay) if pay is not None else 'n/a'} | "
         f"Score: {job.score:.2f} | Priority: {priority}"
     )
 

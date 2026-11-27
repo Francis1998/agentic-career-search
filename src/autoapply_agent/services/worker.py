@@ -13,6 +13,7 @@ from autoapply_agent.adapters.base import CareerSourceAdapter, SourceAdapterErro
 from autoapply_agent.core.time import utc_now
 from autoapply_agent.db.models import Job, Run, RunStatus, SourceConfig, SourceType
 from autoapply_agent.services.agent_decision import AgentDecision, AgentDecisionEngine
+from autoapply_agent.services.compensation import compensation_columns
 from autoapply_agent.services.events import append_run_event
 from autoapply_agent.services.llm_enrichment import LLMEnrichmentResult, LLMEnrichmentService
 from autoapply_agent.services.planning import DeterministicPlanningService
@@ -247,6 +248,10 @@ class InProcessWorker:
                     query=run.query,
                     deterministic_rationale=decision.rationale,
                 )
+            raw = self._build_job_raw_payload(job_candidate.raw, decision, llm_enrichment)
+            # Pay is informational: it is stored for filters and exports, never scored.
+            if job_candidate.compensation is not None:
+                raw["compensation"] = job_candidate.compensation.to_payload()
             # Insert the job before its events: on SQLite the INSERT takes the write lock
             # first, so the event sequence read next counts events the API (a cancel)
             # committed while the provider call was in flight.
@@ -261,7 +266,8 @@ class InProcessWorker:
                     url=job_candidate.url,
                     score=decision.score,
                     plan_steps=self._build_plan_steps(decision, llm_enrichment),
-                    raw=self._build_job_raw_payload(job_candidate.raw, decision, llm_enrichment),
+                    raw=raw,
+                    **compensation_columns(job_candidate.compensation),
                 )
             )
             await session.flush()

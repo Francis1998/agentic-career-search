@@ -7,6 +7,7 @@ from enum import StrEnum
 
 from sqlalchemy import (
     JSON,
+    BigInteger,
     Boolean,
     DateTime,
     Float,
@@ -235,6 +236,14 @@ class Job(Base):
         # Back the job search orderings (newest / score) and their keyset batches.
         Index("ix_jobs_created_at_id", "created_at", "id"),
         Index("ix_jobs_score_created_at_id", "score", "created_at", "id"),
+        # Backs the salary filters (always per currency) and the salary sort.
+        Index(
+            "ix_jobs_salary_currency_max_annual_created_at_id",
+            "salary_currency",
+            "salary_max_annual",
+            "created_at",
+            "id",
+        ),
     )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
@@ -254,6 +263,12 @@ class Job(Base):
     score: Mapped[float] = mapped_column(Float, nullable=False)
     plan_steps: Mapped[list[str]] = mapped_column(JSON, nullable=False)
     raw: Mapped[dict[str, object] | None] = mapped_column(JSON, nullable=True)
+    # Pay transparency: the annualized range of ``raw["compensation"]`` (see
+    # :mod:`autoapply_agent.services.compensation`); all NULL when no pay was captured.
+    salary_min_annual: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
+    salary_max_annual: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
+    salary_currency: Mapped[str | None] = mapped_column(String(3), nullable=True)
+    salary_interval: Mapped[str | None] = mapped_column(String(8), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, default=utc_now
     )

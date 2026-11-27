@@ -568,3 +568,85 @@ def test_jsonld_on_site_and_hybrid_postings_stay_non_remote(
 
     assert location == expected
     assert not is_remote_location(location)
+
+
+def _posting_html(**fields: object) -> str:
+    """A page with one JobPosting carrying ``fields`` besides a title and URL."""
+
+    posting = {"@type": "JobPosting", "title": "Engineer", "url": "/jobs/1", **fields}
+    return f'<script type="application/ld+json">{json.dumps(posting)}</script>'
+
+
+GOOGLE_BASE_SALARY = {
+    "@type": "MonetaryAmount",
+    "currency": "USD",
+    "value": {
+        "@type": "QuantitativeValue",
+        "minValue": 120000,
+        "maxValue": 150000,
+        "unitText": "YEAR",
+    },
+}
+
+
+@pytest.mark.parametrize(
+    ("fields", "expected"),
+    [
+        ({"baseSalary": GOOGLE_BASE_SALARY}, (120_000, 150_000, "USD", "year", "structured")),
+        (
+            {
+                "salaryCurrency": "EUR",
+                "baseSalary": {"value": {"value": 40.0, "unitText": "HOUR"}},
+            },
+            (40, 40, "EUR", "hour", "structured"),
+        ),
+        (
+            {
+                "description": "&lt;p&gt;The base pay range is $95,000&amp;ndash;$105,000."
+                "&lt;/p&gt;&lt;p&gt;$1,000 learning budget&lt;/p&gt;"
+            },
+            (95_000, 105_000, "USD", "year", "description"),
+        ),
+        (
+            # Unusable structured pay (no unitText) falls back to the description.
+            {
+                "baseSalary": {"currency": "USD", "value": {"value": 50}},
+                "description": "<p>Pay: $50 per hour</p>",
+            },
+            (50, 50, "USD", "hour", "description"),
+        ),
+    ],
+)
+def test_jsonld_maps_base_salary_then_description_pay(
+    fields: dict[str, object], expected: tuple[float, float, str, str, str]
+) -> None:
+    adapter = JsonLdAdapter(user_agent="test-agent")
+
+    (job,) = adapter._parse_html("https://acme.example.com", _posting_html(**fields), 10)
+
+    pay = job.compensation
+    assert pay is not None
+    assert (pay.min_amount, pay.max_amount, pay.currency, pay.interval, pay.source) == expected
+
+
+@pytest.mark.parametrize(
+    "fields",
+    [
+        {},
+        {"description": "Competitive salary, $50 stipend and a $5M Series A."},
+        {
+            "estimatedSalary": {
+                "@type": "MonetaryAmountDistribution",
+                "currency": "USD",
+                "median": 140000,
+                "unitText": "YEAR",
+            }
+        },
+    ],
+)
+def test_jsonld_without_stated_pay_has_no_compensation(fields: dict[str, object]) -> None:
+    adapter = JsonLdAdapter(user_agent="test-agent")
+
+    (job,) = adapter._parse_html("https://acme.example.com", _posting_html(**fields), 10)
+
+    assert job.compensation is None

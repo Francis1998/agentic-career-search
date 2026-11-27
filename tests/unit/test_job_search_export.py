@@ -190,6 +190,13 @@ def test_job_csv_row_matches_columns_and_handles_missing_fields() -> None:
         "run_id": "run-1",
         "external_id": "ext-7",
         "created_at": "2026-11-06T18:30:05Z",
+        "salary_min": "",
+        "salary_max": "",
+        "salary_interval": "",
+        "salary_currency": "",
+        "salary_min_annual": "",
+        "salary_max_annual": "",
+        "salary_source": "",
     }
     assert sparse["company"] == sparse["location"] == sparse["priority_tier"] == ""
     assert sparse["remote"] == "false"
@@ -259,7 +266,8 @@ def test_render_atom_feed_with_and_without_entries() -> None:
     assert entry.findtext(f"{ATOM}published") == "2026-11-05T08:00:00Z"
     assert entry.findtext(f"{ATOM}id") == entry_id(_posting())
     assert entry.findtext(f"{ATOM}summary") == (
-        "Company: Acme | Location: Remote - US | Remote: yes | Score: 0.88 | Priority: high"
+        "Company: Acme | Location: Remote - US | Remote: yes | Pay: n/a | Score: 0.88 | "
+        "Priority: high"
     )
 
 

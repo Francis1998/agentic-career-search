@@ -470,7 +470,8 @@ def test_atom_feed_is_well_formed_rfc4287(client: TestClient) -> None:
     assert alternate is not None
     assert alternate.get("href") == "https://jobs.lever.co/globex/py"
     assert newest.findtext(f"{ATOM}summary") == (
-        "Company: Globex | Location: Anywhere | Remote: yes | Score: 0.88 | Priority: high"
+        "Company: Globex | Location: Anywhere | Remote: yes | Pay: n/a | Score: 0.88 | "
+        "Priority: high"
     )
     ids = [entry.findtext(f"{ATOM}id") for entry in entries]
     assert len(set(ids)) == len(ids)
