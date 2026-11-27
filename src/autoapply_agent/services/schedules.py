@@ -315,17 +315,22 @@ async def last_run_status(session: AsyncSession, schedule: RunSchedule) -> str |
 
 
 async def due_schedule_ids(session: AsyncSession, *, now: datetime, limit: int) -> list[int]:
-    """Ids of unpaused schedules due at ``now``, and of schedules holding a buffered fire.
+    """Ids of the schedules a tick can act on at ``now``.
 
-    A paused schedule only holds a buffered fire when a manual trigger buffered it.
+    That is unpaused schedules that are due, and schedules whose buffered fire can start
+    because the run it waited for has ended (a paused schedule only holds a buffered fire
+    when a manual trigger buffered it). Buffers still waiting are left out, so they never
+    fill the batch and keep due schedules from firing.
     """
 
+    run_ended = or_(Run.id.is_(None), Run.status.not_in(list(ACTIVE_RUN_STATUSES)))
     rows = await session.scalars(
         select(RunSchedule.id)
+        .outerjoin(Run, Run.id == RunSchedule.last_run_id)
         .where(
             or_(
                 and_(RunSchedule.paused.is_(False), RunSchedule.next_run_at <= as_utc(now)),
-                RunSchedule.buffered_at.is_not(None),
+                and_(RunSchedule.buffered_at.is_not(None), run_ended),
             )
         )
         .order_by(RunSchedule.next_run_at.asc(), RunSchedule.id.asc())
