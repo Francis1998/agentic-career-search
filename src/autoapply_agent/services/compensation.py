@@ -88,23 +88,40 @@ def normalize_currency(code: object) -> str | None:
     return candidate if candidate in ISO_4217_CODES else None
 
 
+_US_GROUPED_NUMBER = re.compile(r"\d{1,3}(?:,\d{3})+(?:\.\d+)?")
+
+
 def _amount(value: object) -> float | None:
-    """Return a finite positive number from a JSON number or numeric string."""
+    """Return a finite positive number from a JSON number or a numeric string.
+
+    Strings are read as plain numbers (``"50000.000"`` is 50,000; ``"120,000"`` with
+    comma grouping is accepted too); the localized grouping rules of posting text only
+    apply in :func:`compensation_from_text`.
+    """
 
     if isinstance(value, bool):
         return None
     if isinstance(value, str):
-        value = _parse_number(value.strip())
+        text = value.strip()
+        if _US_GROUPED_NUMBER.fullmatch(text):
+            text = text.replace(",", "")
+        try:
+            value = float(text)
+        except ValueError:
+            return None
     if not isinstance(value, (int, float)):
         return None
-    number = float(value)
+    try:
+        number = float(value)
+    except OverflowError:
+        return None
     return number if math.isfinite(number) and number > 0 else None
 
 
 def _plain(value: float) -> int | float:
-    """JSON-friendly amount: an int when whole, else rounded to cents."""
+    """JSON-friendly amount: an int when whole, else the exact float (no rounding)."""
 
-    return int(value) if value.is_integer() else round(value, 2)
+    return int(value) if value.is_integer() else value
 
 
 @dataclass(slots=True, frozen=True)
@@ -317,21 +334,36 @@ def compensation_from_monetary_amount(
         (``unitText``) or a closed range is missing; one-sided ranges are skipped.
     """
 
-    if isinstance(value, list):
-        for item in value:
-            found = compensation_from_monetary_amount(item, default_currency=default_currency)
+    for amount in value if isinstance(value, list) else [value]:
+        if not isinstance(amount, Mapping):
+            continue
+        inner = amount.get("value")
+        for quantity in inner if isinstance(inner, list) else [inner]:
+            found = _from_quantity(amount, quantity, default_currency)
             if found is not None:
                 return found
-        return None
-    if not isinstance(value, Mapping):
-        return None
-    currency = _first_text(value.get("currency")) or _first_text(default_currency)
-    inner = value.get("value")
-    if isinstance(inner, list):
-        inner = inner[0] if inner else None
-    quantity: Mapping[str, Any] = inner if isinstance(inner, Mapping) else value
+    return None
+
+
+def _from_quantity(
+    amount: Mapping[str, Any], inner: object, default_currency: object
+) -> Compensation | None:
+    """Build a range from one ``MonetaryAmount`` and one of its ``value`` entries.
+
+    Args:
+        amount: The ``MonetaryAmount`` object (currency, optionally ``minValue`` /
+            ``maxValue`` / ``unitText`` of its own).
+        inner: One ``value`` entry: a ``QuantitativeValue`` or a plain number.
+        default_currency: The posting's ``salaryCurrency``.
+
+    Returns:
+        A ``structured`` range, or None when it is incomplete or invalid.
+    """
+
+    currency = _first_text(amount.get("currency")) or _first_text(default_currency)
+    quantity: Mapping[str, Any] = inner if isinstance(inner, Mapping) else amount
     single = quantity.get("value") if isinstance(inner, Mapping) else inner
-    unit = _first_text(quantity.get("unitText")) or _first_text(value.get("unitText"))
+    unit = _first_text(quantity.get("unitText")) or _first_text(amount.get("unitText"))
     interval = _unit_interval(unit)
     minimum, maximum = _amount(quantity.get("minValue")), _amount(quantity.get("maxValue"))
     if minimum is None and maximum is None:
