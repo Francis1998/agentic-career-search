@@ -203,11 +203,14 @@ machine-readable `details` (`planned_at`, `late_seconds`,
 
 ### Exactly-once claims
 
-Each tick lists the due schedules, then handles every one in its own transaction: it
-queues the run, then claims the fire with one conditional `UPDATE … WHERE next_run_at =
-<value read> AND last_run_id IS <value read>`. If another tick, process or trigger got
-there first, the update matches no row and the whole transaction — the queued run
-included — rolls back. Two API processes sharing a database therefore never fire a
+Each tick lists the schedules it can act on (due ones, and buffered fires whose run has
+ended — buffers still waiting never take a slot of the batch), then handles every one in
+its own transaction: it queues the run, then claims the fire with one conditional
+`UPDATE … WHERE next_run_at = <value read> AND last_run_id IS <value read> AND updated_at =
+<value read>`. If another tick, process or trigger got there first — or a `PATCH`, pause
+or resume changed the configuration the decision was based on — the update matches no
+row and the whole transaction, the queued run included, rolls back; the next tick decides
+again with the current configuration. Two API processes sharing a database therefore never fire a
 schedule twice, and a manual trigger racing a tick returns `409` instead of starting a
 second concurrent run.
 
@@ -238,7 +241,9 @@ on every Monday. If one field starts with `*` (including `*/2`), both must match
 
 Expressions that can never fire (`0 0 30 2 *`), have the wrong number of fields, use
 out-of-range values or unknown names are rejected with the field and the reason, e.g.
-`invalid cron expression: minute: 61 is outside 0-59`. Seconds, years, `L`, `W`, `#` and
+`invalid cron expression: minute: 61 is outside 0-59`. Sparse ones are fine: fire times
+are searched across a full 400-year calendar cycle, so `0 0 29 2 */7` (29 February on a
+Sunday) keeps firing in 2032, 2060, 2088 and then 2128. Seconds, years, `L`, `W`, `#` and
 `?` are not supported.
 
 Recipes:
@@ -537,6 +542,7 @@ Deleting a schedule deletes its history; the runs it queued, and their jobs, sta
 | Paused, resumed, and the missed runs never came | By design: resume never catches up. Use `trigger` to run once now. |
 | `409 schedule was changed by another request or tick; retry` | A tick or another trigger fired at the same moment; retry the trigger. |
 | `no such table: run_schedules` | An older database: run `alembic upgrade head`. |
+| Log line `schedule_tick_failed schedule_id=3 error=OperationalError` | That schedule's tick failed (e.g. a locked database, or a time zone missing on this machine); other schedules keep firing and the next tick retries. The line carries only the exception type, on purpose: database errors embed query terms. Inspect `GET /schedules/3`. |
 
 ## FAQ
 
