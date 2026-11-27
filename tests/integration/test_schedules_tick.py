@@ -404,3 +404,19 @@ async def test_a_trigger_buffered_while_paused_starts_when_the_run_finishes(
     assert [outcome.kind for outcome in started] == [ScheduleEventKind.FIRED]
     schedule = await _schedule(factory, schedule_id)
     assert (schedule.paused, schedule.next_run_at, schedule.buffered_at) == (True, None, None)
+
+
+async def test_buffers_waiting_on_active_runs_do_not_starve_due_schedules(
+    factory: Factory,
+) -> None:
+    blocked_id = await _create(factory, name="blocked", overlap_policy="buffer_one", paused=True)
+    async with factory() as session:
+        blocked = await session.get(RunSchedule, blocked_id)
+        assert blocked is not None
+        await trigger_schedule(session, blocked, now=T0)
+        await trigger_schedule(session, blocked, now=T0)
+    due_id = await _create(factory, name="due")
+
+    outcomes = await RunScheduler(factory, tick_seconds=60, batch_size=1).tick(T0)
+
+    assert [outcome.schedule_id for outcome in outcomes] == [due_id]
